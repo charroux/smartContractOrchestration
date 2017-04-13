@@ -1,0 +1,16 @@
+instruction :
+
+- convertOrder :
+- compute orderConverter
+
+- evaluateVendor1 :
+- compute vendor1
+
+- evaluateVendor2 :
+- compute vendor2
+
+- evaluateVendor3 :
+- compute vendor3
+
+- selectBestVendor :
+- compute selectBestVendor

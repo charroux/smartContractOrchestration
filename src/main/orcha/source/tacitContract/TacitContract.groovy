@@ -1,0 +1,13 @@
+package source.tacitContract
+
+receive drivingLicence from drivingLicenceRepository
+compute checkDrivingLicenceValidity with drivingLicence.value
+
+receive carInsurance from carInsuranceRepository
+compute checkCarInsuranceValidity with carInsurance.value
+
+when "checkDrivingLicenceValidity terminates and checkCarInsuranceValidity terminates"
+compute authorizeTaxi with checkDrivingLicenceValidity.result, checkCarInsuranceValidity.result
+
+when "authorizeTaxi terminates"
+send authorizeTaxi.result to prefecture
