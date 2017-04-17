@@ -1,0 +1,10 @@
+instruction :
+
+- prepareCommand :
+
+- receive order from curstomer
+- compute prepareCommand with order.value
+- when 'prepreCommand terminates' send prepareCommand.result to curstomer
+
+- comman :
+- compute essai
