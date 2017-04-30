@@ -35,7 +35,6 @@ class ConfigurationPropertiesGenerator {
 		def propertiesMetadata = []
 		
 		JCodeModel codeModel = new JCodeModel();
-		//def className = 'orcha.lang.smartcontract.configure.driving.TacitContractProperties'
 		def className = 'orcha.lang.configure.ConfigurationProperties'
 		JDefinedClass contractPropertyClass = codeModel._class(JMod.PUBLIC, className, ClassType.CLASS)
 		
@@ -61,7 +60,7 @@ class ConfigurationPropertiesGenerator {
 				
 				Output output = instruction.springBean.output
 				
-				if(output != null){
+				if(output!=null && output.adapter!=null){
 					
 					def properties = output.adapter.properties
 					

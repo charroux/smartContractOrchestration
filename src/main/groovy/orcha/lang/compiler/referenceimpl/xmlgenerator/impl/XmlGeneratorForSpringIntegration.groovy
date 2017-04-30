@@ -73,7 +73,7 @@ class XmlGeneratorForSpringIntegration implements XmlGenerator{
 	
 	@Override
 	void generate(OrchaCodeParser orchaCodeParser, String xmlSpringContextFile, String xmlQoSSpringContextFile){
-	
+		
 		this.propagateReceiveEvent(orchaCodeParser)
 				
 		// Connect together mainly channels of Spring integration

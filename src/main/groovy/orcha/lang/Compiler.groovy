@@ -3,6 +3,7 @@ package orcha.lang
 import orcha.lang.business.BusinessAdapter
 import orcha.lang.business.BasicBusinessAdapter
 import orcha.lang.compiler.Compile;
+import orcha.lang.compiler.OrchaConfigurationException
 import orcha.lang.compiler.qualityOfService.QualityOfService
 import orcha.lang.compiler.qualityOfService.QualityOfServiceImpl
 import orcha.lang.compiler.referenceimpl.CompileServiceWithSpringIntegration
@@ -12,6 +13,7 @@ import orcha.lang.compiler.visitor.impl.OrchaCodeVisitor
 
 import org.codehaus.groovy.ast.ClassCodeVisitorSupport;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration
 import org.springframework.context.annotation.Bean
@@ -20,11 +22,10 @@ import org.springframework.context.annotation.ComponentScan
 import org.springframework.context.annotation.ImportResource;
 
 @Configuration
-//@EnableAutoConfiguration
-@ComponentScan(basePackages=['orcha.lang.compiler','orcha.lang.business','configuration'])	
-class Compiler {
+@ComponentScan(basePackages=['orcha.lang.compiler','orcha.lang.business','configuration'])
+class Compiler implements CommandLineRunner{
 	
-	@Bean
+	/*@Bean
 	Compile compile(){
 		return new CompileServiceWithSpringIntegration()
 	}
@@ -42,6 +43,38 @@ class Compiler {
 	@Bean
 	QualityOfService qualityOfService(){
 		return new QualityOfServiceImpl()
+	}*/
+	
+	@Autowired
+	BusinessAdapter businessAdapter
+	
+	@Autowired
+	Compile compile
+	
+	@Autowired
+	OrchaCodeParser composeCodeParser
+
+	@Override
+	public void run(String... args) throws Exception {
+		
+		if(args.length != 1){
+			throw new OrchaConfigurationException("Usage: orchaSourceFile.\nAn orcha source file (.orcha or .groovy extension) should be in ./orcha/source\nPut the file name without the extension (.orcha or .groovy) as the argument of this command.\nIf the orcha file is in a subdirectory of ./orcha/source, add this subdirectory to the command line like directoryName/orchaFileNameWithOutExtension")
+		}
+		
+		String orchaFile = args[0]
+		
+		if(orchaFile.endsWith(".orcha")){
+			orchaFile = businessAdapter.adaptOrchaFileToBusiness(orchaFile)
+		}
+		
+		if(orchaFile.endsWith(".groovy") == false){
+			throw new OrchaConfigurationException("An orcha source file (.orcha or .groovy extension) should be in ./orcha/source\nPut the file name without the extension (.orcha or .groovy) as the argument of this command.\nIf the orcha file is in a subdirectory of ./orcha/source, add this subdirectory to the command line like directoryNama/orchaFileNameWithOutExtension")
+		}
+				
+		composeCodeParser.parseSourceFile(orchaFile)
+		
+		compile.compile(composeCodeParser)
+				
 	}
 	
 	public static void main(String[] args) {

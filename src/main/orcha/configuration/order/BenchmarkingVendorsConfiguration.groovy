@@ -1,6 +1,7 @@
 package configuration.order
 
 import groovy.transform.ToString;
+import groovy.util.logging.Slf4j
 
 import java.text.SimpleDateFormat
 
@@ -34,8 +35,9 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy
 import org.springframework.context.annotation.Profile
 
 import service.order.Order
-import service.order.VendorComparison;
-import service.order.VendorOrderConverter
+import service.order.Product
+import service.order.SpecificOrder
+import service.order.VendorComparison
 
 /*import org.aspectj.lang.JoinPoint
 import org.aspectj.lang.annotation.After
@@ -100,6 +102,7 @@ class OutputFile2EventHandler extends EventHandler{
  *
  */
 @Configuration
+@Slf4j
 //@Profile("myBusinessProfile")
 class BenchmarkingVendorsConfiguration {
 	
@@ -114,8 +117,9 @@ class BenchmarkingVendorsConfiguration {
 	@Bean
 	EventHandler customer(){
 		def eventHandler = new CustomerEventHandler(name: "customer")
-		def fileAdapter = new InputFileAdapter(directory: 'C:/Users/Charroux_std/Documents/projet/ExecAndShare/orcha/Orcha/input', filenamePattern: "orderTV.json")
-		eventHandler.input = new Input(mimeType: "application/json", type: "service.order.Order", adapter: fileAdapter)
+		//def fileAdapter = new InputFileAdapter(directory: 'C:/Users/Charroux_std/Documents/projet/ExecAndShare/orcha/Orcha/input', filenamePattern: "orderTV.json")
+		//eventHandler.input = new Input(mimeType: "application/json", type: "service.order.Order", adapter: fileAdapter)
+		eventHandler.input = new Input(mimeType: "application/json", type: "service.order.Order")
 		return eventHandler
 	}
 	
@@ -127,24 +131,70 @@ class BenchmarkingVendorsConfiguration {
 	 * and returns the type SpecificOrder (see service/order/SpecificOrder)
 	 * @return
 	 */
-	@Bean
+/*	@Bean
 	Application orderConverter(){
 		def program = new OrderConverterApplication(name: "orderConverter", language: "Groovy")
-		def javaAdapter = new JavaServiceAdapter(javaClass: 'VendorOrderConverter', method:'convert')
+		//def javaAdapter = new JavaServiceAdapter(javaClass: 'VendorOrderConverter', method:'convert')
+		def javaAdapter = new JavaServiceAdapter(javaClass: 'VendorOrderConverterInterface', method:'convert')
 		program.input = new Input(type: "service.order.Order", adapter: javaAdapter)
 		program.output = new Output(type: "service.order.SpecificOrder", adapter: javaAdapter)
 		return program
+	}*/
+
+	@Bean
+	Application orderConverter(){
+		def program = new OrderConverterApplication(name: "orderConverter", specifications: "bla bla", description: "bla bla")
+		program.input = new Input(type: "service.order.Order")
+		program.output = new Output(type: "service.order.SpecificOrder")
+		return program
 	}
+	
+/*	{
+		"name": "orderConverter", 
+		"specifications": "bla bla", 
+		"description": "bla bla"),
+		"input" : {
+			"type": "service.order.Order"
+		} 
+		"output" : {
+			"type": "service.order.Order"
+		}
+	}*/
 	
 	/**
 	 * Defines the program to be launched by "compute orderConverter"
 	 * See service/order/VendorOrderConverter.groovy
 	 * @return
 	 */
-	@Bean
+/*	@Bean
 	VendorOrderConverter vendorOrderConverter(){
 		return new VendorOrderConverter()
-	}
+	}*/
+	
+	/*@Bean
+	VendorOrderConverter vendorOrderConverter(){
+		VendorOrderConverter vendorOrderConverter  = org.mockito.Mockito.spy(VendorOrderConverter.class)
+		Product p = new Product();
+		p.setSpecification("TV");
+		Order order = new Order();
+		order.setNumber(1);
+		order.setProduct(p);
+		SpecificOrder specificOrder = new SpecificOrder();
+		specificOrder.setNumber(1111);
+		specificOrder.setProduct("azerty");
+		org.mockito.Mockito.when(vendorOrderConverter.convert(order)).thenReturn( specificOrder );
+		return vendorOrderConverter
+	}*/
+	
+/*	@Bean
+	VendorOrderConverterInterface vendorOrderConverterInterface(){
+		VendorOrderConverterInterface vendorOrderConverter  = org.mockito.Mockito.mock(VendorOrderConverterInterface.class)
+		Product p = new Product(specification: "TV")
+		Order order = new Order(number: 1, product: p);
+		org.mockito.Mockito.when(vendorOrderConverter.convert(order)).thenReturn( new SpecificOrder(number: 1111, product: "azerty") );
+		log.info "-------------------------------------------vendorOrderConverterInterface : " + vendorOrderConverter
+		return vendorOrderConverter
+	}*/
 	
 	/**
 	 * Defines vendor1 used in: compute vendor1 with orderConverter.result
@@ -202,16 +252,18 @@ class BenchmarkingVendorsConfiguration {
 	@Bean
 	EventHandler outputFile1(){
 		def eventHandler = new OutputFile1EventHandler(name: "outputFile1")
-		def fileAdapter = new OutputFileAdapter(directory: 'C:/Users/Charroux_std/Documents/projet/ExecAndShare/orcha/Orcha/output', createDirectory: true, filename:'output1.txt', appendNewLine: true, writingMode: WritingMode.REPLACE)
-		eventHandler.output = new Output(mimeType: "application/json", type: "service.order.Bill", adapter: fileAdapter)
+		//def fileAdapter = new OutputFileAdapter(directory: 'C:/Users/Charroux_std/Documents/projet/ExecAndShare/orcha/Orcha/output', createDirectory: true, filename:'output1.txt', appendNewLine: true, writingMode: WritingMode.REPLACE)
+		//eventHandler.output = new Output(mimeType: "application/json", type: "service.order.Bill", adapter: fileAdapter)
+		eventHandler.output = new Output(mimeType: "application/json", type: "service.order.Bill")
 		return eventHandler
 	}
 	
 	@Bean
 	EventHandler outputFile2(){
 		def eventHandler = new OutputFile2EventHandler(name: "outputFile2")
-		def fileAdapter = new OutputFileAdapter(directory: 'C:/Users/Charroux_std/Documents/projet/ExecAndShare/orcha/Orcha/output', createDirectory: true, filename:'output2.txt', appendNewLine: true, writingMode: WritingMode.REPLACE)
-		eventHandler.output = new Output(mimeType: "application/json", type: "service.order.Bill", adapter: fileAdapter)
+		//def fileAdapter = new OutputFileAdapter(directory: 'C:/Users/Charroux_std/Documents/projet/ExecAndShare/orcha/Orcha/output', createDirectory: true, filename:'output2.txt', appendNewLine: true, writingMode: WritingMode.REPLACE)
+		//eventHandler.output = new Output(mimeType: "application/json", type: "service.order.Bill", adapter: fileAdapter)
+		eventHandler.output = new Output(mimeType: "application/json", type: "service.order.Bill")
 		return eventHandler
 	}
 }

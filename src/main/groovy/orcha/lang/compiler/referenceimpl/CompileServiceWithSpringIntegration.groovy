@@ -7,6 +7,7 @@ import orcha.lang.compiler.OrchaCompilationException
 import orcha.lang.compiler.OrchaConfigurationException
 import orcha.lang.compiler.InstructionNode
 import orcha.lang.compiler.referenceimpl.configurationproperties.ConfigurationPropertiesGenerator
+import orcha.lang.compiler.referenceimpl.testing.ConfigurationMockGenerator
 import orcha.lang.compiler.referenceimpl.xmlgenerator.XmlGenerator
 import orcha.lang.compiler.referenceimpl.xmlgenerator.connectors.SpringIntegrationConnectors
 import orcha.lang.compiler.referenceimpl.xmlgenerator.impl.ErrorUnwrapper;
@@ -16,6 +17,7 @@ import orcha.lang.compiler.visitor.OrchaCodeParser
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan
 import org.springframework.context.annotation.Configuration;
 
 import java.io.File;
@@ -28,32 +30,33 @@ import java.util.Map;
 
 @Slf4j
 @Configuration
+@ComponentScan(basePackages=['orcha.lang.compiler.referenceimpl.xmlgenerator'])
 class CompileServiceWithSpringIntegration implements Compile{
 	
-	@Bean
+/*	@Bean
 	XmlGenerator xmlGenerator(){
 		return new XmlGeneratorForSpringIntegration()
-	}
+	}*/
 	
-	@Bean
+	/*@Bean
 	SpringIntegrationConnectors connectors(){
 		return new SpringIntegrationConnectors()
-	}
+	}*/
 	
-	@Bean
+/*	@Bean
 	ConfigurationPropertiesGenerator configurationPropertiesGenerator(){
 		return new ConfigurationPropertiesGenerator()
-	}
+	}*/
 	
-	@Bean
+/*	@Bean
 	OrchaLauncherGenerator orchaLauncherGenerator(){
 		return new OrchaLauncherGenerator()
-	}
+	}*/
 	
-	@Bean
+/*	@Bean
 	ExpressionParser ExpressionParser(){
 		return new ExpressionParserImpl()
-	}
+	}*/
 		
 	@Autowired
 	ApplicationContext context
@@ -61,11 +64,13 @@ class CompileServiceWithSpringIntegration implements Compile{
 	@Autowired
 	XmlGenerator xmlGenerator
 	
-	@Autowired
-	ConfigurationPropertiesGenerator configurationPropertiesGenerator
+	//@Autowired
+	ConfigurationPropertiesGenerator configurationPropertiesGenerator = new ConfigurationPropertiesGenerator()
 	
-	@Autowired
-	OrchaLauncherGenerator orchaLauncherGenerator
+	//@Autowired
+	OrchaLauncherGenerator orchaLauncherGenerator = new OrchaLauncherGenerator()
+	
+	ConfigurationMockGenerator configurationMockGenerator = new ConfigurationMockGenerator()
 		
 /*	private String stackTraceToString(Throwable e) {
 		StringBuilder sb = new StringBuilder();
@@ -85,7 +90,9 @@ class CompileServiceWithSpringIntegration implements Compile{
 	 */
 	@Override
 	public void compile(OrchaCodeParser orchaCodeParser) throws OrchaCompilationException, OrchaConfigurationException {
-				
+		
+		configurationMockGenerator.generate(orchaCodeParser)
+		
 		//String xmlSpringContent = "." + File.separator + "src" + File.separator + "main" + File.separator + "resources" + File.separator + "orchaSpringContext.xml"
 		String xmlSpringContextFileName = orchaCodeParser.getOrchaMetadata().getTitle() + ".xml"		
 		String xmlSpringContent = "." + File.separator + "src" + File.separator + "main" + File.separator + "resources" + File.separator + xmlSpringContextFileName 
@@ -133,6 +140,8 @@ class CompileServiceWithSpringIntegration implements Compile{
 		configurationPropertiesGenerator.generate(orchaCodeParser)
 		
 		orchaLauncherGenerator.generate(xmlSpringContextFileName, xmlSpringContextQoSFileName)
+		
+		
 		
 	}
 	

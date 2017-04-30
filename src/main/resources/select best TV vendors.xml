@@ -4,7 +4,7 @@
   <bean id="errorUnwrapper" class="orcha.lang.compiler.referenceimpl.xmlgenerator.impl.ErrorUnwrapper"/>
   <int:channel id="recoveryChannel"/>
   <int:transformer input-channel="recoveryChannel" output-channel="loggingChannel" expression="'Failure after many attemps for the message :' + payload.failedMessage.payload"/>
-<int-file:inbound-channel-adapter id="file-customer-InputChannel-id" directory="C:/Users/Charroux_std/Documents/projet/ExecAndShare/orcha/Orcha/input" channel="customer-InputChannel" prevent-duplicates="true" filename-pattern="orderTV.json" queue-size="20">
+<int-file:inbound-channel-adapter id="file-customer-InputChannel-id" directory="C:/Users/Charroux_std/Documents/projet/ExecAndShare/orcha/Orcha/OrchaBeforeLibrary/bin/data/order/customer" channel="customer-InputChannel" prevent-duplicates="true" filename-pattern="" queue-size="20">
     <int:poller fixed-rate="100"/>
   </int-file:inbound-channel-adapter>
   <int-file:file-to-string-transformer input-channel="customer-InputChannel" output-channel="customer-InputChannelTransformer" delete-files="false"/>
@@ -24,7 +24,7 @@
   <int:channel id="customer-OutputChannelRoute2"/>
   <int:channel id="customer-OutputChannelRoute3"/>
 <int:chain id="service-activator-chain-orderConverterChannel-id" input-channel="customer-OutputChannelRoute1" output-channel="orderConverterServiceAcivatorOutput">
-    <int:service-activator id="service-activator-orderConverterChannel-id" expression="@vendorOrderConverter.convert(payload)"/>
+    <int:service-activator id="service-activator-orderConverterChannel-id" expression="@orderConverterService.service(payload)"/>
   </int:chain>
   <int:transformer id="transformer-orderConverterServiceAcivatorOutput-id" input-channel="orderConverterServiceAcivatorOutput" output-channel="orderConverterAggregatorInput" ref="orderConverterTransformerBean" method="transform"/>
   <bean id="orderConverterTransformerBean" class="orcha.lang.compiler.referenceimpl.xmlgenerator.impl.ObjectToApplicationTransformer">

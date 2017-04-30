@@ -44,7 +44,7 @@ dependencies {
 	
 	compile('org.springframework.boot:spring-boot-starter')
 	
-	compile("org.springframework.boot:spring-boot-starter-web")
+	//compile("org.springframework.boot:spring-boot-starter-web")
 	compile("org.springframework.boot:spring-boot-devtools")
 	
 	// for auto completion in the properties files
@@ -131,9 +131,14 @@ sourceSets {
 	test {
 		java {
 			srcDirs = [ 'src/test/java' ]
+			srcDir 'src/main/orcha'
 		}
 		groovy {
 			srcDirs = [ 'src/test/groovy' ]
+			srcDir 'src/main/orcha'
+		}
+		resources {
+			srcDirs = ["src/test/resources"]
 		}
 	}
 }

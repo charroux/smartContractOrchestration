@@ -1,6 +1,7 @@
 package service.order
 
 import groovy.transform.ToString;
+import groovy.transform.EqualsAndHashCode
 
 /**
  * This class is equivalent to a JSon data structure.
@@ -17,6 +18,7 @@ import groovy.transform.ToString;
  *
  */
 @ToString
+@EqualsAndHashCode
 class Order {
 	
 	int number
@@ -25,6 +27,7 @@ class Order {
 }
 
 @ToString
+@EqualsAndHashCode
 class Product{
 	String specification
 }

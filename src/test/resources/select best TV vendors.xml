@@ -15,16 +15,16 @@
     </int:header-enricher>
   </int:chain>
 <int:recipient-list-router id="router-customer-OutputChannel-id" input-channel="customer-OutputChannel">
-    <int:recipient channel="customer-OutputChannelRoute11" selector-expression="payload.product.specification == 'TV'"/>
+    <int:recipient channel="customer-OutputChannelRoute1" selector-expression="payload.product.specification == 'TV'"/>
     <int:recipient channel="customer-OutputChannelRoute2" selector-expression="payload.product.specification == 'TV'"/>
     <int:recipient channel="customer-OutputChannelRoute3" selector-expression="payload.product.specification == 'TV'"/>
     <int:recipient channel="loggingChannel"/>
   </int:recipient-list-router>
-  <int:channel id="customer-OutputChannelRoute11"/>
+  <int:channel id="customer-OutputChannelRoute1"/>
   <int:channel id="customer-OutputChannelRoute2"/>
   <int:channel id="customer-OutputChannelRoute3"/>
 <int:chain id="service-activator-chain-orderConverterChannel-id" input-channel="customer-OutputChannelRoute1" output-channel="orderConverterServiceAcivatorOutput">
-    <int:service-activator id="service-activator-orderConverterChannel-id" expression="@vendorOrderConverter.convert(payload)"/>
+    <int:service-activator id="service-activator-orderConverterChannel-id" expression="@vendorOrderConverterInterface.convert(payload)"/>
   </int:chain>
   <int:transformer id="transformer-orderConverterServiceAcivatorOutput-id" input-channel="orderConverterServiceAcivatorOutput" output-channel="orderConverterAggregatorInput" ref="orderConverterTransformerBean" method="transform"/>
   <bean id="orderConverterTransformerBean" class="orcha.lang.compiler.referenceimpl.xmlgenerator.impl.ObjectToApplicationTransformer">

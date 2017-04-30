@@ -1,6 +1,6 @@
 
 function vendor1(specificOrder) {
-	var billJSon = '{ "date":"", "number":0, "description":"", "price":1200, "vendor":"vendor1" }';
+	var billJSon = '{ "date":"", "number":0, "description":"", "price":999, "vendor":"vendor1" }';
 	//throw 5
 	var bill = JSON.parse(billJSon);
 	bill.date = new Date().getTime();
