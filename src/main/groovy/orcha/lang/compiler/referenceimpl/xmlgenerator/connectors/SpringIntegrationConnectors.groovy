@@ -29,27 +29,48 @@ class SpringIntegrationConnectors{
 		if(eventHandlerClass.isAnnotationPresent(Queue.class)){
 			queueCapacity = eventHandlerClass.getAnnotation(Queue.class).capacity()
 		}*/
-		
+				
 		def id = "headers['id'].toString()"
 		def clos = {
 	
 			if(instructionNode.options!=null && instructionNode.options.queue!=null){
 			
-				"int-file:inbound-channel-adapter"(id:"file-"+inputChannel+"-id", directory:instruction.springBean.input.adapter.directory, channel:inputChannel, "prevent-duplicates":"true", "filename-pattern":instruction.springBean.input.adapter.filenamePattern, "queue-size":instructionNode.options.queue.capacity){
-					
-					if(instructionNode.options.queue.fixedDelay != -1){
-						"int:poller"("fixed-delay":instructionNode.options.queue.fixedDelay){ }
-					} else if(instructionNode.options.queue.fixedRate != -1){
-						"int:poller"("fixed-rate":instructionNode.options.queue.fixedRate){ }
-					} else if(instructionNode.options.queue.cron != ""){
-						"int:poller"("cron":instructionNode.options.queue.cron){ }					
+				if(instruction.springBean.input.adapter.filenamePattern != null){
+					"int-file:inbound-channel-adapter"(id:"file-"+inputChannel+"-id", directory:instruction.springBean.input.adapter.directory, channel:inputChannel, "prevent-duplicates":"true", "filename-pattern":instruction.springBean.input.adapter.filenamePattern, "queue-size":instructionNode.options.queue.capacity){
+						
+						if(instructionNode.options.queue.fixedDelay != -1){
+							"int:poller"("fixed-delay":instructionNode.options.queue.fixedDelay){ }
+						} else if(instructionNode.options.queue.fixedRate != -1){
+							"int:poller"("fixed-rate":instructionNode.options.queue.fixedRate){ }
+						} else if(instructionNode.options.queue.cron != ""){
+							"int:poller"("cron":instructionNode.options.queue.cron){ }
+						}
+					}
+				} else {					
+					"int-file:inbound-channel-adapter"(id:"file-"+inputChannel+"-id", directory:instruction.springBean.input.adapter.directory, channel:inputChannel, "prevent-duplicates":"true", "queue-size":instructionNode.options.queue.capacity){
+						
+						if(instructionNode.options.queue.fixedDelay != -1){
+							"int:poller"("fixed-delay":instructionNode.options.queue.fixedDelay){ }
+						} else if(instructionNode.options.queue.fixedRate != -1){
+							"int:poller"("fixed-rate":instructionNode.options.queue.fixedRate){ }
+						} else if(instructionNode.options.queue.cron != ""){
+							"int:poller"("cron":instructionNode.options.queue.cron){ }
+						}
 					}
 				}
 				
+				
 			} else {
 			
-				"int-file:inbound-channel-adapter"(id:"file-"+inputChannel+"-id", directory:instruction.springBean.input.adapter.directory, channel:inputChannel, "prevent-duplicates":"true", "filename-pattern":instruction.springBean.input.adapter.filenamePattern){
-					"int:poller"(id:"poller-"+inputChannel+"-id", "fixed-delay":"1000"){
+				if(instruction.springBean.input.adapter.filenamePattern != null){
+					"int-file:inbound-channel-adapter"(id:"file-"+inputChannel+"-id", directory:instruction.springBean.input.adapter.directory, channel:inputChannel, "prevent-duplicates":"true", "filename-pattern":instruction.springBean.input.adapter.filenamePattern){
+						"int:poller"(id:"poller-"+inputChannel+"-id", "fixed-delay":"1000"){
+						}
+					}
+				} else {
+					"int-file:inbound-channel-adapter"(id:"file-"+inputChannel+"-id", directory:instruction.springBean.input.adapter.directory, channel:inputChannel, "prevent-duplicates":"true"){
+						"int:poller"(id:"poller-"+inputChannel+"-id", "fixed-delay":"1000"){
+						}
 					}
 				}
 
