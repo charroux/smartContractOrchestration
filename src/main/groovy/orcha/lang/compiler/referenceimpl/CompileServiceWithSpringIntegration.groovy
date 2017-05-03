@@ -64,14 +64,17 @@ class CompileServiceWithSpringIntegration implements Compile{
 	@Autowired
 	XmlGenerator xmlGenerator
 	
-	//@Autowired
-	ConfigurationPropertiesGenerator configurationPropertiesGenerator = new ConfigurationPropertiesGenerator()
+	@Autowired
+	ConfigurationPropertiesGenerator configurationPropertiesGenerator	// = new ConfigurationPropertiesGenerator()
 	
-	//@Autowired
-	OrchaLauncherGenerator orchaLauncherGenerator = new OrchaLauncherGenerator()
+	@Autowired
+	OrchaLauncherGenerator orchaLauncherGenerator	// = new OrchaLauncherGenerator()
 	
-	ConfigurationMockGenerator configurationMockGenerator = new ConfigurationMockGenerator()
-		
+	//ConfigurationMockGenerator configurationMockGenerator = new ConfigurationMockGenerator()
+	
+	@Autowired
+	ConfigurationMockGenerator configurationMockGenerator
+	
 /*	private String stackTraceToString(Throwable e) {
 		StringBuilder sb = new StringBuilder();
 		for (StackTraceElement element : e.getStackTrace()) {
