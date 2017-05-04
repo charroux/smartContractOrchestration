@@ -7,6 +7,7 @@ import orcha.lang.compiler.OrchaConfigurationException
 import orcha.lang.compiler.qualityOfService.QualityOfService
 import orcha.lang.compiler.qualityOfService.QualityOfServiceImpl
 import orcha.lang.compiler.referenceimpl.CompileServiceWithSpringIntegration
+import orcha.lang.compiler.referenceimpl.testing.ConfigurationMockGenerator
 import orcha.lang.compiler.referenceimpl.xmlgenerator.impl.ErrorUnwrapper;
 import orcha.lang.compiler.visitor.OrchaCodeParser
 import orcha.lang.compiler.visitor.impl.OrchaCodeVisitor
@@ -14,8 +15,10 @@ import orcha.lang.compiler.visitor.impl.OrchaCodeVisitor
 import org.codehaus.groovy.ast.ClassCodeVisitorSupport;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner
+import org.springframework.boot.ExitCodeGenerator
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration
+import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.ComponentScan
@@ -53,6 +56,9 @@ class Compiler implements CommandLineRunner{
 	
 	@Autowired
 	OrchaCodeParser composeCodeParser
+	
+	@Autowired
+	ConfigurationMockGenerator configurationMockGenerator
 
 	@Override
 	public void run(String... args) throws Exception {
@@ -73,12 +79,26 @@ class Compiler implements CommandLineRunner{
 				
 		composeCodeParser.parseSourceFile(orchaFile)
 		
-		compile.compile(composeCodeParser)
-				
+		boolean isMockGenerated = configurationMockGenerator.generate(composeCodeParser)
+		
+		if(isMockGenerated == false){
+			compile.compile(composeCodeParser)
+		}
+		
 	}
 	
 	public static void main(String[] args) {
 		SpringApplication application = new SpringApplication(Compiler.class)
+		application.setWebEnvironment(false)
+		ConfigurableApplicationContext configurableApplicationContext = application.run(args)
+		
+		Compile compile = configurableApplicationContext.getBean("compile")
+		//int exitCode = SpringApplication.exit(configurableApplicationContext, new Exit())
+		println '----------------------' + compile.getExitCode()
+		
+		configurableApplicationContext.close()
+		
+		application = new SpringApplication(Compiler.class)
 		application.setWebEnvironment(false)
 		application.run(args)
 	}

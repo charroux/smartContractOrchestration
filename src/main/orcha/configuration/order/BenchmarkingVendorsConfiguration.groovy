@@ -33,7 +33,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy
 import org.springframework.context.annotation.Profile
-
+import org.springframework.context.annotation.Scope
 import service.order.Order
 import service.order.Product
 import service.order.SpecificOrder
@@ -86,13 +86,13 @@ class Vendor1Application extends Application{
 class SelectBestVendorApplication extends Application{
 }
 
-@EventSourcing(messageStore=MessageStore.mongoDB, joinPoint=JoinPoint.before, eventName="")
+/*@EventSourcing(messageStore=MessageStore.mongoDB, joinPoint=JoinPoint.before, eventName="")
 class OutputFile1EventHandler extends EventHandler{
-}
+}*/
 
 //@EventSourcing(messageStore=MessageStore.mongoDB, joinPoint=JoinPoint.before, eventName="")
-class OutputFile2EventHandler extends EventHandler{
-}
+/*class OutputFile2EventHandler extends EventHandler{
+}*/
 
 /**
  * This file defines.
@@ -115,6 +115,7 @@ class BenchmarkingVendorsConfiguration {
 	 * @return
 	 */
 	@Bean
+	@Scope("singleton")
 	EventHandler customer(){
 		def eventHandler = new CustomerEventHandler(name: "customer")
 		//def fileAdapter = new InputFileAdapter(directory: 'C:/Users/Charroux_std/Documents/projet/ExecAndShare/orcha/Orcha/input', filenamePattern: "orderTV.json")
@@ -250,8 +251,10 @@ class BenchmarkingVendorsConfiguration {
 	}
 		
 	@Bean
+	@Scope("singleton")
 	EventHandler outputFile1(){
-		def eventHandler = new OutputFile1EventHandler(name: "outputFile1")
+		//def eventHandler = new OutputFile1EventHandler(name: "outputFile1")
+		def eventHandler = new EventHandler(name: "outputFile1")
 		//def fileAdapter = new OutputFileAdapter(directory: 'C:/Users/Charroux_std/Documents/projet/ExecAndShare/orcha/Orcha/output', createDirectory: true, filename:'output1.txt', appendNewLine: true, writingMode: WritingMode.REPLACE)
 		//eventHandler.output = new Output(mimeType: "application/json", type: "service.order.Bill", adapter: fileAdapter)
 		eventHandler.output = new Output(mimeType: "application/json", type: "service.order.Bill")
@@ -260,10 +263,11 @@ class BenchmarkingVendorsConfiguration {
 	
 	@Bean
 	EventHandler outputFile2(){
-		def eventHandler = new OutputFile2EventHandler(name: "outputFile2")
-		//def fileAdapter = new OutputFileAdapter(directory: 'C:/Users/Charroux_std/Documents/projet/ExecAndShare/orcha/Orcha/output', createDirectory: true, filename:'output2.txt', appendNewLine: true, writingMode: WritingMode.REPLACE)
-		//eventHandler.output = new Output(mimeType: "application/json", type: "service.order.Bill", adapter: fileAdapter)
-		eventHandler.output = new Output(mimeType: "application/json", type: "service.order.Bill")
+		//def eventHandler = new OutputFile2EventHandler(name: "outputFile2")
+		def eventHandler = new EventHandler(name: "outputFile2")
+		def fileAdapter = new OutputFileAdapter(directory: 'C:/Users/Charroux_std/Documents/projet/ExecAndShare/orcha/Orcha/output', createDirectory: true, filename:'output2.txt', appendNewLine: true, writingMode: WritingMode.REPLACE)
+		eventHandler.output = new Output(mimeType: "application/json", type: "service.order.Bill", adapter: fileAdapter)
+		//eventHandler.output = new Output(mimeType: "application/json", type: "service.order.Bill")
 		return eventHandler
 	}
 }

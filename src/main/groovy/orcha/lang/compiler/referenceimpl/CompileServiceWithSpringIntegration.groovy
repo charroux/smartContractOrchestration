@@ -72,8 +72,7 @@ class CompileServiceWithSpringIntegration implements Compile{
 	
 	//ConfigurationMockGenerator configurationMockGenerator = new ConfigurationMockGenerator()
 	
-	@Autowired
-	ConfigurationMockGenerator configurationMockGenerator
+	
 	
 /*	private String stackTraceToString(Throwable e) {
 		StringBuilder sb = new StringBuilder();
@@ -92,9 +91,9 @@ class CompileServiceWithSpringIntegration implements Compile{
 	 * @throws OrchaConfigurationException
 	 */
 	@Override
-	public void compile(OrchaCodeParser orchaCodeParser) throws OrchaCompilationException, OrchaConfigurationException {
+	public boolean compile(OrchaCodeParser orchaCodeParser) throws OrchaCompilationException, OrchaConfigurationException {
 		
-		configurationMockGenerator.generate(orchaCodeParser)
+		
 		
 		//String xmlSpringContent = "." + File.separator + "src" + File.separator + "main" + File.separator + "resources" + File.separator + "orchaSpringContext.xml"
 		String xmlSpringContextFileName = orchaCodeParser.getOrchaMetadata().getTitle() + ".xml"		
@@ -145,7 +144,13 @@ class CompileServiceWithSpringIntegration implements Compile{
 		orchaLauncherGenerator.generate(xmlSpringContextFileName, xmlSpringContextQoSFileName)
 		
 		
-		
+		return true
+	}
+
+	@Override
+	public int getExitCode() {
+		// TODO Auto-generated method stub
+		return 10;
 	}
 	
 }
