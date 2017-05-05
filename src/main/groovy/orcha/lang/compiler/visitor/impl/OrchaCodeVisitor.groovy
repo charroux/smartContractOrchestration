@@ -736,7 +736,7 @@ class OrchaCodeVisitor extends OrchaCodeParser{
 	}
 
 	void visitConstantExpression(ConstantExpression expression){
-		log.info "begin"
+		log.debug "begin"
 	}	
 	
 	/**
@@ -744,7 +744,7 @@ class OrchaCodeVisitor extends OrchaCodeParser{
 	 */
 	void visitMethodCallExpression(MethodCallExpression call){
 			
-		log.info "begin"
+		log.debug "begin"
 		
 		def method
 		
@@ -758,7 +758,7 @@ class OrchaCodeVisitor extends OrchaCodeParser{
 			if(expression instanceof ConstantExpression){
 				ConstantExpression constantExpression = (ConstantExpression)expression
 				method = constantExpression.getText() 
-				log.info method	+ " from ConstantExpression"	// from
+				log.debug method	+ " from ConstantExpression"	// from
 			}
 			expression = methodExpression.getObjectExpression()
 			if(expression instanceof MethodCallExpression){
@@ -773,7 +773,7 @@ class OrchaCodeVisitor extends OrchaCodeParser{
 						if(expression instanceof VariableExpression){
 							VariableExpression variableExpression = (VariableExpression)expression
 							def arg = variableExpression.getText()	// incomingMessageEvent
-							log.info arg + " incomingMessageEvent VariableArgumentExpression " + i
+							log.debug arg + " incomingMessageEvent VariableArgumentExpression " + i
 							if(method == 'from'){
 								instruction = new Instruction(variable: arg)
 							}
@@ -785,7 +785,7 @@ class OrchaCodeVisitor extends OrchaCodeParser{
 				if(expression instanceof ConstantExpression){
 					ConstantExpression constantExpression = (ConstantExpression)expression
 					method = constantExpression.getText()
-					log.info method	+ " receive ConstantExpression"	// receive
+					log.debug method	+ " receive ConstantExpression"	// receive
 					if(method == 'receive'){
 						instruction.instruction = 'receive'
 					}
@@ -802,7 +802,7 @@ class OrchaCodeVisitor extends OrchaCodeParser{
 					if(expression instanceof VariableExpression){
 						VariableExpression variableExpression = (VariableExpression)expression
 						def arg = variableExpression.getText()	// event, code1, composeEvents
-						log.info arg + " composeEvents VariableArgumentExpression " + i
+						log.debug arg + " composeEvents VariableArgumentExpression " + i
 						i++
 						if(instruction!=null && instruction.instruction=='receive'){
 							instruction.springBean = context.getBean(arg)
@@ -824,7 +824,7 @@ class OrchaCodeVisitor extends OrchaCodeParser{
 						if(method == 'send'){
 							instruction = new Instruction(instruction:'send', variable: ar)
 						}
-						log.info ar  + " PropertyVariableExpression"
+						log.debug ar  + " PropertyVariableExpression"
 					}
 					expression = propertyExpression.getProperty()
 					if(expression instanceof ConstantExpression){
@@ -833,7 +833,7 @@ class OrchaCodeVisitor extends OrchaCodeParser{
 						if(method == 'send'){
 							instruction.variableProperty = value							
 						}
-						log.info value + " PropertyValueExpression"
+						log.debug value + " PropertyValueExpression"
 					}
 				}
 			}
@@ -843,7 +843,7 @@ class OrchaCodeVisitor extends OrchaCodeParser{
 		if(expression instanceof ConstantExpression){
 			ConstantExpression constantExpression = (ConstantExpression)expression
 			method = constantExpression.getText()
-			log.info method	+ " with MethodExpression" //runScript, from, with
+			log.debug method	+ " with MethodExpression" //runScript, from, with
 		}
 		
 		expression = call.getArguments()
@@ -856,7 +856,7 @@ class OrchaCodeVisitor extends OrchaCodeParser{
 				if(expression instanceof VariableExpression){
 					VariableExpression variableExpression = (VariableExpression)expression
 					def arg = variableExpression.getText()	// args, input, database
-					log.info arg  + " VariableArgumentExpression " + i
+					log.debug arg  + " VariableArgumentExpression " + i
 					i++
 					if(method == 'from'){
 						instruction.springBean = context.getBean(arg)		// arg instanceof EventHandler
@@ -881,7 +881,7 @@ class OrchaCodeVisitor extends OrchaCodeParser{
 					if(expression instanceof VariableExpression){
 						VariableExpression variableExpression = (VariableExpression)expression
 						def prop = variableExpression.getText()		// event
-						log.info prop + " PropertyVariableExpression"
+						log.debug prop + " PropertyVariableExpression"
 						if(method == 'with'){
 							with.with = prop  
 						}
@@ -890,7 +890,7 @@ class OrchaCodeVisitor extends OrchaCodeParser{
 					if(expression instanceof ConstantExpression){
 						ConstantExpression constantExpression = (ConstantExpression)expression
 						def value = constantExpression.getText() // event.value
-						log.info value + " PropertyValueExpression"
+						log.debug value + " PropertyValueExpression"
 						if(method == 'with'){
 							//instruction.withProperty = value
 							with.withProperty = value
@@ -900,7 +900,7 @@ class OrchaCodeVisitor extends OrchaCodeParser{
 				} else if(expression instanceof ConstantExpression){
 					ConstantExpression constantExpression = (ConstantExpression)expression
 					def m = constantExpression.getText()
-					log.info m	+ " incomingMessageEvent.state=INCOMING_MESSAGE ConstantExpression" // receive event with constantExpression
+					log.debug m	+ " incomingMessageEvent.state=INCOMING_MESSAGE ConstantExpression" // receive event with constantExpression
 					if(method == 'condition'){
 						instruction.condition = m
 					} else if(method == 'description'){
@@ -932,7 +932,7 @@ class OrchaCodeVisitor extends OrchaCodeParser{
 			instruction = new Instruction(instruction:'when', variable: value)
 			instructions.add(instruction)
 			
-			log.info value + " PropertyValueExpression"
+			log.debug value + " PropertyValueExpression"
 			
 			/*def applications = this.getApplicationsInExpression(value)
 
@@ -946,7 +946,7 @@ class OrchaCodeVisitor extends OrchaCodeParser{
 		
 		
 		
-		log.info "end"
+		log.debug "end"
 		
 	}
 	

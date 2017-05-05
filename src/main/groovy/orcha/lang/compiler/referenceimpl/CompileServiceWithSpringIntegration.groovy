@@ -91,9 +91,7 @@ class CompileServiceWithSpringIntegration implements Compile{
 	 * @throws OrchaConfigurationException
 	 */
 	@Override
-	public boolean compile(OrchaCodeParser orchaCodeParser) throws OrchaCompilationException, OrchaConfigurationException {
-		
-		
+	public void compile(OrchaCodeParser orchaCodeParser) throws OrchaCompilationException, OrchaConfigurationException {
 		
 		//String xmlSpringContent = "." + File.separator + "src" + File.separator + "main" + File.separator + "resources" + File.separator + "orchaSpringContext.xml"
 		String xmlSpringContextFileName = orchaCodeParser.getOrchaMetadata().getTitle() + ".xml"		
@@ -143,14 +141,12 @@ class CompileServiceWithSpringIntegration implements Compile{
 		
 		orchaLauncherGenerator.generate(xmlSpringContextFileName, xmlSpringContextQoSFileName)
 		
-		
-		return true
 	}
 
-	@Override
+/*	@Override
 	public int getExitCode() {
 		// TODO Auto-generated method stub
 		return 10;
-	}
+	}*/
 	
 }

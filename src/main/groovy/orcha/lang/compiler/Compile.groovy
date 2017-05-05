@@ -12,7 +12,6 @@ interface Compile{
 	 * @throws OrchaCompilationException
 	 * @throws OrchaConfigurationException
 	 */
-	boolean compile(OrchaCodeParser orchaCodeParser)  throws OrchaCompilationException, OrchaConfigurationException
+	void compile(OrchaCodeParser orchaCodeParser)  throws OrchaCompilationException, OrchaConfigurationException
 	
-	int getExitCode()
 }

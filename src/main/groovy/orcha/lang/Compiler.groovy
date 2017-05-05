@@ -24,6 +24,9 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.ComponentScan
 import org.springframework.context.annotation.ImportResource;
 
+import groovy.util.logging.Slf4j
+
+@Slf4j
 @Configuration
 @ComponentScan(basePackages=['orcha.lang.compiler','orcha.lang.business','configuration'])
 class Compiler implements CommandLineRunner{
@@ -88,19 +91,27 @@ class Compiler implements CommandLineRunner{
 	}
 	
 	public static void main(String[] args) {
+		
 		SpringApplication application = new SpringApplication(Compiler.class)
 		application.setWebEnvironment(false)
 		ConfigurableApplicationContext configurableApplicationContext = application.run(args)
 		
-		Compile compile = configurableApplicationContext.getBean("compile")
-		//int exitCode = SpringApplication.exit(configurableApplicationContext, new Exit())
-		println '----------------------' + compile.getExitCode()
+		ConfigurationMockGenerator configurationMockGenerator = configurableApplicationContext.getBean("configurationMockGenerator")
 		
-		configurableApplicationContext.close()
-		
-		application = new SpringApplication(Compiler.class)
-		application.setWebEnvironment(false)
-		application.run(args)
+		if(configurationMockGenerator.getIsMockGenerated()){
+			
+			log.info "Fix uncomplete Orcha configuration: trying to compile again the Orcha program..."
+
+			configurableApplicationContext.close()
+			
+			application = new SpringApplication(Compiler.class)
+			application.setWebEnvironment(false)
+			application.run(args)
+			
+			log.info "Compilation of the Orcha program successful."
+	
+		}
+	
 	}
 
 }
