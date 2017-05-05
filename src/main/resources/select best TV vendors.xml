@@ -7,6 +7,7 @@
 <int-file:inbound-channel-adapter id="file-customer-InputChannel-id" directory="C:/Users/Charroux_std/Documents/projet/ExecAndShare/orcha/Orcha/OrchaBeforeLibrary/bin/data/order/customer/" channel="customer-InputChannel" prevent-duplicates="true" queue-size="20">
     <int:poller fixed-rate="100"/>
   </int-file:inbound-channel-adapter>
+  
   <int-file:file-to-string-transformer input-channel="customer-InputChannel" output-channel="customer-InputChannelTransformer" delete-files="false"/>
   <int:chain input-channel="customer-InputChannelTransformer" output-channel="customer-OutputChannel">
     <int:json-to-object-transformer type="service.order.Order"/>
@@ -91,7 +92,7 @@
     <int:object-to-json-transformer/>
   </int:chain>
   <int:channel id="selectBestVendorOutputFileChannelAdapteroutputFile1"/>
-  <int-file:outbound-channel-adapter id="file-selectBestVendoroutputFile1Channel-id" channel="selectBestVendorOutputFileChannelAdapteroutputFile1" directory-expression="@outputFile1.output.adapter.directory" filename-generator-expression="@outputFile1.output.adapter.filename" append-new-line="false" mode="null" auto-create-directory="false" delete-source-files="false"/>
+  <int-file:outbound-channel-adapter id="file-selectBestVendoroutputFile1Channel-id" channel="selectBestVendorOutputFileChannelAdapteroutputFile1" directory-expression="@outputFile1.output.adapter.directory" filename-generator-expression="@outputFile1.output.adapter.filename" append-new-line="true" mode="APPEND" auto-create-directory="true" delete-source-files="false"/>
 <int:aggregator id="aggregator-selectBestVendorAggregatorInputRoute2-id" input-channel="selectBestVendorAggregatorInputRoute2" output-channel="selectBestVendorAggregatorInputRoute2Transformer" correlation-strategy-expression="headers['messageID']" release-strategy-expression="size()==1 and ( ([0].payload instanceof T(orcha.lang.configuration.Application) AND [0].payload.state==T(orcha.lang.configuration.State).TERMINATED)  and  [0].payload.output.value.price&lt;=1000 )"/>
   <int:transformer id="transformer-selectBestVendorAggregatorInputRoute2-id" input-channel="selectBestVendorAggregatorInputRoute2Transformer" output-channel="selectBestVendorAggregatorInputRoute2AggregatorOutput" expression="payload.?[name=='selectBestVendor']"/>
   <int:transformer id="transformer-selectBestVendorAggregatorInputRoute2AggregatorOutput-id" input-channel="selectBestVendorAggregatorInputRoute2AggregatorOutput" output-channel="selectBestVendorAggregatorOutputTransformerRoute2" ref="selectBestVendorAggregatorOutputTransformerRoute2ApplicationToObjectTransformerBean" method="transform"/>

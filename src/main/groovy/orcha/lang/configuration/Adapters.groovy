@@ -67,7 +67,7 @@ class OutputFileAdapter extends ConfigurableProperties{
 	boolean createDirectory
 	def filename
 	boolean appendNewLine
-	WritingMode writingMode
+	WritingMode writingMode = WritingMode.APPEND
 	
 	OutputFileAdapter(){
 		super.properties.add("directory")
