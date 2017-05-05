@@ -115,7 +115,6 @@ class BenchmarkingVendorsConfiguration {
 	 * @return
 	 */
 	@Bean
-	@Scope("singleton")
 	EventHandler customer(){
 		def eventHandler = new CustomerEventHandler(name: "customer")
 		//def fileAdapter = new InputFileAdapter(directory: 'C:/Users/Charroux_std/Documents/projet/ExecAndShare/orcha/Orcha/input', filenamePattern: "orderTV.json")
@@ -251,7 +250,6 @@ class BenchmarkingVendorsConfiguration {
 	}
 		
 	@Bean
-	@Scope("singleton")
 	EventHandler outputFile1(){
 		//def eventHandler = new OutputFile1EventHandler(name: "outputFile1")
 		def eventHandler = new EventHandler(name: "outputFile1")

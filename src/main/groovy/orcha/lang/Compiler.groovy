@@ -100,7 +100,7 @@ class Compiler implements CommandLineRunner{
 		
 		if(configurationMockGenerator.getIsMockGenerated()){
 			
-			log.info "Fix uncomplete Orcha configuration: trying to compile again the Orcha program..."
+			log.info "Uncomplete Orcha configuration fixed by an auto generated configuration. Trying now to compile again the Orcha program..."
 
 			configurableApplicationContext.close()
 			
