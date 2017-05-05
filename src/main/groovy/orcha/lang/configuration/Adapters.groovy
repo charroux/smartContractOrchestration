@@ -63,7 +63,7 @@ class OutputFileAdapter extends ConfigurableProperties{
 	}
 	
 	def adapter = UnidirectionalAdapter.File
-	def directory
+	String directory
 	boolean createDirectory
 	def filename
 	boolean appendNewLine
