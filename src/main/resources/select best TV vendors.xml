@@ -7,7 +7,6 @@
 <int-file:inbound-channel-adapter id="file-customer-InputChannel-id" directory="C:/Users/Charroux_std/Documents/projet/ExecAndShare/orcha/Orcha/OrchaBeforeLibrary/bin/data/order/customer/" channel="customer-InputChannel" prevent-duplicates="true" queue-size="20">
     <int:poller fixed-rate="100"/>
   </int-file:inbound-channel-adapter>
-  
   <int-file:file-to-string-transformer input-channel="customer-InputChannel" output-channel="customer-InputChannelTransformer" delete-files="false"/>
   <int:chain input-channel="customer-InputChannelTransformer" output-channel="customer-OutputChannel">
     <int:json-to-object-transformer type="service.order.Order"/>

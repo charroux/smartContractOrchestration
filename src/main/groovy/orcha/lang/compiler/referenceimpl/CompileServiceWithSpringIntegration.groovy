@@ -32,31 +32,6 @@ import java.util.Map;
 @Configuration
 @ComponentScan(basePackages=['orcha.lang.compiler.referenceimpl.xmlgenerator'])
 class CompileServiceWithSpringIntegration implements Compile{
-	
-/*	@Bean
-	XmlGenerator xmlGenerator(){
-		return new XmlGeneratorForSpringIntegration()
-	}*/
-	
-	/*@Bean
-	SpringIntegrationConnectors connectors(){
-		return new SpringIntegrationConnectors()
-	}*/
-	
-/*	@Bean
-	ConfigurationPropertiesGenerator configurationPropertiesGenerator(){
-		return new ConfigurationPropertiesGenerator()
-	}*/
-	
-/*	@Bean
-	OrchaLauncherGenerator orchaLauncherGenerator(){
-		return new OrchaLauncherGenerator()
-	}*/
-	
-/*	@Bean
-	ExpressionParser ExpressionParser(){
-		return new ExpressionParserImpl()
-	}*/
 		
 	@Autowired
 	ApplicationContext context
@@ -70,20 +45,6 @@ class CompileServiceWithSpringIntegration implements Compile{
 	@Autowired
 	OrchaLauncherGenerator orchaLauncherGenerator	// = new OrchaLauncherGenerator()
 	
-	//ConfigurationMockGenerator configurationMockGenerator = new ConfigurationMockGenerator()
-	
-	
-	
-/*	private String stackTraceToString(Throwable e) {
-		StringBuilder sb = new StringBuilder();
-		for (StackTraceElement element : e.getStackTrace()) {
-			sb.append(element.toString());
-			sb.append("\n");
-		}
-		return sb.toString();
-	}*/
-
-	
 	/**
 	 * @param orchaCodeParser
 	 * @param commandLineArgs
@@ -93,7 +54,8 @@ class CompileServiceWithSpringIntegration implements Compile{
 	@Override
 	public void compile(OrchaCodeParser orchaCodeParser) throws OrchaCompilationException, OrchaConfigurationException {
 		
-		//String xmlSpringContent = "." + File.separator + "src" + File.separator + "main" + File.separator + "resources" + File.separator + "orchaSpringContext.xml"
+		log.info 'Compilatation begins'
+		
 		String xmlSpringContextFileName = orchaCodeParser.getOrchaMetadata().getTitle() + ".xml"		
 		String xmlSpringContent = "." + File.separator + "src" + File.separator + "main" + File.separator + "resources" + File.separator + xmlSpringContextFileName 
 		
@@ -120,6 +82,8 @@ class CompileServiceWithSpringIntegration implements Compile{
 		Files.copy(oldFile.toPath(), fos);
 		fos.close()
 		
+		log.info 'Compilatation complete successfully. Orcha orchestrator generated into ' + xmlSpringContentInSrc
+		
 		xmlContext = new File(xmlQoSSpringContent).text
 		springContexteAsText = XmlUtil.serialize(xmlContext)
 		new File(xmlQoSSpringContent).withWriter('utf-8') { writer ->
@@ -137,6 +101,8 @@ class CompileServiceWithSpringIntegration implements Compile{
 		Files.copy(oldFile.toPath(), fos);
 		fos.close()
 
+		log.info 'Compilatation complete successfully. QoS for Orcha orchestrator generated into ' + xmlSpringContentInSrc
+		
 		configurationPropertiesGenerator.generate(orchaCodeParser)
 		
 		orchaLauncherGenerator.generate(xmlSpringContextFileName, xmlSpringContextQoSFileName)

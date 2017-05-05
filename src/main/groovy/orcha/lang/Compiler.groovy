@@ -31,26 +31,6 @@ import groovy.util.logging.Slf4j
 @ComponentScan(basePackages=['orcha.lang.compiler','orcha.lang.business','configuration'])
 class Compiler implements CommandLineRunner{
 	
-	/*@Bean
-	Compile compile(){
-		return new CompileServiceWithSpringIntegration()
-	}
-	
-	@Bean
-	OrchaCodeParser composeCodeParser(){
-		return new OrchaCodeVisitor()
-	} 
-	
-	@Bean
-	BusinessAdapter businessAdapter(){
-		return new BasicBusinessAdapter()
-	}
-	
-	@Bean
-	QualityOfService qualityOfService(){
-		return new QualityOfServiceImpl()
-	}*/
-	
 	@Autowired
 	BusinessAdapter businessAdapter
 	

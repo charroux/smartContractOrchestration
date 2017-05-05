@@ -30,6 +30,8 @@ class ConfigurationPropertiesGenerator {
 	
 	void generate(OrchaCodeParser orchaCodeParser){
 		
+		log.info 'Configuration property generation begins'
+		
 		def configurationMetadata = [:]
 		def groupsMetadata = []		
 		def propertiesMetadata = []
@@ -71,6 +73,8 @@ class ConfigurationPropertiesGenerator {
 						JDefinedClass embeddedClass = contractPropertyClass._class(JMod.PUBLIC, embedddedClassName)
 						
 						properties.each { property ->
+							
+							log.info 'Configuration property generation: ' + property + ' can be set for ' + embedddedClassName + ' before launching the Orcha program into META-INF/application.properties'
 								
 							JFieldVar field = embeddedClass.field(JMod.PUBLIC, String.class, property)
 							
@@ -136,6 +140,8 @@ class ConfigurationPropertiesGenerator {
 		new File(springConfigurationMetadata).withWriter('utf-8') { writer ->
 			writer.writeLine json
 		}
+		
+		log.info 'Configuration property generated successfully. Property metadata file is: ' + springConfigurationMetadata
 		
 	}
 
