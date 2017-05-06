@@ -29,7 +29,6 @@ import orcha.lang.configuration.JavaServiceAdapter
 import service.order.Order
 import service.order.SpecificOrder
 
-import org.mockito.Mockito
 import org.objectweb.asm.AnnotationVisitor
 import org.objectweb.asm.ClassWriter
 import org.objectweb.asm.FieldVisitor
