@@ -126,7 +126,7 @@ class XmlGeneratorForSpringIntegration implements XmlGenerator{
 			writer.close()
 		}
 		
-		log.info 'Compilatation complete successfully. Orcha orchestrator generated into ' + xmlSpringContextFile
+		log.info 'Transpilatation complete successfully. Orcha orchestrator generated into ' + xmlSpringContextFile
 		
 		bufferedWriterQoSSpringContext.writeLine('</beans>')
 		bufferedWriterQoSSpringContext.flush()
@@ -140,7 +140,7 @@ class XmlGeneratorForSpringIntegration implements XmlGenerator{
 			writer.close()
 		}
 		
-		log.info 'Compilatation complete successfully. QoS for Orcha orchestrator generated into ' + xmlQoSSpringContextFile
+		log.info 'Transpilatation complete successfully. QoS for Orcha orchestrator generated into ' + xmlQoSSpringContextFile
 	}
 	
 	public void propagateSameEvent(InstructionNode nextNode, InstructionNode node){

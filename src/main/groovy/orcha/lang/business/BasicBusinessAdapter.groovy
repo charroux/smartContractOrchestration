@@ -2,6 +2,9 @@ package orcha.lang.business
 
 import org.springframework.beans.factory.annotation.Autowired;
 
+import groovy.util.logging.Slf4j
+
+@Slf4j
 class BasicBusinessAdapter implements BusinessAdapter{
 	
 	@Autowired
@@ -12,6 +15,8 @@ class BasicBusinessAdapter implements BusinessAdapter{
 		
 		//String pathToCode = "." + File.separator + "orcha" + File.separator + "source" + File.separator + orchaFile
 		String pathToCode = "." + File.separator + "src" + File.separator + "main" + File.separator + "orcha" + File.separator + "source" + File.separator + orchaFile
+		
+		log.info 'Conversion of the Orcha program ' + pathToCode + ' to a Groovy program'
 		
 		def wordsToReplace = [:]
 		def lines = []
@@ -66,6 +71,8 @@ class BasicBusinessAdapter implements BusinessAdapter{
 				writer.writeLine it
 			}
 		}
+		
+		log.info 'Conversion of the Orcha program to a Groovy program done successfully into :' + pathToCode
 		
 		return orchaFile.replace(".orcha", ".groovy")
 		

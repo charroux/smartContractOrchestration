@@ -5,6 +5,9 @@ import com.sun.codemodel.JDefinedClass
 import com.sun.codemodel.JDocComment
 import com.sun.codemodel.JMod
 import com.sun.codemodel.writer.FileCodeWriter
+
+import groovy.util.logging.Slf4j
+
 import com.sun.codemodel.ClassType
 import com.sun.codemodel.JAnnotationArrayMember
 
@@ -19,6 +22,7 @@ import org.objectweb.asm.Opcodes
 
 import org.springframework.context.annotation.ImportResource
 
+@Slf4j
 class OrchaLauncherGenerator {
 	
 	void generate(String xmlSpringContextFileName, String xmlSpringContextQoSFileName){
@@ -27,6 +31,7 @@ class OrchaLauncherGenerator {
 			
 			JCodeModel codeModel = new JCodeModel();
 			def className = 'orcha.lang.ImportDynamicResourcesForConfiguration'
+			
 			JDefinedClass orchaLauncherClass = codeModel._class(JMod.PUBLIC, className, ClassType.CLASS)
 			
 			JDocComment jDocComment = orchaLauncherClass.javadoc();
@@ -38,6 +43,8 @@ class OrchaLauncherGenerator {
 			FileCodeWriter fileCodeWriter = new FileCodeWriter(new File(s))
 			codeModel.build(fileCodeWriter)
 			fileCodeWriter.close()
+			
+			log.info 'Praparing of the Orcha program launching by the generation of the importation of Orcha orchestration files ' + xmlSpringContextFileName + ' and ' + xmlSpringContextQoSFileName + ' into ' + className + ' (' + s + ')'
 			
 			// generate java class file (useful to avoid refreshing the IDE like Eclipse
 			
@@ -74,6 +81,10 @@ class OrchaLauncherGenerator {
 			FileOutputStream fos = new FileOutputStream(file);
 			fos.write(bytes);
 			fos.close();
+			
+			log.info 'Praparing of the Orcha program launching by the generation of the importation (binary version) of Orcha orchestration files ' + xmlSpringContextFileName + ', ' + xmlSpringContextQoSFileName + ' into ' + fichier
+			
+			log.info 'Praparing of the Orcha program launching done successfully'
 			
 	/*		// Generate java source file
 			

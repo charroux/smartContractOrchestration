@@ -400,6 +400,8 @@ class OrchaCodeVisitor extends OrchaCodeParser{
 		
 		if(graphOfInstructions.empty){
 			
+			log.info 'Syntax analysis of the the Orcha program'
+			
 			Instruction instruction
 			
 			Iterator<Instruction> listOfInsctructions = instructions.iterator()
@@ -661,7 +663,10 @@ class OrchaCodeVisitor extends OrchaCodeParser{
 						newRootNode = newNode
 					}
 				}
-			}		
+			}
+			
+			log.info 'Syntax analysis of the the Orcha program complete successfully'
+			
 		}
 		
 		return graphOfInstructions
