@@ -7,6 +7,8 @@ import orcha.lang.compiler.OrchaConfigurationException
 import orcha.lang.compiler.qualityOfService.QualityOfService
 import orcha.lang.compiler.qualityOfService.QualityOfServiceImpl
 import orcha.lang.compiler.referenceimpl.CompileServiceWithSpringIntegration
+import orcha.lang.compiler.referenceimpl.OrchaLauncherGenerator
+import orcha.lang.compiler.referenceimpl.configurationproperties.ConfigurationPropertiesGenerator
 import orcha.lang.compiler.referenceimpl.testing.ConfigurationMockGenerator
 import orcha.lang.compiler.referenceimpl.xmlgenerator.impl.ErrorUnwrapper;
 import orcha.lang.compiler.visitor.OrchaCodeParser
@@ -42,6 +44,9 @@ class Compiler implements CommandLineRunner{
 	
 	@Autowired
 	ConfigurationMockGenerator configurationMockGenerator
+	
+	@Autowired
+	ConfigurationPropertiesGenerator configurationPropertiesGenerator
 
 	@Override
 	public void run(String... args) throws Exception {
@@ -65,13 +70,17 @@ class Compiler implements CommandLineRunner{
 		boolean isMockGenerated = configurationMockGenerator.generate(composeCodeParser)
 		
 		if(isMockGenerated == false){
+			
 			compile.compile(composeCodeParser)
+			
+			configurationPropertiesGenerator.generate(composeCodeParser)
+		
 		}
 		
 	}
 	
 	public static void main(String[] args) {
-		
+
 		SpringApplication application = new SpringApplication(Compiler.class)
 		application.setWebEnvironment(false)
 		ConfigurableApplicationContext configurableApplicationContext = application.run(args)
@@ -88,9 +97,9 @@ class Compiler implements CommandLineRunner{
 			application.setWebEnvironment(false)
 			application.run(args)
 			
-			log.info "Compilation of the Orcha program successful."
-	
 		}
+		
+		log.info "Compilation of the Orcha program successful. The Orcha program (orcha.lang.OrchaSpringIntegrationLauncher.groovy) can be launched."		
 	
 	}
 

@@ -40,10 +40,7 @@ class CompileServiceWithSpringIntegration implements Compile{
 	XmlGenerator xmlGenerator
 	
 	@Autowired
-	ConfigurationPropertiesGenerator configurationPropertiesGenerator	// = new ConfigurationPropertiesGenerator()
-	
-	@Autowired
-	OrchaLauncherGenerator orchaLauncherGenerator	// = new OrchaLauncherGenerator()
+	OrchaLauncherGenerator orchaLauncherGenerator
 	
 	/**
 	 * @param orchaCodeParser
@@ -102,8 +99,6 @@ class CompileServiceWithSpringIntegration implements Compile{
 		fos.close()
 
 		log.info 'Transpilatation complete successfully. QoS for Orcha orchestrator generated into ' + xmlSpringContentInSrc
-		
-		configurationPropertiesGenerator.generate(orchaCodeParser)
 		
 		orchaLauncherGenerator.generate(xmlSpringContextFileName, xmlSpringContextQoSFileName)
 		
