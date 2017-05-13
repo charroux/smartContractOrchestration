@@ -22,7 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.*;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes=[orcha.lang.OrchaM.class,  orcha.lang.AutoConfiguration.class])
+//@SpringBootTest(classes=[orcha.lang.OrchaForTestConfiguration.class,  orcha.lang.AutoConfiguration.class])
 class SpringTestOrchaTests {
 	
 /*	@Bean

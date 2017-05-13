@@ -14,7 +14,7 @@ import orcha.lang.configuration.OrchaSession
 	"select best TV vendors.xml",
 	"select best TV vendorsQoS.xml"
 ])
-class OrchaM {
+class OrchaForTestConfiguration {
 	
 	@Bean
 	OrchaSession orchaSession(){
