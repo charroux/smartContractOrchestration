@@ -8,7 +8,7 @@ import groovy.transform.EqualsAndHashCode
  * 
  * For example:
  * {
- *	"number":1,
+ *	"number":2,
  *	"product":{
  *		"specification":"TV"
  *	}

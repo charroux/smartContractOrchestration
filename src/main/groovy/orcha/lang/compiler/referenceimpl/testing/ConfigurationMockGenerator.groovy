@@ -180,8 +180,34 @@ class ConfigurationMockGenerator {
 					 FileCodeWriter fileCodeWriter = new FileCodeWriter(new File(s))
 					 codeModel.build(fileCodeWriter)
 					 fileCodeWriter.close()
+					 
+					 String[] packagePathElements = packageName.split("\\.");
+					 String fichier = "." + File.separator + "src" + File.separator + "main" + File.separator + "orcha" + File.separator
+					 for(String element: packagePathElements){
+						 fichier = fichier + element + File.separator
+					 }
+					
+					 // copy the java file into a groovy file and delete the java file
+					 				 
+					 String javaFileName = fichier + serviceNameInterface + ".java"
+					 
+					 def linesInJavaFile = []
 
-					 log.info 'Mock of Java source file service interface ' + serviceClassNameInterface + ' generated into ' + s
+					 new File(javaFileName).eachLine { line ->	
+						 linesInJavaFile.add(line)
+					 }
+					 
+					 new File(javaFileName).delete()
+					 
+					 String groovyFileName = fichier + serviceNameInterface + ".groovy"
+					  
+					 new File(groovyFileName).withWriter('utf-8') { writer ->
+						 linesInJavaFile.each{ line ->
+							 writer.writeLine line
+						 }
+					 }
+					 
+					 log.info 'Mock of Groovy source file service interface ' + serviceClassNameInterface + ' generated into ' + s
 									 
 					 // generate service interface as java class file (useful to avoid refreshing the IDE like Eclipse)
 									 
@@ -205,8 +231,8 @@ class ConfigurationMockGenerator {
 						 
 					 byte[] bytes = cw.toByteArray()
 									 
-					 String[] packagePathElements = packageName.split("\\.");
-					 String fichier = "." + File.separator + "bin" + File.separator
+					 packagePathElements = packageName.split("\\.");
+					 fichier = "." + File.separator + "bin" + File.separator
 					 for(String element: packagePathElements){
 						 fichier = fichier + element + File.separator
 					 }
@@ -270,14 +296,16 @@ class ConfigurationMockGenerator {
 			}
 							
 			title = title.substring(0, 1).toUpperCase().concat(title.substring(1)).concat("Configuration")
-							
+					
+			String serviceMockClassName = title
+			
 			String packageName =  configurationClass.getPackage().getName()
 			
-			String serviceMockClassName = packageName + '.' + title
+			String serviceMockFullClassName = packageName + '.' + title
 					
-			log.info 'Generate a Java source file overriding of the configuration ' + configurationClass + ' :' + serviceMockClassName + ' started...'
+			log.info 'Generate a Groovy source file overriding of the configuration ' + configurationClass + ' :' + serviceMockFullClassName + ' started...'
 			
-			JDefinedClass serviceMockClass = codeModel._class(JMod.PUBLIC, serviceMockClassName, ClassType.CLASS)
+			JDefinedClass serviceMockClass = codeModel._class(JMod.PUBLIC, serviceMockFullClassName, ClassType.CLASS)
 							
 			JDocComment jDocComment = serviceMockClass.javadoc();
 			jDocComment.add(String.format("Auto generated configuration file due to missing configuration detail.\nEdit this file to improve the configuration.\nThis file won't be generated again once it has been edited.\nDelete it to generate a new one (any added configuration will be discarded)"))
@@ -288,14 +316,14 @@ class ConfigurationMockGenerator {
 			serviceMockClass._extends(codeModel.ref(configurationClass));
 			
 			
-			log.info 'Generation a Java class overrinding of the configuration ' + configurationClass + ' :' + serviceMockClassName + ' started...'
+			log.info 'Generation a Java class overrinding of the configuration ' + configurationClass + ' :' + serviceMockFullClassName + ' started...'
 			
 			ClassWriter cw = new ClassWriter(0)
 			FieldVisitor fv;
 			MethodVisitor mv;
 			AnnotationVisitor av0;
 			
-			cw.visit(52, Opcodes.ACC_PUBLIC + Opcodes.ACC_SUPER, serviceMockClassName.replaceAll("\\.", "/"), null, configurationClass.getCanonicalName().replaceAll("\\.", "/"), null);
+			cw.visit(52, Opcodes.ACC_PUBLIC + Opcodes.ACC_SUPER, serviceMockFullClassName.replaceAll("\\.", "/"), null, configurationClass.getCanonicalName().replaceAll("\\.", "/"), null);
 			
 			av0 = cw.visitAnnotation("Lorg/springframework/context/annotation/Configuration;", true);
 			av0.visitEnd();
@@ -616,20 +644,49 @@ class ConfigurationMockGenerator {
 
 				}						
 				
-				String s = "." + File.separator + "src" + File.separator + "main" + File.separator + "orcha"
-				FileCodeWriter fileCodeWriter = new FileCodeWriter(new File(s))
-				codeModel.build(fileCodeWriter)
-				fileCodeWriter.close()
 				
-				log.info 'Overriding of the configuration ' + configurationClass + ' (' + serviceMockClassName + ' source file) generated into: ' + s
 			}
+			
+			
+			String s = "." + File.separator + "src" + File.separator + "main" + File.separator + "orcha"
+			FileCodeWriter fileCodeWriter = new FileCodeWriter(new File(s))
+			codeModel.build(fileCodeWriter)
+			fileCodeWriter.close()
+			
+			String[] packagePathElements = packageName.split("\\.");
+			String fichier = "." + File.separator + "src" + File.separator + "main" + File.separator + "orcha" + File.separator
+			for(String element: packagePathElements){
+				fichier = fichier + element + File.separator
+			}
+			
+			// copy the java file into a groovy file and delete the java file
+			
+			String javaFileName = fichier + serviceMockClassName + ".java"
+			
+			def linesInJavaFile = []
+			
+			new File(javaFileName).eachLine { line ->
+			   linesInJavaFile.add(line)
+			}
+			
+			new File(javaFileName).delete()
+			
+			String groovyFileName = fichier + serviceMockClassName + ".groovy"
+			
+			new File(groovyFileName).withWriter('utf-8') { writer ->
+			   linesInJavaFile.each{ line ->
+				   writer.writeLine line
+			   }
+			}
+
+			log.info 'Overriding of the configuration ' + configurationClass + ' (' + serviceMockFullClassName + ' source file) generated into: ' + s
 			
 			cw.visitEnd();
 			
 			byte[] bytes = cw.toByteArray()
 							
-			String[] packagePathElements = serviceMockClassName.split("\\.");
-			String fichier = "." + File.separator + "bin"
+			packagePathElements = serviceMockFullClassName.split("\\.");
+			fichier = "." + File.separator + "bin"
 			for(String element: packagePathElements){
 				fichier = fichier + File.separator + element
 			}
@@ -639,7 +696,7 @@ class ConfigurationMockGenerator {
 			fos.write(bytes);
 			fos.close();
 
-			log.info 'Overriding of the configuration ' + configurationClass + ' (' + serviceMockClassName + ' class file) generated into: ' + fichier + ".class"
+			log.info 'Overriding of the configuration ' + configurationClass + ' (' + serviceMockFullClassName + ' class file) generated into: ' + fichier + ".class"
 		}
 		
 		log.info 'Missing Orcha configuration details for the compilation => auto generation of the remainded configuration achived successfully.'

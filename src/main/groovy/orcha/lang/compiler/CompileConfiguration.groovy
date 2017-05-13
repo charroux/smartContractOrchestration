@@ -15,6 +15,7 @@ import orcha.lang.compiler.referenceimpl.configurationproperties.ConfigurationPr
 import orcha.lang.compiler.referenceimpl.testing.ConfigurationMockGenerator
 import orcha.lang.compiler.referenceimpl.xmlgenerator.XmlGenerator
 import orcha.lang.compiler.referenceimpl.xmlgenerator.impl.XmlGeneratorForSpringIntegration
+import orcha.lang.compiler.serviceOffer.ServiceOfferSelectionGenerator
 import orcha.lang.compiler.visitor.OrchaCodeParser
 import orcha.lang.compiler.visitor.impl.OrchaCodeVisitor
 
@@ -60,6 +61,11 @@ class CompileConfiguration {
 	@Bean
 	OrchaLauncherGenerator orchaLauncherGenerator(){
 		return new OrchaLauncherGenerator()
+	}
+	
+	@Bean
+	ServiceOfferSelectionGenerator serviceOfferSelectionGenerator(){
+		return new ServiceOfferSelectionGenerator()
 	}
 	
 /*	@Bean

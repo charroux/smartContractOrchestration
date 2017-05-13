@@ -11,6 +11,7 @@ import orcha.lang.compiler.referenceimpl.OrchaLauncherGenerator
 import orcha.lang.compiler.referenceimpl.configurationproperties.ConfigurationPropertiesGenerator
 import orcha.lang.compiler.referenceimpl.testing.ConfigurationMockGenerator
 import orcha.lang.compiler.referenceimpl.xmlgenerator.impl.ErrorUnwrapper;
+import orcha.lang.compiler.serviceOffer.ServiceOfferSelectionGenerator
 import orcha.lang.compiler.visitor.OrchaCodeParser
 import orcha.lang.compiler.visitor.impl.OrchaCodeVisitor
 
@@ -30,7 +31,7 @@ import groovy.util.logging.Slf4j
 
 @Slf4j
 @Configuration
-@ComponentScan(basePackages=['orcha.lang.compiler','orcha.lang.business','configuration'])
+@ComponentScan(basePackages=['orcha.lang.compiler','orcha.lang.business','configuration','orcha.lang.registry'])
 class Compiler implements CommandLineRunner{
 	
 	@Autowired
@@ -48,6 +49,9 @@ class Compiler implements CommandLineRunner{
 	@Autowired
 	ConfigurationPropertiesGenerator configurationPropertiesGenerator
 
+	@Autowired
+	ServiceOfferSelectionGenerator serviceOfferSelectionGenerator
+	
 	@Override
 	public void run(String... args) throws Exception {
 		
@@ -66,6 +70,8 @@ class Compiler implements CommandLineRunner{
 		}
 				
 		composeCodeParser.parseSourceFile(orchaFile)
+		
+		serviceOfferSelectionGenerator.generate(composeCodeParser)
 		
 		boolean isMockGenerated = configurationMockGenerator.generate(composeCodeParser)
 		
