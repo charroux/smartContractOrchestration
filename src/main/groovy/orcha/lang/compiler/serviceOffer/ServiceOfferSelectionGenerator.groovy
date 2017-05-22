@@ -67,6 +67,8 @@ class ServiceOfferSelectionGenerator {
 			return false
 		}
 		
+		log.info 'Missing Orcha configuration details for the compilation => auto generate a service selector...'
+		
 		def offersByapplication = [:]
 		
 		beansByConfigurationClass.each{ entry, value ->
@@ -126,37 +128,105 @@ class ServiceOfferSelectionGenerator {
 		offersByapplication.each { application, offers ->
 			
 			String projectTemplateFile = "." + File.separator + "src" + File.separator + "main" + File.separator + "resources" + File.separator + "orchaProjectTemplate.zip"
-			String outputFolder = "." + File.separator + "src" + File.separator + "main" + File.separator + "resources"
+			String outputFolder = "orchaProjects"
 			
 			ZipInputStream zis =  new ZipInputStream(new FileInputStream(projectTemplateFile))
 			
 			ZipEntry ze = zis.getNextEntry()
-
+			
+			File fileEntry
 			byte[] buffer = new byte[1024]
 			
 			while(ze!=null){
 				
-				String fileName = ze.getName();
-				File newFile = new File(outputFolder + File.separator + fileName);
-			
-				System.out.println("file unzip : "+ newFile.getAbsoluteFile());
-				//create all non exists folders
-				//else you will hit FileNotFoundException for compressed folder
-				new File(newFile.getParent()).mkdirs();
-			
-				FileOutputStream fos = new FileOutputStream(newFile);
-				int len;
-				while ((len = zis.read(buffer)) > 0) {
-				   fos.write(buffer, 0, len);
+				fileEntry = new File(outputFolder + File.separator + ze.getName()) 
+				
+				if(ze.isDirectory()){
+					fileEntry.mkdirs()
+				} else {
+					
+					new File(fileEntry.getParent()).mkdirs()
+					
+					try{
+						FileOutputStream fos = new FileOutputStream(fileEntry);
+						int len;
+						while ((len = zis.read(buffer)) > 0) {
+						   fos.write(buffer, 0, len);
+						}
+						fos.close()
+					}catch(FileNotFoundException e){
+					}
+					
 				}
-			
-				fos.close();
+	
 				ze = zis.getNextEntry();
 			}
 			
 			zis.closeEntry();
 			zis.close();
+			
+			String send = application.name
+			
+			String className = application.name.substring(0,1).toUpperCase().concat(application.name.substring(1))
+			
+			String pathToOrchaComparisonFile = outputFolder + File.separator + "src" + File.separator + "main" + File.separator + "orcha" + File.separator + "source" + File.separator + application.name 
+			
+			new File(pathToOrchaComparisonFile).mkdirs()
+			
+			pathToOrchaComparisonFile = pathToOrchaComparisonFile +  File.separator + "Select" + className + ".groovy"
+			
+			log.info 'Missing Orcha configuration details for the compilation => orcha program service selector generated: ' + new File(pathToOrchaComparisonFile).getAbsolutePath()
+			
+			new File(pathToOrchaComparisonFile).withWriter('utf-8') { writer ->
+				String event
+				int indexOfDot = application.input.type.lastIndexOf(".")
+				if(indexOfDot != -1){
+					event = application.input.type.substring(indexOfDot + 1)
+				} else {
+					event = application.input.type
+				}
+				event = event.toLowerCase()
+				
+				
+				String packageName = "package source." + application.name
+				writer.writeLine packageName
+								
+				String comparison = "compute select" + className + " with "
+				
+				String when = "when \"select" + className + " terminates\""
+				
+				send = "send select" + className + ".result to " + send + "Output"
+				
+				className = className.concat("OffersComparison")
+				
+				String synchronize = "when \"("
+				
+				int i = 0
+				
+				offers.each{ offer ->
+					writer.writeLine "receive " + event + " from " + event + "EventHandler"
+					writer.writeLine "compute " + offer.name + " with " + event + ".value"
+					synchronize = synchronize + offer.name + " terminates)"
+					comparison = comparison + offer.name + ".result"
+					i++
+					if(i < offers.size()){
+						synchronize = synchronize + " and ("
+						comparison = comparison + ", "
+					}
+				}
+				synchronize = synchronize + "\""
+				writer.writeLine synchronize
+	
+				writer.writeLine comparison
+				
+				writer.writeLine when
+				
+				writer.writeLine send
+			}
+						
 		}
+		
+		log.info 'Missing Orcha configuration details for the compilation => service selector generation complete successfully'
 		
 		return true
 		
