@@ -33,7 +33,7 @@ class RestWebServiceConfiguration {
 	@Bean
 	Application javaCode(){
 		def code1Application = new Application(name: "javaCode", language: "Java")
-		def javaCode1Adapter = new JavaServiceAdapter(javaClass: 'MyProgram', method:'myMethod')
+		def javaCode1Adapter = new JavaServiceAdapter(javaClass: 'service.MyProgram', method:'myMethod')
 		def code1Input = new Input(type: "java.lang.Integer", adapter: javaCode1Adapter)
 		code1Application.input = code1Input
 		def code1Output = new Output(type: "java.lang.Integer", adapter: javaCode1Adapter)

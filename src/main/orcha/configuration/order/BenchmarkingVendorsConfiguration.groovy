@@ -134,7 +134,7 @@ class BenchmarkingVendorsConfiguration {
 /*	@Bean
 	Application orderConverter(){
 		def program = new OrderConverterApplication(name: "orderConverter", language: "Groovy")
-		//def javaAdapter = new JavaServiceAdapter(javaClass: 'VendorOrderConverter', method:'convert')
+		//def javaAdapter = new JavaServiceAdapter(javaClass: 'service.order.VendorOrderConverter', method:'convert')
 		def javaAdapter = new JavaServiceAdapter(javaClass: 'VendorOrderConverterInterface', method:'convert')
 		program.input = new Input(type: "service.order.Order", adapter: javaAdapter)
 		program.output = new Output(type: "service.order.SpecificOrder", adapter: javaAdapter)
@@ -238,7 +238,7 @@ class BenchmarkingVendorsConfiguration {
 	@Bean
 	Application selectBestVendor(){
 		def program = new SelectBestVendorApplication(name: "selectBestVendor", language: "Java")
-		def javaAdapter = new JavaServiceAdapter(javaClass: 'VendorComparison', method:'compare')
+		def javaAdapter = new JavaServiceAdapter(javaClass: 'service.order.VendorComparison', method:'compare')
 		program.input = new Input(type: "java.util.List<service.order.Bill>", adapter: javaAdapter)
 		program.output = new Output(type: "service.order.Bill", adapter: javaAdapter)
 		return program

@@ -56,7 +56,7 @@ class FailsHandlingConfiguration {
 	@Bean
 	Application aService(){
 		def program = new Application(name: "aService", language: "Groovy")
-		def javaAdapter = new JavaServiceAdapter(javaClass: 'AClass', method:'method')
+		def javaAdapter = new JavaServiceAdapter(javaClass: 'service.failsHandling.AClass', method:'method')
 		program.input = new Input(type: "java.lang.String", adapter: javaAdapter)
 		program.output = new Output(type: "java.lang.String", adapter: javaAdapter)
 		return program
@@ -93,7 +93,7 @@ class FailsHandlingConfiguration {
 	@Bean
 	Application finalService(){
 		def program = new Application(name: "finalService", language: "Groovy")
-		def javaAdapter = new JavaServiceAdapter(javaClass: 'ServiceComparison', method:'compare')
+		def javaAdapter = new JavaServiceAdapter(javaClass: 'service.failsHandling.ServiceComparison', method:'compare')
 		program.input = new Input(type: "java.util.List<java.lang.String>", adapter: javaAdapter)
 		program.output = new Output(type: "java.util.List<java.lang.String>", adapter: javaAdapter)
 		return program
@@ -108,7 +108,7 @@ class FailsHandlingConfiguration {
 	@Bean
 	Application alternativeService(){
 		def program = new Application(name: "alternativeService", language: "Groovy")
-		def javaAdapter = new JavaServiceAdapter(javaClass: 'AlternativeClass', method:'method')
+		def javaAdapter = new JavaServiceAdapter(javaClass: 'service.failsHandling.AlternativeClass', method:'method')
 		program.input = new Input(type: "java.lang.String", adapter: javaAdapter)
 		program.output = new Output(type: "java.lang.String", adapter: javaAdapter)
 		return program

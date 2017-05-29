@@ -40,7 +40,7 @@ class ResumeAtStoppingPointConfiguration {
 	@Bean
 	Application s1(){
 		def program = new PersistentApplication1(name: "s1", language: "Groovy")
-		def javaAdapter = new JavaServiceAdapter(javaClass: 'Class1', method:'method1')
+		def javaAdapter = new JavaServiceAdapter(javaClass: 'service.resumeAtStoppingPoint.Class1', method:'method1')
 		program.input = new Input(type: "java.lang.Integer", adapter: javaAdapter)
 		program.output = new Output(type: "java.lang.Integer", adapter: javaAdapter)
 		return program
@@ -54,7 +54,7 @@ class ResumeAtStoppingPointConfiguration {
 	@Bean
 	Application s2(){
 		def program = new PersistentApplication2(name: "s2", language: "Groovy")
-		def javaAdapter = new JavaServiceAdapter(javaClass: 'Class2', method:'method2')
+		def javaAdapter = new JavaServiceAdapter(javaClass: 'service.resumeAtStoppingPoint.Class2', method:'method2')
 		program.input = new Input(type: "java.lang.Integer", adapter: javaAdapter)
 		program.output = new Output(type: "java.lang.Integer", adapter: javaAdapter)
 		return program

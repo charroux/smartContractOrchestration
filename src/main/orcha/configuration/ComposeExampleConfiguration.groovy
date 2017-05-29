@@ -21,7 +21,7 @@ class ComposeConfiguration {
 	@Bean
 	Application code1(){
 		def code1Application = new Application(name: "code1", language: "Groovy")
-		def groovyCode1Adapter = new JavaServiceAdapter(javaClass: 'GroovyCode1', method:'method1')
+		def groovyCode1Adapter = new JavaServiceAdapter(javaClass: 'service.GroovyCode1', method:'method1')
 		def code1Input = new Input(type: "java.lang.Integer", adapter: groovyCode1Adapter)
 		code1Application.input = code1Input
 		def code1Output = new Output(type: "java.lang.Integer", adapter: groovyCode1Adapter)
@@ -37,7 +37,7 @@ class ComposeConfiguration {
 	@Bean
 	Application code2(){
 		def code2Application = new Application(name: "code2", language: "Groovy")
-		def groovyCode2Adapter = new JavaServiceAdapter(javaClass: 'GroovyCode2', method:'method2')
+		def groovyCode2Adapter = new JavaServiceAdapter(javaClass: 'service.GroovyCode2', method:'method2')
 		def code2Input = new Input(type: "java.lang.Integer", adapter: groovyCode2Adapter)
 		code2Application.input = code2Input
 		def code2Output = new Output(type: "java.lang.Integer", adapter: groovyCode2Adapter)

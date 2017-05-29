@@ -25,7 +25,7 @@ class ComputeInASeriesConfiguration {
 	@Bean
 	Application program1(){
 		def program1 = new Application(name: "program1", language: "Java")
-		def javaAdapter = new JavaServiceAdapter(javaClass: 'MyProgram1', method:'myMethod')
+		def javaAdapter = new JavaServiceAdapter(javaClass: 'service.MyProgram1', method:'myMethod')
 		program1.input = new Input(type: "java.lang.Integer", adapter: javaAdapter)
 		program1.output = new Output(type: "java.lang.Integer", adapter: javaAdapter)
 		return program1
@@ -39,7 +39,7 @@ class ComputeInASeriesConfiguration {
 	@Bean
 	Application program2(){
 		def program2 = new Application(name: "program2", language: "Java")
-		def javaAdapter = new JavaServiceAdapter(javaClass: 'MyProgram2', method:'myMethod')
+		def javaAdapter = new JavaServiceAdapter(javaClass: 'service.MyProgram2', method:'myMethod')
 		program2.input = new Input(type: "java.lang.Integer", adapter: javaAdapter)
 		program2.output = new Output(type: "java.lang.Integer", adapter: javaAdapter)
 		return program2

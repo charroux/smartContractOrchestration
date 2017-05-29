@@ -32,7 +32,7 @@ class ComposeFileConfiguration {
 	@Bean
 	Application program(){
 		def program = new ProgramConfiguration(name: "program", language: "Java")
-		def javaAdapter = new JavaServiceAdapter(javaClass: 'MyProgram', method:'myMethod')
+		def javaAdapter = new JavaServiceAdapter(javaClass: 'service.MyProgram', method:'myMethod')
 		program.input = new Input(type: "java.lang.Integer", adapter: javaAdapter)
 		program.output = new Output(type: "java.lang.Integer", adapter: javaAdapter)
 		return program

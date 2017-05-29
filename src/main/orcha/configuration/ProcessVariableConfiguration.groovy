@@ -32,7 +32,7 @@ class ProcessVariableConfiguration {
 	@Bean
 	Application codeWithAVariableProcess(){
 		def program = new Application(name: "codeWithAVariableProcess", language: "Groovy")
-		def javaAdapter = new JavaServiceAdapter(javaClass: 'ClassWithAVariableProcess', method:'method')
+		def javaAdapter = new JavaServiceAdapter(javaClass: 'service.ClassWithAVariableProcess', method:'method')
 		program.input = new Input(type: "java.lang.Integer", adapter: javaAdapter)
 		program.output = new Output(type: "java.lang.Integer", adapter: javaAdapter)
 		return program

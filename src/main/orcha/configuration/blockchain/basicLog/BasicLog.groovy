@@ -39,7 +39,7 @@ class BasicLog {
 	@Bean
 	Application service4(){	
 		def program = new PersistentService(name: "service4", language: "Groovy")
-		def javaAdapter = new JavaServiceAdapter(javaClass: 'Service4Class', method:'method')
+		def javaAdapter = new JavaServiceAdapter(javaClass: 'service.blockchain.basiclog.Service4Class', method:'method')
 		program.input = new Input(type: "service.blockchain.basicLog.Person", adapter: javaAdapter)
 		program.output = new Output(type: "service.blockchain.basicLog.Person", adapter: javaAdapter)
 		return program

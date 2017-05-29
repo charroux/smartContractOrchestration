@@ -31,7 +31,7 @@ class SQLDatabaseConfiguration {
 	@Bean
 	Application code(){
 		def codeApplication = new Application(name: "code", language: "Java")
-		def javaCodeAdapter = new JavaServiceAdapter(javaClass: 'MyProgram', method:'myMethod')
+		def javaCodeAdapter = new JavaServiceAdapter(javaClass: 'service.MyProgram', method:'myMethod')
 		def codeInput = new Input(type: "java.lang.Integer", adapter: javaCodeAdapter)
 		codeApplication.input = codeInput
 		def codeOutput = new Output(type: "java.lang.Integer", adapter: javaCodeAdapter)

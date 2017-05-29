@@ -38,7 +38,7 @@ class TacitContractConfiguration {
 	@Bean
 	Application checkDrivingLicenceValidity(){
 		def program = new Application(name: "checkDrivingLicenceValidity", language: "Groovy")
-		def javaAdapter = new JavaServiceAdapter(javaClass: 'DrivingLicenceValidity', method:'check')
+		def javaAdapter = new JavaServiceAdapter(javaClass: 'service.tacitContract.service.DrivingLicenceValidity', method:'check')
 		program.input = new Input(type: "service.tacitContract.domain.DrivingLicence", adapter: javaAdapter)
 		program.output = new Output(type: "service.tacitContract.domain.AvailableDrivingLicence", adapter: javaAdapter)
 		return program
@@ -52,7 +52,7 @@ class TacitContractConfiguration {
 	@Bean
 	Application checkCarInsuranceValidity(){
 		def program = new Application(name: "checkCarInsuranceValidity", language: "Groovy")
-		def javaAdapter = new JavaServiceAdapter(javaClass: 'CarInsuranceValidity', method:'check')
+		def javaAdapter = new JavaServiceAdapter(javaClass: 'service.tacitContract.service.CarInsuranceValidity', method:'check')
 		program.input = new Input(type: "service.tacitContract.domain.CarInsurance", adapter: javaAdapter)
 		program.output = new Output(type: "service.tacitContract.domain.AvailableCarInsurance", adapter: javaAdapter)
 		return program
@@ -66,7 +66,7 @@ class TacitContractConfiguration {
 	@Bean
 	Application authorizeTaxi(){
 		def program = new Application(name: "authorizeTaxi", language: "Groovy")
-		def javaAdapter = new JavaServiceAdapter(javaClass: 'TaxiValidity', method:'authorize')
+		def javaAdapter = new JavaServiceAdapter(javaClass: 'service.tacitContract.service.TaxiValidity', method:'authorize')
 		program.input = new Input(type: "service.tacitContract.domain.AvailableDrivingLicence", adapter: javaAdapter)
 		program.output = new Output(type: "service.tacitContract.domain.Taxi", adapter: javaAdapter)
 		return program
