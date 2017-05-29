@@ -1,5 +1,17 @@
 package orcha.lang.compiler.serviceOffer
 
+import com.sun.codemodel.JCodeModel
+import com.sun.codemodel.JDefinedClass
+import com.sun.codemodel.JDocComment
+import com.sun.codemodel.JMethod
+import com.sun.codemodel.JMod
+import com.sun.codemodel.JVar
+import com.sun.codemodel.writer.FileCodeWriter
+import com.sun.org.apache.xpath.internal.functions.FuncSubstring
+import com.sun.codemodel.ClassType
+import com.sun.codemodel.JBlock
+import com.sun.codemodel.JExpr
+import com.sun.codemodel.JInvocation
 import groovy.json.JsonSlurper
 import groovy.util.logging.Slf4j
 import groovyx.net.http.HTTPBuilder
@@ -165,6 +177,9 @@ class ServiceOfferSelectionGenerator {
 			zis.closeEntry();
 			zis.close();
 			
+			String inputEventHandler
+			String outputEventHandler
+			
 			String send = application.name
 			
 			String className = application.name.substring(0,1).toUpperCase().concat(application.name.substring(1))
@@ -187,7 +202,8 @@ class ServiceOfferSelectionGenerator {
 				}
 				event = event.toLowerCase()
 				
-				
+				inputEventHandler = event + "EventHandler"
+							
 				String packageName = "package source." + application.name
 				writer.writeLine packageName
 								
@@ -195,7 +211,9 @@ class ServiceOfferSelectionGenerator {
 				
 				String when = "when \"select" + className + " terminates\""
 				
-				send = "send select" + className + ".result to " + send + "Output"
+				outputEventHandler = send + "Output"
+				
+				send = "send select" + className + ".result to " + outputEventHandler
 				
 				className = className.concat("OffersComparison")
 				
@@ -204,7 +222,7 @@ class ServiceOfferSelectionGenerator {
 				int i = 0
 				
 				offers.each{ offer ->
-					writer.writeLine "receive " + event + " from " + event + "EventHandler"
+					writer.writeLine "receive " + event + " from " + inputEventHandler
 					writer.writeLine "compute " + offer.name + " with " + event + ".value"
 					synchronize = synchronize + offer.name + " terminates)"
 					comparison = comparison + offer.name + ".result"
@@ -223,7 +241,301 @@ class ServiceOfferSelectionGenerator {
 				
 				writer.writeLine send
 			}
+			
+			
+			
+			
+			JCodeModel codeModel = new JCodeModel()
+			
+			String title = orchaCodeParser.getOrchaMetadata().getTitle()
+							
+			int indexOfWhiteSpace
+			
+			title = title.trim()
+			while((indexOfWhiteSpace=title.indexOf(" ")) != -1){
+			title = title.substring(0, indexOfWhiteSpace).concat(title.substring(indexOfWhiteSpace+1))
+			}
 						
+			title = title.substring(0, 1).toUpperCase().concat(title.substring(1)).concat("Configuration")
+				
+			String serviceMockClassName = title
+			
+			String packageName = "configuration." + application.name
+			
+			String configurationClass = application.name.substring(0,1).toUpperCase().concat(application.name.substring(1)) + 'Configuration'
+			
+			String serviceMockFullClassName = packageName + '.' + configurationClass
+				
+			log.info 'Generate a Groovy source file overriding of the configuration ' + configurationClass + ' :' + serviceMockFullClassName + ' started...'
+			
+			JDefinedClass serviceMockClass = codeModel._class(JMod.PUBLIC, serviceMockFullClassName, ClassType.CLASS)
+						
+			JDocComment jDocComment = serviceMockClass.javadoc();
+			jDocComment.add(String.format("Auto generated configuration file due to missing configuration detail.\nEdit this file to improve the configuration.\nThis file won't be generated again once it has been edited.\nDelete it to generate a new one (any added configuration will be discarded)"))
+							
+			serviceMockClass.annotate(Configuration.class)
+			serviceMockClass.annotate(Slf4j.class)
+			
+			JMethod method
+			JBlock body
+			JVar jVar
+			JInvocation jInvoque
+			
+			offers.each{ offer ->
+				
+				method = serviceMockClass.method(JMod.PUBLIC, orcha.lang.configuration.Application.class, offer.name)
+				method.annotate(org.springframework.context.annotation.Bean.class)
+								
+				body = method.body()
+				
+				jVar = body.decl(codeModel.ref(orcha.lang.configuration.Application.class), "application", JExpr._new(codeModel.ref(orcha.lang.configuration.Application)))
+				
+				jInvoque = jVar.invoke("setName").arg(JExpr.lit(offer.name))
+				body.add(jInvoque)
+				
+				jInvoque = jVar.invoke("language").arg(JExpr.lit(offer.language))
+				body.add(jInvoque)
+				
+				if(offer.description != null){
+					jInvoque = jVar.invoke("description").arg(JExpr.lit(offer.description))
+					body.add(jInvoque)
+				}
+				
+				if(offer.specifications != null){
+					jInvoque = jVar.invoke("specifications").arg(JExpr.lit(offer.specifications))
+					body.add(jInvoque)
+				}
+				
+				if(offer.language.equalsIgnoreCase("java") || offer.language.equalsIgnoreCase("groovy")){
+					
+					JVar adapterJVar = body.decl(codeModel.ref(orcha.lang.configuration.JavaServiceAdapter.class), "javaAdapter", JExpr._new(codeModel.ref(orcha.lang.configuration.JavaServiceAdapter)));
+					
+					jInvoque = adapterJVar.invoke("setJavaClass").arg(JExpr.lit(offer.input.adapter.javaClass))
+					body.add(jInvoque);
+														
+					jInvoque = adapterJVar.invoke("setMethod").arg(JExpr.lit(offer.input.adapter.method))
+					body.add(jInvoque);
+							
+					JVar inputTypeJVar = body.decl(codeModel.ref(orcha.lang.configuration.Input.class), "input", JExpr._new(codeModel.ref(orcha.lang.configuration.Input)));
+					
+					jInvoque = inputTypeJVar.invoke("setType").arg(JExpr.lit(offer.input.type))
+					body.add(jInvoque)
+					
+					if(offer.input.mimeType != null){
+						jInvoque = inputTypeJVar.invoke("setMimeType").arg(JExpr.lit(offer.input.mimeType))
+						body.add(jInvoque)
+					}
+					
+					jInvoque = inputTypeJVar.invoke("setAdapter").arg(adapterJVar);
+					body.add(jInvoque)
+					
+					jInvoque = jVar.invoke("setInput").arg(inputTypeJVar)
+					body.add(jInvoque)
+				
+					JVar outputTypeJVar = body.decl(codeModel.ref(orcha.lang.configuration.Output.class), "output", JExpr._new(codeModel.ref(orcha.lang.configuration.Output)));
+					
+					jInvoque = outputTypeJVar.invoke("setType").arg(JExpr.lit(offer.output.type))
+					body.add(jInvoque);
+					
+					jInvoque = outputTypeJVar.invoke("setAdapter").arg(adapterJVar);
+					body.add(jInvoque)
+					
+					jInvoque = jVar.invoke("setOutput").arg(outputTypeJVar)
+					body.add(jInvoque)	
+									
+				} else if(offer.language.equalsIgnoreCase("js") || offer.language.equalsIgnoreCase("javascript") || offer.language.equalsIgnoreCase("java script")){
+				
+					JVar adapterJVar = body.decl(codeModel.ref(orcha.lang.configuration.ScriptServiceAdapter.class), "scriptAdapter", JExpr._new(codeModel.ref(orcha.lang.configuration.ScriptServiceAdapter)));
+					
+					jInvoque = adapterJVar.invoke("setFile").arg(JExpr.lit(offer.input.adapter.file))
+					body.add(jInvoque);
+															
+					JVar inputTypeJVar = body.decl(codeModel.ref(orcha.lang.configuration.Input.class), "input", JExpr._new(codeModel.ref(orcha.lang.configuration.Input)));
+					
+					jInvoque = inputTypeJVar.invoke("setType").arg(JExpr.lit(offer.input.type))
+					body.add(jInvoque)
+					
+					if(offer.input.mimeType != null){
+						jInvoque = inputTypeJVar.invoke("setMimeType").arg(JExpr.lit(offer.input.mimeType))
+						body.add(jInvoque)
+					}
+					
+					jInvoque = inputTypeJVar.invoke("setAdapter").arg(adapterJVar);
+					body.add(jInvoque)
+					
+					jInvoque = jVar.invoke("setInput").arg(inputTypeJVar)
+					body.add(jInvoque)
+				
+					JVar outputTypeJVar = body.decl(codeModel.ref(orcha.lang.configuration.Output.class), "output", JExpr._new(codeModel.ref(orcha.lang.configuration.Output)));
+					
+					jInvoque = outputTypeJVar.invoke("setType").arg(JExpr.lit(offer.output.type))
+					body.add(jInvoque);
+					
+					jInvoque = outputTypeJVar.invoke("setAdapter").arg(adapterJVar);
+					body.add(jInvoque)
+					
+					jInvoque = jVar.invoke("setOutput").arg(outputTypeJVar)
+					body.add(jInvoque)		
+					
+				}
+				
+				body._return(jVar)
+				
+			}
+			
+			offers.each{ offer ->
+				
+				if(offer.language.equalsIgnoreCase("java") || offer.language.equalsIgnoreCase("groovy")){
+					
+					String serviceBeanName = offer.input.adapter.javaClass
+					serviceBeanName = serviceBeanName.substring(0, 1).toLowerCase().concat(serviceBeanName.substring(1))
+					
+					method = serviceMockClass.method(JMod.PUBLIC, service.order.VendorOrderConverter.class, serviceBeanName)
+					method.annotate(org.springframework.context.annotation.Bean.class)
+			
+					body = method.body()
+					
+					JVar beanJVar = body.decl(codeModel.ref(service.order.VendorOrderConverter.class), "service", JExpr._new(codeModel.ref(service.order.VendorOrderConverter)))
+					
+					body._return(beanJVar)
+					
+				}
+			}
+			
+			
+			method = serviceMockClass.method(JMod.PUBLIC, orcha.lang.configuration.EventHandler.class, inputEventHandler)
+			method.annotate(org.springframework.context.annotation.Bean.class)
+							
+			body = method.body()
+			
+			JVar eventHandlerJVar = body.decl(codeModel.ref(orcha.lang.configuration.EventHandler.class), "eventHandler", JExpr._new(codeModel.ref(orcha.lang.configuration.EventHandler)))
+			
+			JVar adapterJVar = body.decl(codeModel.ref(orcha.lang.configuration.InputFileAdapter.class), "localFileAdapter", JExpr._new(codeModel.ref(orcha.lang.configuration.InputFileAdapter)))			
+								
+			// example: C:/Users/Charroux_std/Documents/projet/ExecAndShare/orcha/Orcha/OrchaBeforeLibrary/bin/data/order
+			// the corresponding src folder is src/main/resources/data/order
+			
+			String dataFolder = ""
+			
+/*			String folder = packageName.substring( "configuration.".length() )
+			
+			String[] dataSubFolders = folder.split("\\.")
+			if(dataSubFolders.size() > 0){
+				for(String s: dataSubFolders){
+					dataFolder =  dataFolder + File.separator + s
+				}
+			} else {
+				dataFolder =  dataFolder + File.separator + folder
+			}
+			
+			dataFolder =  dataFolder + File.separator + methodName
+			
+			// src/main/resources
+			  
+			Path path = Paths.get(this.getClass().getClassLoader().getResource("data").toURI())
+			
+			dataFolder = Paths.get(path.toString().concat(dataFolder)).toUri().toURL().getPath().substring(1)*/
+			
+			log.info "Mock of an event handler => put your input data into (src/main/resources): " + dataFolder			
+			
+			jInvoque = adapterJVar.invoke("setDirectory").arg(JExpr.lit(dataFolder))
+			body.add(jInvoque)
+			
+			JVar inputTypeJVar = body.decl(codeModel.ref(orcha.lang.configuration.Input.class), "input", JExpr._new(codeModel.ref(orcha.lang.configuration.Input)));
+					
+			jInvoque = inputTypeJVar.invoke("setType").arg(JExpr.lit(application.input.type))
+			body.add(jInvoque)
+					
+			if(application.input.mimeType != null){
+				jInvoque = inputTypeJVar.invoke("setMimeType").arg(JExpr.lit(application.input.mimeType))
+				body.add(jInvoque)
+			}
+			
+			jInvoque = inputTypeJVar.invoke("setAdapter").arg(adapterJVar);
+			body.add(jInvoque)
+			
+			jInvoque = eventHandlerJVar.invoke("setInput").arg(inputTypeJVar)
+			body.add(jInvoque)
+										
+			body._return(eventHandlerJVar)
+			
+			
+			
+			
+			method = serviceMockClass.method(JMod.PUBLIC, orcha.lang.configuration.EventHandler.class, outputEventHandler)
+			method.annotate(org.springframework.context.annotation.Bean.class)
+			method.annotate(java.lang.Override.class)
+							
+			body = method.body()
+			
+			eventHandlerJVar = body.decl(codeModel.ref(orcha.lang.configuration.EventHandler.class), "eventHandler", JExpr._new(codeModel.ref(orcha.lang.configuration.EventHandler)))
+			
+			adapterJVar = body.decl(codeModel.ref(orcha.lang.configuration.OutputFileAdapter.class), "localFileAdapter", JExpr._new(codeModel.ref(orcha.lang.configuration.OutputFileAdapter)));			
+								
+			// example: C:/Users/Charroux_std/Documents/projet/ExecAndShare/orcha/Orcha/OrchaBeforeLibrary/bin/data/order
+			// the corresponding src folder is src/main/resources/data/order
+			
+/*			String dataFolder = ""
+			
+			String folder = packageName.substring( "configuration.".length() )
+			
+			String[] dataSubFolders = folder.split("\\.")
+			if(dataSubFolders.size() > 0){
+				for(String s: dataSubFolders){
+					dataFolder =  dataFolder + File.separator + s
+				}
+			} else {
+				dataFolder =  dataFolder + File.separator + folder
+			}
+			
+			dataFolder =  dataFolder + File.separator + methodName
+			
+			// src/main/resources
+			  
+			Path path = Paths.get(this.getClass().getClassLoader().getResource("data").toURI())
+			
+			dataFolder = Paths.get(path.toString().concat(dataFolder)).toUri().toURL().getPath().substring(1)*/
+			
+			log.info "Mock of an event handler => output data will be into: " + dataFolder
+			
+			
+			jInvoque = adapterJVar.invoke("setDirectory").arg(JExpr.lit(dataFolder))
+			body.add(jInvoque)
+			
+			jInvoque = adapterJVar.invoke("setCreateDirectory").arg(JExpr.lit(true))
+			body.add(jInvoque)
+				
+			jInvoque = adapterJVar.invoke("setAppendNewLine").arg(JExpr.lit(true))
+			body.add(jInvoque)
+				
+			jInvoque = adapterJVar.invoke("setWritingMode").arg(JExpr.direct("orcha.lang.configuration.OutputFileAdapter.WritingMode.APPEND"))
+			body.add(jInvoque)
+			
+			JVar outputTypeJVar = body.decl(codeModel.ref(orcha.lang.configuration.Output.class), "output", JExpr._new(codeModel.ref(orcha.lang.configuration.Output)));
+					
+			jInvoque = outputTypeJVar.invoke("setType").arg(JExpr.lit(application.output.type))
+			body.add(jInvoque)
+					
+			if(application.output.mimeType != null){
+				jInvoque = outputTypeJVar.invoke("setMimeType").arg(JExpr.lit(application.output.mimeType))
+				body.add(jInvoque)
+			}
+			
+			jInvoque = outputTypeJVar.invoke("setAdapter").arg(adapterJVar);
+			body.add(jInvoque)
+			
+			jInvoque = eventHandlerJVar.invoke("setOutput").arg(outputTypeJVar)
+			body.add(jInvoque)
+										
+			body._return(eventHandlerJVar)
+			
+			
+			
+			String s = outputFolder + File.separator + "src" + File.separator + "main" + File.separator + "orcha"
+			FileCodeWriter fileCodeWriter = new FileCodeWriter(new File(s))
+			codeModel.build(fileCodeWriter)
+			fileCodeWriter.close()
+					
 		}
 		
 		log.info 'Missing Orcha configuration details for the compilation => service selector generation complete successfully'
