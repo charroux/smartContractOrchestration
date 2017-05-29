@@ -27,6 +27,8 @@ import orcha.lang.configuration.Input
 import orcha.lang.configuration.JavaServiceAdapter
 import orcha.lang.configuration.Output
 import orcha.lang.configuration.ScriptServiceAdapter
+
+import org.hibernate.validator.internal.util.privilegedactions.GetClassLoader
 import org.springframework.beans.factory.config.BeanDefinition
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider
 import org.springframework.context.annotation.Configuration
@@ -35,7 +37,7 @@ import org.springframework.core.type.filter.AnnotationTypeFilter
 @Slf4j
 class ServiceOfferSelectionGenerator {
 	
-	String registryURI = "http://localhost:8080/applications"
+	String registryURI = "http://localhost:8080/"
 	
 	private Map<Class, List<InstructionNode>> getBeansByConfigurationClass(OrchaCodeParser orchaCodeParser){
 		
@@ -102,7 +104,7 @@ class ServiceOfferSelectionGenerator {
 					String inputType = application.input.type
 					String outputType = application.output.type
 					
-					String uri = registryURI + "?input=" + inputType + "&output=" + outputType
+					String uri = registryURI + "applications?input=" + inputType + "&output=" + outputType
 			
 					def http = new HTTPBuilder(uri)
 					
@@ -387,15 +389,19 @@ class ServiceOfferSelectionGenerator {
 				
 				if(offer.language.equalsIgnoreCase("java") || offer.language.equalsIgnoreCase("groovy")){
 					
-					String serviceBeanName = offer.input.adapter.javaClass
-					serviceBeanName = serviceBeanName.substring(0, 1).toLowerCase().concat(serviceBeanName.substring(1))
 					
-					method = serviceMockClass.method(JMod.PUBLIC, service.order.VendorOrderConverter.class, serviceBeanName)
+					String serviceBeanName = offer.input.adapter.javaClass
+					serviceBeanName = serviceBeanName.substring(serviceBeanName.lastIndexOf('.')+1)
+					serviceBeanName = serviceBeanName.substring(0,1).toLowerCase() + serviceBeanName.substring(1)
+					
+					Class argumentClass = Class.forName(offer.input.adapter.javaClass)
+					
+					method = serviceMockClass.method(JMod.PUBLIC, argumentClass, serviceBeanName)
 					method.annotate(org.springframework.context.annotation.Bean.class)
 			
 					body = method.body()
 					
-					JVar beanJVar = body.decl(codeModel.ref(service.order.VendorOrderConverter.class), "service", JExpr._new(codeModel.ref(service.order.VendorOrderConverter)))
+					JVar beanJVar = body.decl(codeModel.ref(argumentClass), "service", JExpr._new(codeModel.ref(argumentClass.getCanonicalName())))
 					
 					body._return(beanJVar)
 					
@@ -535,13 +541,71 @@ class ServiceOfferSelectionGenerator {
 			FileCodeWriter fileCodeWriter = new FileCodeWriter(new File(s))
 			codeModel.build(fileCodeWriter)
 			fileCodeWriter.close()
+	
+			
+			
+			
+			
+			offers.each{ offer ->
+				
+				String content = downloadService(offer.name, offer.input.type)
+				println content
 					
+				content = downloadService(offer.name, offer.output.type)
+				println content
+				
+				if(offer.input.adapter instanceof orcha.lang.configuration.JavaServiceAdapter){
+					
+					content = downloadService(offer.name, offer.input.adapter.javaClass)
+					println content
+					
+				} else if(offer.input.adapter instanceof orcha.lang.configuration.ScriptServiceAdapter){
+					
+					content = downloadService(offer.name, offer.input.adapter.file)
+					println content
+	
+				}
+			}
 		}
+		
+			
 		
 		log.info 'Missing Orcha configuration details for the compilation => service selector generation complete successfully'
 		
 		return true
 		
+	
+	}
+	
+	private String downloadService(String applicationName, String service){
+				
+		String uri = registryURI + "services/" + applicationName + "?serviceName=" + service
+		
+		log.info "Download service: " + service + " at: " + uri
+		
+		def http = new HTTPBuilder(uri)
+				
+		String content = ""
+		
+		http.request(groovyx.net.http.Method.GET,ContentType.TEXT) { req ->
+			response.success = { resp, inputStreamReader  ->
+
+				char[] buf = new char[1024]
+				int nbChar
+				while((nbChar=inputStreamReader.read(buf, 0, 1024)) != -1){
+					content = content + String.copyValueOf(buf, 0, nbChar)
+				}
+								   
+			}
+			response.failure = { resp ->
+				throw new Exception("Error: ${resp.status}")
+			}
+		}
+		
+		log.info "Download service completed successfully: " + service + " at: " + uri
+		
+		return content
+
 	}
 
 }
