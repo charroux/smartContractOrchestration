@@ -402,6 +402,8 @@ class OrchaCodeVisitor extends OrchaCodeParser{
 		if(graphOfInstructions.empty){
 			
 			log.info 'Syntax analysis of the the Orcha program'
+		
+			checkOrchaCompliance()
 			
 			Instruction instruction
 			
@@ -949,8 +951,6 @@ class OrchaCodeVisitor extends OrchaCodeParser{
 		} else {
 			//aggregateInstruction = false
 		}
-		
-		checkOrchaCompliance()
 		
 		log.debug "end"
 		

@@ -210,7 +210,10 @@ class ServiceOfferSelectionGenerator {
 							
 				String packageName = "package source." + application.name
 				writer.writeLine packageName
-								
+				
+				String title = "title select" + className
+				writer.writeLine title
+				
 				String comparison = "compute select" + className + " with "
 				
 				String when = "when \"select" + className + " terminates\""
