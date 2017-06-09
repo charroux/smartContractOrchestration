@@ -11,6 +11,7 @@ import orcha.lang.compiler.InstructionNode
 import orcha.lang.compiler.qualityOfService.QualityOfServicesOptions;
 import orcha.lang.compiler.referenceimpl.ExpressionParser;
 import orcha.lang.compiler.visitor.OrchaCodeParser
+import orcha.lang.compiler.visitor.OrchaComplianceException
 import orcha.lang.compiler.visitor.MyClassLoader
 import orcha.lang.configuration.Application
 
@@ -949,10 +950,16 @@ class OrchaCodeVisitor extends OrchaCodeParser{
 			//aggregateInstruction = false
 		}
 		
-		
+		checkOrchaCompliance()
 		
 		log.debug "end"
 		
+	}
+	
+	private void checkOrchaCompliance(){
+		if(orchaMetadata.getTitle() == null){
+			throw new OrchaComplianceException("Orcha metadata title is  missing")
+		}
 	}
 	
 	protected SourceUnit getSourceUnit() {
