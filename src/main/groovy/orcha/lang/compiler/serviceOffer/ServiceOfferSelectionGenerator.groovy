@@ -112,7 +112,7 @@ class ServiceOfferSelectionGenerator {
 						response.success = { resp, apps  ->
 							apps.each{ appli ->				
 								
-								def input = new Input(appli.input)
+								//def input = new Input(appli.input)
 								
 								def adapter
 								
@@ -121,8 +121,10 @@ class ServiceOfferSelectionGenerator {
 								} else if(appli.language.equalsIgnoreCase("js") || appli.language.equalsIgnoreCase("javascript") || appli.language.equalsIgnoreCase("java script")){
 									adapter = new ScriptServiceAdapter(appli.output.adapter)
 								}
-								
+										
+								def input = new Input(mimeType: appli.input.mimeType, type: appli.input.type, value: appli.input.value, adapter: adapter, autoStartup: appli.input.autoStartup)
 								def output = new Output(mimeType: appli.output.mimeType, type: appli.output.type, value: appli.output.value, adapter: adapter, autoStartup: appli.output.autoStartup)
+													
 								def app = new Application(specifications: appli.specifications, name: appli.name, description: appli.description, language: appli.language, properties: appli.properties, input: input, output: output, state: appli.state, error: appli.error)
 								
 								applicationOffers.add(app)
@@ -295,16 +297,16 @@ class ServiceOfferSelectionGenerator {
 				jInvoque = jVar.invoke("setName").arg(JExpr.lit(offer.name))
 				body.add(jInvoque)
 				
-				jInvoque = jVar.invoke("language").arg(JExpr.lit(offer.language))
+				jInvoque = jVar.invoke("setLanguage").arg(JExpr.lit(offer.language))
 				body.add(jInvoque)
 				
 				if(offer.description != null){
-					jInvoque = jVar.invoke("description").arg(JExpr.lit(offer.description))
+					jInvoque = jVar.invoke("setDescription").arg(JExpr.lit(offer.description))
 					body.add(jInvoque)
 				}
 				
 				if(offer.specifications != null){
-					jInvoque = jVar.invoke("specifications").arg(JExpr.lit(offer.specifications))
+					jInvoque = jVar.invoke("setSpecifications").arg(JExpr.lit(offer.specifications))
 					body.add(jInvoque)
 				}
 				
@@ -416,6 +418,9 @@ class ServiceOfferSelectionGenerator {
 			
 			JVar eventHandlerJVar = body.decl(codeModel.ref(orcha.lang.configuration.EventHandler.class), "eventHandler", JExpr._new(codeModel.ref(orcha.lang.configuration.EventHandler)))
 			
+			jInvoque = eventHandlerJVar.invoke("setName").arg(JExpr.lit(inputEventHandler))
+			body.add(jInvoque)
+			
 			JVar adapterJVar = body.decl(codeModel.ref(orcha.lang.configuration.InputFileAdapter.class), "localFileAdapter", JExpr._new(codeModel.ref(orcha.lang.configuration.InputFileAdapter)))			
 								
 			// example: C:/Users/Charroux_std/Documents/projet/ExecAndShare/orcha/Orcha/OrchaBeforeLibrary/bin/data/order
@@ -455,6 +460,9 @@ class ServiceOfferSelectionGenerator {
 			if(application.input.mimeType != null){
 				jInvoque = inputTypeJVar.invoke("setMimeType").arg(JExpr.lit(application.input.mimeType))
 				body.add(jInvoque)
+			} else {
+				jInvoque = inputTypeJVar.invoke("setMimeType").arg(JExpr.lit("application/json"))
+				body.add(jInvoque)
 			}
 			
 			jInvoque = inputTypeJVar.invoke("setAdapter").arg(adapterJVar);
@@ -470,11 +478,14 @@ class ServiceOfferSelectionGenerator {
 			
 			method = serviceMockClass.method(JMod.PUBLIC, orcha.lang.configuration.EventHandler.class, outputEventHandler)
 			method.annotate(org.springframework.context.annotation.Bean.class)
-			method.annotate(java.lang.Override.class)
+			//method.annotate(java.lang.Override.class)
 							
 			body = method.body()
 			
 			eventHandlerJVar = body.decl(codeModel.ref(orcha.lang.configuration.EventHandler.class), "eventHandler", JExpr._new(codeModel.ref(orcha.lang.configuration.EventHandler)))
+			
+			jInvoque = eventHandlerJVar.invoke("setName").arg(JExpr.lit(outputEventHandler))
+			body.add(jInvoque)
 			
 			adapterJVar = body.decl(codeModel.ref(orcha.lang.configuration.OutputFileAdapter.class), "localFileAdapter", JExpr._new(codeModel.ref(orcha.lang.configuration.OutputFileAdapter)));			
 								
@@ -503,7 +514,6 @@ class ServiceOfferSelectionGenerator {
 			dataFolder = Paths.get(path.toString().concat(dataFolder)).toUri().toURL().getPath().substring(1)*/
 			
 			log.info "Mock of an event handler => output data will be into: " + dataFolder
-			
 			
 			jInvoque = adapterJVar.invoke("setDirectory").arg(JExpr.lit(dataFolder))
 			body.add(jInvoque)
@@ -541,6 +551,32 @@ class ServiceOfferSelectionGenerator {
 			FileCodeWriter fileCodeWriter = new FileCodeWriter(new File(s))
 			codeModel.build(fileCodeWriter)
 			fileCodeWriter.close()
+			
+			
+			
+			
+			String[] packageElements = serviceMockFullClassName.split("\\.");
+			for(String element: packageElements){
+				s = s + File.separator + element 
+			}
+			
+			String javaFileName = s + ".java"
+			
+			def linesInJavaFile = []
+
+			new File(javaFileName).eachLine { line ->
+				linesInJavaFile.add(line)
+			}
+			
+			new File(javaFileName).delete()
+			
+			String groovyFileName = s + ".groovy"
+			 
+			new File(groovyFileName).withWriter('utf-8') { writer ->
+				linesInJavaFile.each{ line ->
+					writer.writeLine line
+				}
+			}
 	
 			
 			
@@ -549,21 +585,120 @@ class ServiceOfferSelectionGenerator {
 			offers.each{ offer ->
 				
 				String content = downloadService(offer.name, offer.input.type)
-				println content
+				
+				String[] packagePathElements = offer.input.type.split("\\.");
+				String fichier = outputFolder + File.separator + "src" + File.separator + "main" + File.separator + "orcha" + File.separator
+				for(String element: packagePathElements){
+					fichier = fichier + element + File.separator
+				}
+					
+				String fileName = fichier.substring(0, fichier.size()-1)
+				
+				if(offer.language.equalsIgnoreCase("java")){
+					fileName = fileName + ".java"
+				} else {
+					fileName = fileName + ".groovy"
+				}
+				
+				log.info 'Writing service file to: ' + fileName
+				
+				new File(fileName.substring(0, fileName.lastIndexOf("\\"))).mkdirs()
+				
+				new File(fileName).withWriter('utf-8') { writer ->
+					writer.writeLine content
+				}			
+				
+
+				
 					
 				content = downloadService(offer.name, offer.output.type)
-				println content
+
+				packagePathElements = offer.output.type.split("\\.");
+				fichier = outputFolder + File.separator + "src" + File.separator + "main" + File.separator + "orcha" + File.separator
+				for(String element: packagePathElements){
+					fichier = fichier + element + File.separator
+				}
+					
+				fileName = fichier.substring(0, fichier.size()-1)
+				
+				if(offer.language.equalsIgnoreCase("java")){
+					fileName = fileName + ".java"
+				} else {
+					fileName = fileName + ".groovy"
+				}
+				
+				log.info 'Writing service file to: ' + fileName
+				
+				new File(fileName.substring(0, fileName.lastIndexOf("\\"))).mkdirs()
+				
+				new File(fileName).withWriter('utf-8') { writer ->
+					writer.writeLine content
+				}
+
+				
+				
 				
 				if(offer.input.adapter instanceof orcha.lang.configuration.JavaServiceAdapter){
 					
 					content = downloadService(offer.name, offer.input.adapter.javaClass)
-					println content
+					
+					packagePathElements = offer.input.adapter.javaClass.split("\\.");
+					fichier = outputFolder + File.separator + "src" + File.separator + "main" + File.separator + "orcha" + File.separator
+					for(String element: packagePathElements){
+						fichier = fichier + element + File.separator
+					}
+						
+					fileName = fichier.substring(0, fichier.size()-1)
+					
+					if(offer.language.equalsIgnoreCase("java")){
+						fileName = fileName + ".java"
+					} else {
+						fileName = fileName + ".groovy"
+					}
+					
+					log.info 'Writing service file to: ' + fileName
+					
+					new File(fileName.substring(0, fileName.lastIndexOf("\\"))).mkdirs()
+					
+					new File(fileName).withWriter('utf-8') { writer ->
+						writer.writeLine content
+					}
 					
 				} else if(offer.input.adapter instanceof orcha.lang.configuration.ScriptServiceAdapter){
 					
 					content = downloadService(offer.name, offer.input.adapter.file)
-					println content
+					
+					if(offer.input.adapter.file.startsWith("file:")){
+						fileName = offer.input.adapter.file.substring(5)
+					} else {
+						fileName = offer.input.adapter.file
+					}
+					
+					
+					
+					fileName = fileName.replace('/', '\\')
+					
+					packagePathElements = fileName.split("\\\\");
+					fichier = outputFolder + File.separator
+					for(String element: packagePathElements){
+						fichier = fichier + element + File.separator
+					}
+						
+					fileName = fichier.substring(0, fichier.size()-1)
+					
+					/*if(offer.language.equalsIgnoreCase("java")){
+						fileName = fileName + ".java"
+					} else {
+						fileName = fileName + ".groovy"
+					}*/
+					
+					log.info 'Writing service file to: ' + fileName
 	
+					new File(fileName.substring(0, fileName.lastIndexOf("\\"))).mkdirs()
+					
+					new File(fileName).withWriter('utf-8') { writer ->
+						writer.writeLine content
+					}
 				}
 			}
 		}

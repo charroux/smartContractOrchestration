@@ -69,6 +69,10 @@ class ConfigurationPropertiesGenerator {
 					if(properties.size() > 0){
 
 						String embedddedClassName = instruction.springBean.name
+						
+						
+						println '===========' + instruction
+						
 						embedddedClassName = embedddedClassName.substring(0,1).toUpperCase().concat(embedddedClassName.substring(1))
 						JDefinedClass embeddedClass = contractPropertyClass._class(JMod.PUBLIC, embedddedClassName)
 						
