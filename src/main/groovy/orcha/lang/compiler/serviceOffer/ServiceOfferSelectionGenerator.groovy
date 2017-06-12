@@ -87,6 +87,8 @@ class ServiceOfferSelectionGenerator {
 		
 		def offersByapplication = [:]
 		
+		// get all the applications (application offers) from the registry having the same input type and output type as all the applications without adapter		
+		
 		beansByConfigurationClass.each{ entry, value ->
 			
 			Class configurationClass = entry
@@ -143,7 +145,11 @@ class ServiceOfferSelectionGenerator {
 			}
 		}
 		
+		
+		
 		offersByapplication.each { application, offers ->
+		
+			// unzip the project for service offers selection
 			
 			String projectTemplateFile = "." + File.separator + "src" + File.separator + "main" + File.separator + "resources" + File.separator + "orchaProjectTemplate.zip"
 			String outputFolder = "orchaProjects"
@@ -182,6 +188,8 @@ class ServiceOfferSelectionGenerator {
 			
 			zis.closeEntry();
 			zis.close();
+			
+			// generation of an Orcha source file for the service offers selection 
 			
 			String inputEventHandler
 			String outputEventHandler
@@ -253,6 +261,7 @@ class ServiceOfferSelectionGenerator {
 			
 			
 			
+			// generation of a Groovy source file for the configuration of the Orcha offers selection program 
 			
 			JCodeModel codeModel = new JCodeModel()
 			
@@ -431,28 +440,15 @@ class ServiceOfferSelectionGenerator {
 			// example: C:/Users/Charroux_std/Documents/projet/ExecAndShare/orcha/Orcha/OrchaBeforeLibrary/bin/data/order
 			// the corresponding src folder is src/main/resources/data/order
 			
-			String dataFolder = ""
+			String dataFolder = outputFolder + File.separator + "src" + File.separator + "main" + File.separator + "resources" + File.separator + "data" + File.separator + application.name + File.separator + inputEventHandler
 			
-/*			String folder = packageName.substring( "configuration.".length() )
+			File file = new File(dataFolder)
+			file.mkdirs()
 			
-			String[] dataSubFolders = folder.split("\\.")
-			if(dataSubFolders.size() > 0){
-				for(String s: dataSubFolders){
-					dataFolder =  dataFolder + File.separator + s
-				}
-			} else {
-				dataFolder =  dataFolder + File.separator + folder
-			}
-			
-			dataFolder =  dataFolder + File.separator + methodName
-			
-			// src/main/resources
-			  
-			Path path = Paths.get(this.getClass().getClassLoader().getResource("data").toURI())
-			
-			dataFolder = Paths.get(path.toString().concat(dataFolder)).toUri().toURL().getPath().substring(1)*/
-			
-			log.info "Mock of an event handler => put your input data into (src/main/resources): " + dataFolder			
+			dataFolder =  file.getAbsoluteFile()
+			dataFolder = dataFolder.replaceAll("\\\\", "/")
+ 				
+			log.info "Generate default input event handler for " + application.name + " as an InputFileAdapter => put your input data into : " + dataFolder			
 			
 			jInvoque = adapterJVar.invoke("setDirectory").arg(JExpr.lit(dataFolder))
 			body.add(jInvoque)
@@ -497,28 +493,15 @@ class ServiceOfferSelectionGenerator {
 			// example: C:/Users/Charroux_std/Documents/projet/ExecAndShare/orcha/Orcha/OrchaBeforeLibrary/bin/data/order
 			// the corresponding src folder is src/main/resources/data/order
 			
-/*			String dataFolder = ""
+			dataFolder = outputFolder + File.separator + "src" + File.separator + "main" + File.separator + "resources" + File.separator + "data" + File.separator + application.name + File.separator + outputEventHandler
 			
-			String folder = packageName.substring( "configuration.".length() )
+			file = new File(dataFolder)
+			file.mkdirs()
 			
-			String[] dataSubFolders = folder.split("\\.")
-			if(dataSubFolders.size() > 0){
-				for(String s: dataSubFolders){
-					dataFolder =  dataFolder + File.separator + s
-				}
-			} else {
-				dataFolder =  dataFolder + File.separator + folder
-			}
+			dataFolder =  file.getAbsoluteFile()
+			dataFolder = dataFolder.replaceAll("\\\\", "/")
 			
-			dataFolder =  dataFolder + File.separator + methodName
-			
-			// src/main/resources
-			  
-			Path path = Paths.get(this.getClass().getClassLoader().getResource("data").toURI())
-			
-			dataFolder = Paths.get(path.toString().concat(dataFolder)).toUri().toURL().getPath().substring(1)*/
-			
-			log.info "Mock of an event handler => output data will be into: " + dataFolder
+			log.info "Generate default output event handler for " + application.name + " as an OutputFileAdapter => get the output data into : " + dataFolder
 			
 			jInvoque = adapterJVar.invoke("setDirectory").arg(JExpr.lit(dataFolder))
 			body.add(jInvoque)
