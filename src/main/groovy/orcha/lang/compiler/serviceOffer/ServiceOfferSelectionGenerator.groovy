@@ -77,7 +77,7 @@ class ServiceOfferSelectionGenerator {
 		
 		//def beansByConfigurationClass = this.getBeansByConfigurationClass(orchaCodeParser)
 		
-		def beansByConfigurationClass = orchaCodeParser.getAllComputeNodesByConfigurationClass()
+		def beansByConfigurationClass = orchaCodeParser.findAllComputeNodesWithoutAdapterByConfigurationClass()
 		
 		if(beansByConfigurationClass.size() == 0){
 			return false

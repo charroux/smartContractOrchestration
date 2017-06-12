@@ -341,7 +341,7 @@ class OrchaCodeVisitor extends OrchaCodeParser{
 		
 	}
 	
-	Map<Class, List<InstructionNode>> getAllComputeNodesByConfigurationClass(){
+	Map<Class, List<InstructionNode>> findAllComputeNodesWithoutAdapterByConfigurationClass(){
 		
 		def beansByConfigurationClass = [:]
 		
@@ -375,7 +375,7 @@ class OrchaCodeVisitor extends OrchaCodeParser{
 		return beansByConfigurationClass
 	}
 	
-	Map<Class, List<InstructionNode>> getAllNodesByConfigurationClass(){
+	Map<Class, List<InstructionNode>> findAllNodesWithoutAdapterByConfigurationClass(){
 		
 		def beansByConfigurationClass = [:]
 		

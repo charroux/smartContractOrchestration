@@ -110,7 +110,7 @@ class ConfigurationMockGenerator {
 			
 		//def beansByConfigurationClass = this.getBeansByConfigurationClass(orchaCodeParser)
 		
-		def beansByConfigurationClass = orchaCodeParser.getAllNodesByConfigurationClass()
+		def beansByConfigurationClass = orchaCodeParser.findAllNodesWithoutAdapterByConfigurationClass()
 		
 		if(beansByConfigurationClass.size() == 0){
 			isMockGenerated = false
