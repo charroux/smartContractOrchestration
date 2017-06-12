@@ -54,7 +54,7 @@ class ConfigurationMockGenerator {
 	
 	boolean isMockGenerated
 	
-	private Map<Class, List<InstructionNode>> getBeansByConfigurationClass(OrchaCodeParser orchaCodeParser){
+/*	private Map<Class, List<InstructionNode>> getBeansByConfigurationClass(OrchaCodeParser orchaCodeParser){
 		
 		def beansByConfigurationClass = [:]
 		
@@ -104,11 +104,13 @@ class ConfigurationMockGenerator {
 		}
 		
 		return beansByConfigurationClass
-	}
+	}*/
 		
 	boolean generate(OrchaCodeParser orchaCodeParser) throws OrchaConfigurationException{
 			
-		def beansByConfigurationClass = this.getBeansByConfigurationClass(orchaCodeParser)
+		//def beansByConfigurationClass = this.getBeansByConfigurationClass(orchaCodeParser)
+		
+		def beansByConfigurationClass = orchaCodeParser.getAllNodesByConfigurationClass()
 		
 		if(beansByConfigurationClass.size() == 0){
 			isMockGenerated = false

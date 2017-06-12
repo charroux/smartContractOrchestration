@@ -2,6 +2,7 @@ package orcha.lang.compiler.visitor.impl
 
 import java.lang.reflect.Method
 import java.util.List;
+import java.util.Map
 
 import orcha.lang.compiler.OrchaCompilationException
 import orcha.lang.compiler.OrchaConfigurationException
@@ -27,7 +28,11 @@ import org.codehaus.groovy.ast.expr.VariableExpression;
 import org.codehaus.groovy.ast.stmt.Statement
 import org.codehaus.groovy.control.SourceUnit;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanDefinition
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider
+import org.springframework.context.annotation.Configuration
+import org.springframework.core.type.filter.AnnotationTypeFilter
 import org.springframework.stereotype.Service
 
 import groovy.util.logging.Slf4j
@@ -334,6 +339,92 @@ class OrchaCodeVisitor extends OrchaCodeParser{
 		
 		return nodes
 		
+	}
+	
+	Map<Class, List<InstructionNode>> getAllComputeNodesByConfigurationClass(){
+		
+		def beansByConfigurationClass = [:]
+		
+		ClassPathScanningCandidateComponentProvider provider = new ClassPathScanningCandidateComponentProvider(false);
+		provider.addIncludeFilter(new AnnotationTypeFilter(Configuration.class));
+		
+		List<InstructionNode> computeNodes = this.findAllComputeNodes()
+		
+		for (BeanDefinition beanDef : provider.findCandidateComponents("configuration.*")) {
+			
+			Class<?> configurationClass = Class.forName(beanDef.getBeanClassName());
+			Configuration findable = configurationClass.getAnnotation(Configuration.class);
+			
+			Method[] methods = configurationClass.getMethods();
+			
+			def beans = []
+			
+			for(Method method: methods){
+				InstructionNode instruction = computeNodes.find{ it.instruction.springBean.input!=null && it.instruction.springBean.input.adapter==null && it.instruction.springBean.output!=null && it.instruction.springBean.output.adapter==null && it.instruction.springBean.name.equals(method.getName())}
+				if( instruction != null){
+					beans.add(instruction)
+				}
+			}
+			
+			if(beans.empty == false){
+				beansByConfigurationClass[configurationClass] = beans
+			}
+			
+		}
+		
+		return beansByConfigurationClass
+	}
+	
+	Map<Class, List<InstructionNode>> getAllNodesByConfigurationClass(){
+		
+		def beansByConfigurationClass = [:]
+		
+		ClassPathScanningCandidateComponentProvider provider = new ClassPathScanningCandidateComponentProvider(false);
+		provider.addIncludeFilter(new AnnotationTypeFilter(Configuration.class));
+		
+		List<InstructionNode> computeNodes = this.findAllComputeNodes()
+		
+		List<InstructionNode> receiveNodes = this.findAllReceiveNodes();
+		
+		List<InstructionNode> sendNodes = this.findAllSendNodes();
+		
+		for (BeanDefinition beanDef : provider.findCandidateComponents("configuration.*")) {
+			
+			Class<?> configurationClass = Class.forName(beanDef.getBeanClassName());
+			Configuration findable = configurationClass.getAnnotation(Configuration.class);
+			
+			Method[] methods = configurationClass.getMethods();
+			
+			def beans = []
+			
+			for(Method method: methods){
+				InstructionNode instruction = computeNodes.find{ it.instruction.springBean.input!=null && it.instruction.springBean.input.adapter==null && it.instruction.springBean.output!=null && it.instruction.springBean.output.adapter==null && it.instruction.springBean.name.equals(method.getName())}
+				if( instruction != null){
+					beans.add(instruction)
+				}
+			}
+			
+			for(Method method: methods){
+				InstructionNode instruction = receiveNodes.find{ it.instruction.springBean.input!=null && it.instruction.springBean.input.adapter==null && it.instruction.springBean.name.equals(method.getName())}
+				if( instruction != null){
+					beans.add(instruction)
+				}
+			}
+			
+			for(Method method: methods){
+				InstructionNode instruction = sendNodes.find{ it.instruction.springBean.output!=null && it.instruction.springBean.output.adapter==null && it.instruction.springBean.name.equals(method.getName())}
+				if( instruction != null){
+					beans.add(instruction)
+				}
+			}
+			
+			if(beans.empty == false){
+				beansByConfigurationClass[configurationClass] = beans
+			}
+			
+		}
+		
+		return beansByConfigurationClass
 	}
 	
 //	boolean isFailsAndTerminatesInExpression(InstructionNode node){
@@ -719,6 +810,7 @@ class OrchaCodeVisitor extends OrchaCodeParser{
 			
 			//String pathToCode = "." + File.separator + "orcha" + File.separator + "source" + File.separator + orchaFileName
 			String pathToCode = "." + File.separator + "src" + File.separator + "main" + File.separator + "orcha" + File.separator + "source" + File.separator + orchaFileName
+			
 			def myCL = new MyClassLoader(visitor: this)
 			
 			def script = myCL.parseClass(new GroovyCodeSource(new File(pathToCode)))

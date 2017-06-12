@@ -39,7 +39,7 @@ class ServiceOfferSelectionGenerator {
 	
 	String registryURI = "http://localhost:8080/"
 	
-	private Map<Class, List<InstructionNode>> getBeansByConfigurationClass(OrchaCodeParser orchaCodeParser){
+	/*private Map<Class, List<InstructionNode>> getBeansByConfigurationClass(OrchaCodeParser orchaCodeParser){
 		
 		def beansByConfigurationClass = [:]
 		
@@ -72,10 +72,12 @@ class ServiceOfferSelectionGenerator {
 		
 		return beansByConfigurationClass
 	}
-	
+*/	
 	boolean generate(OrchaCodeParser orchaCodeParser){
 		
-		def beansByConfigurationClass = this.getBeansByConfigurationClass(orchaCodeParser)
+		//def beansByConfigurationClass = this.getBeansByConfigurationClass(orchaCodeParser)
+		
+		def beansByConfigurationClass = orchaCodeParser.getAllComputeNodesByConfigurationClass()
 		
 		if(beansByConfigurationClass.size() == 0){
 			return false

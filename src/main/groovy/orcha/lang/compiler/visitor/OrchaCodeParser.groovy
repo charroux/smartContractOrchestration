@@ -97,6 +97,10 @@ abstract class OrchaCodeParser extends ClassCodeVisitorSupport{
 	
 	abstract List<InstructionNode> findAllRawPrecedingNodes(InstructionNode node)
 	
+	abstract Map<Class, List<InstructionNode>> getAllComputeNodesByConfigurationClass()
+	
+	abstract Map<Class, List<InstructionNode>> getAllNodesByConfigurationClass()
+	
 	/**
 	 * The method to call at each node of the Orcha instructions tree shoul have 2 arguments: the next node, and the current node to be visited.
 	 * 
