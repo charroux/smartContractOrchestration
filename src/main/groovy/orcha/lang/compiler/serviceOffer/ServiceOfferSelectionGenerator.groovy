@@ -38,41 +38,7 @@ import org.springframework.core.type.filter.AnnotationTypeFilter
 class ServiceOfferSelectionGenerator {
 	
 	String registryURI = "http://localhost:8080/"
-	
-	/*private Map<Class, List<InstructionNode>> getBeansByConfigurationClass(OrchaCodeParser orchaCodeParser){
 		
-		def beansByConfigurationClass = [:]
-		
-		ClassPathScanningCandidateComponentProvider provider = new ClassPathScanningCandidateComponentProvider(false);
-		provider.addIncludeFilter(new AnnotationTypeFilter(Configuration.class));
-		
-		List<InstructionNode> computeNodes = orchaCodeParser.findAllComputeNodes()
-		
-		for (BeanDefinition beanDef : provider.findCandidateComponents("configuration.*")) {
-			
-			Class<?> configurationClass = Class.forName(beanDef.getBeanClassName());
-			Configuration findable = configurationClass.getAnnotation(Configuration.class);
-			
-			Method[] methods = configurationClass.getMethods();
-			
-			def beans = []
-			
-			for(Method method: methods){
-				InstructionNode instruction = computeNodes.find{ it.instruction.springBean.input!=null && it.instruction.springBean.input.adapter==null && it.instruction.springBean.output!=null && it.instruction.springBean.output.adapter==null && it.instruction.springBean.name.equals(method.getName())}
-				if( instruction != null){
-					beans.add(instruction)
-				}
-			}
-			
-			if(beans.empty == false){
-				beansByConfigurationClass[configurationClass] = beans
-			}
-			
-		}
-		
-		return beansByConfigurationClass
-	}
-*/	
 	boolean generate(OrchaCodeParser orchaCodeParser){
 		
 		//def beansByConfigurationClass = this.getBeansByConfigurationClass(orchaCodeParser)
@@ -146,6 +112,15 @@ class ServiceOfferSelectionGenerator {
 		}
 		
 		
+		// unzip the project for service offers selection
+		// generation of an Orcha source file for the service offers selection
+		// generation of a Groovy source file for the configuration of the Orcha offers selection program
+		// for each service offer:
+		//		generation of an application's bean for the current offer
+		// generation of an application's bean for the selection of the offer
+		// generation of an input event handler
+		// generation of an output event handler
+		// download services file for all the service offers
 		
 		offersByapplication.each { application, offers ->
 		
@@ -301,6 +276,8 @@ class ServiceOfferSelectionGenerator {
 			
 			offers.each{ offer ->
 				
+				// generation of an application's bean for the current offer
+				
 				method = serviceMockClass.method(JMod.PUBLIC, orcha.lang.configuration.Application.class, offer.name)
 				method.annotate(org.springframework.context.annotation.Bean.class)
 								
@@ -425,6 +402,48 @@ class ServiceOfferSelectionGenerator {
 			}
 			
 			
+			
+			// generation of an application's bean for the selection of the offer
+			
+			String offerSelectionMethodsName = "select" + application.name.substring(0,1).toUpperCase().concat(application.name.substring(1))
+			
+			method = serviceMockClass.method(JMod.PUBLIC, orcha.lang.configuration.Application.class, offerSelectionMethodsName)
+			method.annotate(org.springframework.context.annotation.Bean.class)
+							
+			body = method.body()
+			
+			jVar = body.decl(codeModel.ref(orcha.lang.configuration.Application.class), "application", JExpr._new(codeModel.ref(orcha.lang.configuration.Application)))
+			
+			jInvoque = jVar.invoke("setName").arg(JExpr.lit(offerSelectionMethodsName))
+			body.add(jInvoque)
+			
+			jInvoque = jVar.invoke("setDescription").arg(JExpr.lit("selection of a service offer"))
+			body.add(jInvoque)
+			
+			JVar inputTypeJVar = body.decl(codeModel.ref(orcha.lang.configuration.Input.class), "input", JExpr._new(codeModel.ref(orcha.lang.configuration.Input)));
+			
+			String type = "java.util.List<" + application.output.type + ">"
+			jInvoque = inputTypeJVar.invoke("setType").arg(JExpr.lit(type))
+			body.add(jInvoque)
+			
+			jInvoque = jVar.invoke("setInput").arg(inputTypeJVar)
+			body.add(jInvoque)
+		
+			JVar outputTypeJVar = body.decl(codeModel.ref(orcha.lang.configuration.Output.class), "output", JExpr._new(codeModel.ref(orcha.lang.configuration.Output)));
+			
+			jInvoque = outputTypeJVar.invoke("setType").arg(JExpr.lit(application.output.type))
+			body.add(jInvoque);
+			
+			jInvoque = jVar.invoke("setOutput").arg(outputTypeJVar)
+			body.add(jInvoque)
+			
+			body._return(jVar)
+			
+			
+			
+			
+			// generation of an input event handler
+						
 			method = serviceMockClass.method(JMod.PUBLIC, orcha.lang.configuration.EventHandler.class, inputEventHandler)
 			method.annotate(org.springframework.context.annotation.Bean.class)
 							
@@ -437,9 +456,6 @@ class ServiceOfferSelectionGenerator {
 			
 			JVar adapterJVar = body.decl(codeModel.ref(orcha.lang.configuration.InputFileAdapter.class), "localFileAdapter", JExpr._new(codeModel.ref(orcha.lang.configuration.InputFileAdapter)))			
 								
-			// example: C:/Users/Charroux_std/Documents/projet/ExecAndShare/orcha/Orcha/OrchaBeforeLibrary/bin/data/order
-			// the corresponding src folder is src/main/resources/data/order
-			
 			String dataFolder = outputFolder + File.separator + "src" + File.separator + "main" + File.separator + "resources" + File.separator + "data" + File.separator + application.name + File.separator + inputEventHandler
 			
 			File file = new File(dataFolder)
@@ -453,7 +469,7 @@ class ServiceOfferSelectionGenerator {
 			jInvoque = adapterJVar.invoke("setDirectory").arg(JExpr.lit(dataFolder))
 			body.add(jInvoque)
 			
-			JVar inputTypeJVar = body.decl(codeModel.ref(orcha.lang.configuration.Input.class), "input", JExpr._new(codeModel.ref(orcha.lang.configuration.Input)));
+			inputTypeJVar = body.decl(codeModel.ref(orcha.lang.configuration.Input.class), "input", JExpr._new(codeModel.ref(orcha.lang.configuration.Input)));
 					
 			jInvoque = inputTypeJVar.invoke("setType").arg(JExpr.lit(application.input.type))
 			body.add(jInvoque)
@@ -476,6 +492,7 @@ class ServiceOfferSelectionGenerator {
 			
 			
 			
+			// generation of an output event handler
 			
 			method = serviceMockClass.method(JMod.PUBLIC, orcha.lang.configuration.EventHandler.class, outputEventHandler)
 			method.annotate(org.springframework.context.annotation.Bean.class)
@@ -490,9 +507,6 @@ class ServiceOfferSelectionGenerator {
 			
 			adapterJVar = body.decl(codeModel.ref(orcha.lang.configuration.OutputFileAdapter.class), "localFileAdapter", JExpr._new(codeModel.ref(orcha.lang.configuration.OutputFileAdapter)));			
 								
-			// example: C:/Users/Charroux_std/Documents/projet/ExecAndShare/orcha/Orcha/OrchaBeforeLibrary/bin/data/order
-			// the corresponding src folder is src/main/resources/data/order
-			
 			dataFolder = outputFolder + File.separator + "src" + File.separator + "main" + File.separator + "resources" + File.separator + "data" + File.separator + application.name + File.separator + outputEventHandler
 			
 			file = new File(dataFolder)
@@ -515,7 +529,7 @@ class ServiceOfferSelectionGenerator {
 			jInvoque = adapterJVar.invoke("setWritingMode").arg(JExpr.direct("orcha.lang.configuration.OutputFileAdapter.WritingMode.APPEND"))
 			body.add(jInvoque)
 			
-			JVar outputTypeJVar = body.decl(codeModel.ref(orcha.lang.configuration.Output.class), "output", JExpr._new(codeModel.ref(orcha.lang.configuration.Output)));
+			outputTypeJVar = body.decl(codeModel.ref(orcha.lang.configuration.Output.class), "output", JExpr._new(codeModel.ref(orcha.lang.configuration.Output)));
 					
 			jInvoque = outputTypeJVar.invoke("setType").arg(JExpr.lit(application.output.type))
 			body.add(jInvoque)
@@ -569,6 +583,7 @@ class ServiceOfferSelectionGenerator {
 			
 			
 			
+			// download services file for all the service offers
 			
 			offers.each{ offer ->
 				
