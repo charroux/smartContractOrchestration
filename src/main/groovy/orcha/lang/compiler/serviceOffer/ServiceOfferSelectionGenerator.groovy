@@ -34,6 +34,14 @@ import org.springframework.context.annotation.ClassPathScanningCandidateComponen
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.type.filter.AnnotationTypeFilter
 
+/**
+ * An ASM version of Java classes can be generated using (ASM 5.2) :
+ * java -cp asm-util-5.2.jar;ams-5.2.jar org.objectweb.asm.util.ASMifier *.class > *.java 
+ * where * is a Java class.
+ * 
+ * @author Ben C.
+ *
+ */
 @Slf4j
 class ServiceOfferSelectionGenerator {
 	
@@ -196,7 +204,7 @@ class ServiceOfferSelectionGenerator {
 				String packageName = "package source." + application.name
 				writer.writeLine packageName
 				
-				String title = "title select" + className
+				String title = "title \"select" + className + "\""
 				writer.writeLine title
 				
 				String comparison = "compute select" + className + " with "
