@@ -16,9 +16,12 @@ import groovy.json.JsonSlurper
 import groovy.util.logging.Slf4j
 import groovyx.net.http.HTTPBuilder
 import groovyx.net.http.ContentType
+
+import java.io.File
 import java.lang.reflect.Method
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
+import java.util.zip.ZipOutputStream
 import orcha.lang.compiler.Instruction
 import orcha.lang.compiler.InstructionNode
 import orcha.lang.compiler.visitor.OrchaCodeParser
@@ -714,7 +717,12 @@ class ServiceOfferSelectionGenerator {
 			}
 		}
 		
-			
+		File inputDirectory = new File("orchaProjects");
+		File zipFile = new File("src" + File.separator + "main" + File.separator + "resources" + File.separator + "orchaProjectTemplate1.zip")
+		
+		this.zipFile(zipFile, inputDirectory)
+		
+		log.info 'A new service selector project has been generated into the compressed file: ' + zipFile.getAbsolutePath()
 		
 		log.info 'Missing Orcha configuration details for the compilation => service selector generation complete successfully'
 		
@@ -753,5 +761,60 @@ class ServiceOfferSelectionGenerator {
 		return content
 
 	}
+	
+	private void recursivZip(ZipOutputStream zipOutputStream, File sourceDirectory, File currentDirectory){
+		
+		int BUFFER = 2048
+		byte[] data = new byte[BUFFER]
+		BufferedInputStream origin
+		
+		String[] files = currentDirectory.list()
 
+		for (String file: files) {
+			
+		   String s = currentDirectory.getAbsolutePath() + File.separator + file
+		   File f = new File(s)
+		   
+		   if(f.isFile()){
+			
+			   FileInputStream fis = new FileInputStream(f.getAbsolutePath());
+			   origin = new BufferedInputStream(fis, BUFFER);
+			   
+			   String relativePath = currentDirectory.getAbsolutePath().substring(sourceDirectory.getAbsolutePath().length())
+			   
+			   if(relativePath.size() != 0){
+				   relativePath = relativePath.substring(1)  + File.separator +  file
+			   } else {
+				   relativePath = file
+			   }
+			   
+			   ZipEntry entry = new ZipEntry(relativePath);
+			   zipOutputStream.putNextEntry(entry);
+			   int count;
+			   while((count = origin.read(data, 0, BUFFER)) != -1) {
+				  zipOutputStream.write(data, 0, count);
+			   }
+			   origin.close();
+			   
+		   } else if(f.isDirectory()){	// directory
+			   
+			   recursivZip(zipOutputStream, sourceDirectory, new File(f.getAbsolutePath()))
+			   
+		   }
+		   
+		}
+
+	}
+	
+	private void zipFile(File zipFile, File directory){
+		
+		FileOutputStream dest = new  FileOutputStream(zipFile);
+		ZipOutputStream zipOutputStream = new ZipOutputStream(new  BufferedOutputStream(dest))
+		
+		recursivZip(zipOutputStream, directory, directory);
+		
+		zipOutputStream.close()
+	}
+
+	
 }
