@@ -51,7 +51,7 @@ class SpringTestOrchaTests {
 	@Test
 	void testContextLoads() throws Exception {
 		assertThat(new String("essai")).isNotNull();
-		Thread.sleep(20000);
+		//Thread.sleep(20000);
 	}
 
 }

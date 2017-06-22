@@ -294,17 +294,8 @@ class ConfigurationMockGenerator {
 					 JDocComment jDocComment = serviceInterface.javadoc();
 					 jDocComment.add(String.format("Mock of service interface. Auto generated file."));
 		
-					 
-					 
-					 
-					 							 
-					 //Class serviceArgumentClass = Class.forName(instruction.springBean.input.type)					 
-					 //Class serviceReturnClass = Class.forName(instruction.springBean.output.type)
-					 
 					 JType serviceArgumentClass = this.forName(instruction.springBean.input.type, codeModel)
 					 JType serviceReturnClass = this.forName(instruction.springBean.output.type, codeModel)
-					 
-					 
 					 
 					 JMethod method = serviceInterface.method(JMod.PUBLIC, serviceReturnClass, "service")
 					 method.param(serviceArgumentClass, "arg");
@@ -353,15 +344,9 @@ class ConfigurationMockGenerator {
 					 packagePath = packagePath.replaceAll("\\.", "/");
 									 
 					 cw.visit(52, Opcodes.ACC_PUBLIC + Opcodes.ACC_ABSTRACT + Opcodes.ACC_INTERFACE, packagePath + serviceNameInterface, null, "java/lang/Object", null);
-									 
-					 //String argAndReturn = "(L" + instruction.springBean.input.type + ";)L" + instruction.springBean.output.type + ";"
-					 
+									 			 
 					 String argAndReturn = argAndReturnOfService(instruction.springBean.input.type, instruction.springBean.output.type)
-					 
-					 //String argAndReturn = "(Ljava/util/List;)Lservice/order/SpecificOrder;"
-					 
-					 //argAndReturn = argAndReturn.replaceAll("\\.", "/")
-													 
+					 								 
 					 mv = cw.visitMethod(Opcodes.ACC_PUBLIC + Opcodes.ACC_ABSTRACT, "service", argAndReturn, null, null);
 					 mv.visitEnd();
 									 
@@ -473,9 +458,7 @@ class ConfigurationMockGenerator {
 			mv.visitInsn(Opcodes.RETURN);
 			mv.visitMaxs(1, 1);
 			mv.visitEnd();
-						
-			
-			
+					
 				
 			instructionNodes.each{ instructionNode ->
 				
@@ -498,19 +481,7 @@ class ConfigurationMockGenerator {
 				
 					log.info 'Mock of a service => generated method : ' + methodName
 					
-					
-					
-					
-					
-					
-					//Class argumentClass = Class.forName(serviceClassNameInterface)
 					JType argumentClass = codeModel.ref(Class.forName(serviceClassNameInterface))
-					//JDefinedClass argumentClass = codeModel._class(serviceClassNameInterface);
-					
-					
-					
-					
-					
 							
 					JMethod method = serviceMockClass.method(JMod.PUBLIC, argumentClass, methodName)
 					method.annotate(org.springframework.context.annotation.Bean.class)
@@ -519,36 +490,12 @@ class ConfigurationMockGenerator {
 									
 					JInvocation assertEqualsInvoke = codeModel.ref(org.mockito.Mockito.class).staticInvoke("mock").arg(JExpr.direct(serviceClassNameInterface + ".class"));
 									
-					
-					
-					
-					
-					
-					//JVar serviceMockVariable = body.decl(codeModel.ref(argumentClass), methodName + "Mock", assertEqualsInvoke);
 					JVar serviceMockVariable = body.decl(argumentClass, methodName + "Mock", assertEqualsInvoke);
 					
-					
-					
-					
-					
-					
 					JType argClass = this.forName(instruction.springBean.input.type, codeModel)				
-					//argumentClass = Class.forName(instruction.springBean.input.type)
-					
-					//JVar testArgumentVariable = body.decl(argClass, "mockInput", JExpr._new(codeModel.ref(argClass)));
-					//JVar testArgumentVariable = body.decl(argClass, "mockInput", JExpr._new(this.forName1(instruction.springBean.input.type, codeModel)))
-					//JExpression JNewExpression = this.forName1(instruction.springBean.input.type, codeModel)
 					
 					JVar testArgumentVariable = body.decl(argClass, "mockInput", this.newExpression(instruction.springBean.input.type, codeModel))
-					
-					
-					
-					
-					
-					
-					
-					
-					
+
 					Class returnClass = Class.forName(instruction.springBean.output.type)
 				
 					JVar testArgumentReturn = body.decl(codeModel.ref(returnClass), "mockOutput", JExpr._new(codeModel.ref(returnClass)));
@@ -571,29 +518,14 @@ class ConfigurationMockGenerator {
 					mv.visitTypeInsn(Opcodes.CHECKCAST, serviceClassNameInterface.replaceAll("\\.", "/"));
 					mv.visitVarInsn(Opcodes.ASTORE, 1);
 					
-					
 
 					String newasm = this.newASM(instruction.springBean.input.type)
 					
 					mv.visitTypeInsn(Opcodes.NEW, newasm);
 					
-					//mv.visitTypeInsn(Opcodes.NEW, instruction.springBean.input.type.replaceAll("\\.", "/"));
-					
-					
-					
-					
 					mv.visitInsn(Opcodes.DUP);
 
-					
-					
-					
-					//mv.visitMethodInsn(Opcodes.INVOKESPECIAL, instruction.springBean.input.type.replaceAll("\\.", "/"), "<init>", "()V", false);
 					mv.visitMethodInsn(Opcodes.INVOKESPECIAL, newasm, "<init>", "()V", false);
-					
-					
-					
-					
-					
 					
 					mv.visitVarInsn(Opcodes.ASTORE, 2);
 					mv.visitTypeInsn(Opcodes.NEW, returnClass.getCanonicalName().replaceAll("\\.", "/"));
@@ -603,23 +535,11 @@ class ConfigurationMockGenerator {
 					mv.visitVarInsn(Opcodes.ALOAD, 1);
 					mv.visitVarInsn(Opcodes.ALOAD, 2);
 					
-					
-					
-					
-					
-					//mv.visitMethodInsn(Opcodes.INVOKEINTERFACE, serviceClassNameInterface.replaceAll("\\.", "/"), "service", "(L" + argumentClass.getCanonicalName().replaceAll("\\.", "/") + ";)L" + returnClass.getCanonicalName().replaceAll("\\.", "/") + ";", true);
-					
-					
 					String invokeSASM = this.invokeServiceAMS(instruction.springBean.input.type)
 					
 					invokeSASM = invokeSASM + "L" + returnClass.getCanonicalName().replaceAll("\\.", "/") + ";"
 					
-					//mv.visitMethodInsn(Opcodes.INVOKEINTERFACE, serviceClassNameInterface.replaceAll("\\.", "/"), "service", "(L" + instruction.springBean.input.type.replaceAll("\\.", "/") + ";)L" + returnClass.getCanonicalName().replaceAll("\\.", "/") + ";", true);
 					mv.visitMethodInsn(Opcodes.INVOKEINTERFACE, serviceClassNameInterface.replaceAll("\\.", "/"), "service", invokeSASM, true);
-					
-					
-					
-					
 					
 					
 					mv.visitMethodInsn(Opcodes.INVOKESTATIC, "org/mockito/Mockito", "when", "(Ljava/lang/Object;)Lorg/mockito/stubbing/OngoingStubbing;", false);
@@ -630,11 +550,6 @@ class ConfigurationMockGenerator {
 					mv.visitInsn(Opcodes.ARETURN);
 					mv.visitMaxs(2, 4);
 					mv.visitEnd();
-					
-						
-						
-						
-						
 					
 							
 					methodName = serviceName.substring(0,1).toLowerCase().concat(serviceName.substring(1))
@@ -833,9 +748,6 @@ class ConfigurationMockGenerator {
 						mv.visitVarInsn(Opcodes.ALOAD, 1);
 						mv.visitInsn(Opcodes.ICONST_1);
 						mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "orcha/lang/configuration/OutputFileAdapter", "setAppendNewLine", "(Z)V", false);
-						//mv.visitVarInsn(Opcodes.ALOAD, 1);
-						//mv.visitFieldInsn(Opcodes.GETSTATIC, "orcha/lang/configuration/OutputFileAdapter$WritingMode", "APPEND", "Lorcha/lang/configuration/OutputFileAdapter$WritingMode;");
-						//mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "orcha/lang/configuration/OutputFileAdapter", "setWritingMode", "(Lorcha/lang/configuration/OutputFileAdapter$WritingMode;)V", false);
 							
 						mv.visitVarInsn(Opcodes.ALOAD, 0);
 						mv.visitMethodInsn(Opcodes.INVOKESPECIAL, configurationClass.getCanonicalName().replaceAll("\\.", "/"), methodName, "()Lorcha/lang/configuration/EventHandler;", false);											
@@ -889,6 +801,9 @@ class ConfigurationMockGenerator {
 			
 			new File(groovyFileName).withWriter('utf-8') { writer ->
 			   linesInJavaFile.each{ line ->
+				  if(line == 'import org.mockito.Mockito;'){	// to avoid unresolved class at compilation time !
+					  line = 'import org.mockito.Mockito.*;'
+				  }
 				   writer.writeLine line
 			   }
 			}
