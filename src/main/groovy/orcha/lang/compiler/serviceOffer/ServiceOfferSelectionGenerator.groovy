@@ -38,6 +38,9 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.core.type.filter.AnnotationTypeFilter
 
 /**
+ * 
+ * Generate a spring boot Orcha project for the comparison and the selection of the best service among services in a registry when an Orcha configuration has no service binded.
+ * 
  * An ASM version of Java classes can be generated using (ASM 5.2) :
  * java -cp asm-util-5.2.jar;ams-5.2.jar org.objectweb.asm.util.ASMifier *.class > *.java 
  * where * is a Java class.
@@ -50,9 +53,13 @@ class ServiceOfferSelectionGenerator {
 	
 	String registryURI = "http://localhost:8080/"
 		
+	/**
+	 * Generate a spring boot Orcha project for the comparison and the selection of the best service among services in a registry when an Orcha configuration has no service binded.
+	 *  
+	 * @param orchaCodeParser
+	 * @return
+	 */
 	boolean generate(OrchaCodeParser orchaCodeParser){
-		
-		//def beansByConfigurationClass = this.getBeansByConfigurationClass(orchaCodeParser)
 		
 		def beansByConfigurationClass = orchaCodeParser.findAllComputeNodesWithoutAdapterByConfigurationClass()
 		
@@ -93,8 +100,6 @@ class ServiceOfferSelectionGenerator {
 						response.success = { resp, apps  ->
 							apps.each{ appli ->				
 								
-								//def input = new Input(appli.input)
-								
 								def adapter
 								
 								if(appli.language.equalsIgnoreCase("java") || appli.language.equalsIgnoreCase("groovy")){
@@ -132,6 +137,7 @@ class ServiceOfferSelectionGenerator {
 		// generation of an input event handler
 		// generation of an output event handler
 		// download services file for all the service offers
+		// zip the project
 		
 		offersByapplication.each { application, offers ->
 		
