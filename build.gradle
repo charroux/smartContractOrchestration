@@ -117,11 +117,11 @@ sourceSets {
 	test {
 		java {
 			srcDirs = [ 'src/test/java' ]
-			srcDir 'src/main/orcha'
+			srcDir 'src/test/orcha'
 		}
 		groovy {
 			srcDirs = [ 'src/test/groovy' ]
-			srcDir 'src/main/orcha'
+			srcDir 'src/test/orcha'
 		}
 		resources {
 			srcDirs = ["src/test/resources"]
