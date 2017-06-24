@@ -803,24 +803,19 @@ class OrchaCodeVisitor extends OrchaCodeParser{
 	}*/
 	
 	@Override
-	public void parseSourceFile(String orchaFileName) throws OrchaCompilationException, OrchaConfigurationException {
+	public void parseSourceFile(File orchaFile) throws OrchaCompilationException, OrchaConfigurationException {
 		
 
 		try{
 			
-			//String pathToCode = "." + File.separator + "orcha" + File.separator + "source" + File.separator + orchaFileName
-			String pathToCode = "." + File.separator + "src" + File.separator + "main" + File.separator + "orcha" + File.separator + "source" + File.separator + orchaFileName
-			
 			def myCL = new MyClassLoader(visitor: this)
 			
-			def script = myCL.parseClass(new GroovyCodeSource(new File(pathToCode)))
+			def script = myCL.parseClass(new GroovyCodeSource(orchaFile))
 	
 			try{
 	
 				this.getGraphOfInstructions()
 				
-				//this.getPredecedingInstructions()
-	
 			} catch(org.codehaus.groovy.control.MultipleCompilationErrorsException e){
 				Iterator errors = e.getErrorCollector().getErrors().iterator()
 				while(errors.hasNext()){

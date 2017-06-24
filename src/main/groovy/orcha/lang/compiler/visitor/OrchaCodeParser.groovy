@@ -24,7 +24,7 @@ abstract class OrchaCodeParser extends ClassCodeVisitorSupport{
 	
 	abstract OrchaMetadata getOrchaMetadata()
 	
-	abstract void parseSourceFile(String orchaFileName) throws OrchaCompilationException, OrchaConfigurationException
+	abstract void parseSourceFile(File orchaFile) throws OrchaCompilationException, OrchaConfigurationException
 	
 	/**
 	 * 

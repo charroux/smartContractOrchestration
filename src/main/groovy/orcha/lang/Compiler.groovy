@@ -69,7 +69,10 @@ class Compiler implements CommandLineRunner{
 			throw new OrchaConfigurationException("An orcha source file (.orcha or .groovy extension) should be in ./orcha/source\nPut the file name without the extension (.orcha or .groovy) as the argument of this command.\nIf the orcha file is in a subdirectory of ./orcha/source, add this subdirectory to the command line like directoryNama/orchaFileNameWithOutExtension")
 		}
 				
-		composeCodeParser.parseSourceFile(orchaFile)
+		String pathToCode = "." + File.separator + "src" + File.separator + "main" + File.separator + "orcha" + File.separator + "source" + File.separator + orchaFile
+		File orchaSourceFile = new File(pathToCode)
+		
+		composeCodeParser.parseSourceFile(orchaSourceFile)
 		
 		serviceOfferSelectionGenerator.generate(composeCodeParser)
 		
