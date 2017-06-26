@@ -54,6 +54,7 @@ class OrchaCodeVisitor extends OrchaCodeParser{
 	ExpressionParser expressionParser
 	
 	//def aggregators = []
+	File orchaFile
 	
 	private def instructions = []
 	
@@ -770,7 +771,8 @@ class OrchaCodeVisitor extends OrchaCodeParser{
 	@Override
 	public void parseSourceFile(File orchaFile) throws OrchaCompilationException, OrchaConfigurationException {
 		
-
+		this.orchaFile = orchaFile
+		
 		try{
 			
 			def myCL = new MyClassLoader(visitor: this)
@@ -801,6 +803,9 @@ class OrchaCodeVisitor extends OrchaCodeParser{
 			String message = "Orcha configuration error while parsing the orcha file (" + orchaFile.getAbsolutePath() + "): no definition for "  + e.getBeanName() + ". Please define it as a bean in an Oche configuration class."
 			log.error "Orcha configuration error while parsing the orcha file (" + orchaFile.getAbsolutePath() + "): no definition for "  + e.getBeanName() + ". Please define it as a bean in an Oche configuration class."
 			throw new OrchaConfigurationException(message)
+		}catch(Exception e){
+			log.error e.getMessage()
+			throw e
 		}
 	}
 
@@ -1019,7 +1024,7 @@ class OrchaCodeVisitor extends OrchaCodeParser{
 	
 	private void checkOrchaCompliance(){
 		if(orchaMetadata.getTitle() == null){
-			throw new OrchaComplianceException("Orcha metadata title is  missing")
+			throw new OrchaComplianceException("Orcha metadata title is missing in: " + orchaFile.getAbsolutePath())
 		}
 	}
 	
