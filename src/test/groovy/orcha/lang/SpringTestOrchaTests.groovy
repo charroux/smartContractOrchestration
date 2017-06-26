@@ -23,6 +23,7 @@ import static org.mockito.BDDMockito.*;
 
 @RunWith(SpringRunner.class)
 //@SpringBootTest(classes=[orcha.lang.OrchaForTestConfiguration.class,  orcha.lang.AutoConfiguration.class])
+@SpringBootTest(classes=[orcha.lang.OrchaForTestConfiguration.class])
 class SpringTestOrchaTests {
 	
 /*	@Bean
@@ -50,8 +51,8 @@ class SpringTestOrchaTests {
 	
 	@Test
 	void testContextLoads() throws Exception {
-		assertThat(new String("essai")).isNotNull();
-		//Thread.sleep(20000);
+		//assertThat(new String("essai")).isNotNull();
+		Thread.sleep(20000);
 	}
 
 }

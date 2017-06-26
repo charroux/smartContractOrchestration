@@ -95,7 +95,8 @@ class Compiler implements CommandLineRunner{
 				orchaTestCodeParser.parseSourceFile(testFiles[0])
 			}
 			
-		
+			compile.compile(orchaTestCodeParser)
+			
 		}
 		
 	}
