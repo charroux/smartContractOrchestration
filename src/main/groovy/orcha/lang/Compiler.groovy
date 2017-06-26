@@ -42,7 +42,10 @@ class Compiler implements CommandLineRunner{
 	Compile compile
 	
 	@Autowired
-	OrchaCodeParser composeCodeParser
+	OrchaCodeParser orchaCodeParser
+	
+	@Autowired
+	OrchaCodeParser orchaTestCodeParser
 	
 	@Autowired
 	ConfigurationMockGenerator configurationMockGenerator
@@ -72,33 +75,26 @@ class Compiler implements CommandLineRunner{
 				
 		String pathToCode = "." + File.separator + "src" + File.separator + "main" + File.separator + "orcha" + File.separator + "source" + File.separator + orchaFile
 		File orchaSourceFile = new File(pathToCode)
+				
+		orchaCodeParser.parseSourceFile(orchaSourceFile)
 		
-		String testFolder = orchaSourceFile.getParent().replace("main", "test")
-		String[] files = new File(testFolder).list()
-		def testFiles = []
-		for(String file: files){
-			File f = new File(testFolder + File.separator + file)
-			println f.getAbsolutePath()
-			if(f.isFile()){
-				testFiles.add(f)
-			}
-		}
+		serviceOfferSelectionGenerator.generate(orchaCodeParser)
 		
-		testFiles.each { testFile ->
-			println testFile.getAbsolutePath()
-		}
-		
-		composeCodeParser.parseSourceFile(orchaSourceFile)
-		
-		serviceOfferSelectionGenerator.generate(composeCodeParser)
-		
-		boolean isMockGenerated = configurationMockGenerator.generate(composeCodeParser)
+		boolean isMockGenerated = configurationMockGenerator.generate(orchaCodeParser)
 		
 		if(isMockGenerated == false){
 			
-			compile.compile(composeCodeParser)
+			compile.compile(orchaCodeParser)
 			
-			configurationPropertiesGenerator.generate(composeCodeParser)
+			configurationPropertiesGenerator.generate(orchaCodeParser)
+			
+			String testFolder = orchaSourceFile.getParent().replace("main", "test")
+			File orchaTestSourceDirectory = new File(testFolder)
+			File[] testFiles = orchaTestSourceDirectory.listFiles()
+			if(testFiles.length > 0){
+				orchaTestCodeParser.parseSourceFile(testFiles[0])
+			}
+			
 		
 		}
 		

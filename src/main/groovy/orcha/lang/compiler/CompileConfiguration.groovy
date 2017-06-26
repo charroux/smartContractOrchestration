@@ -34,7 +34,12 @@ class CompileConfiguration {
 	}
 	
 	@Bean
-	OrchaCodeParser composeCodeParser(){
+	OrchaCodeParser orchaCodeParser(){
+		return new OrchaCodeVisitor()
+	}
+	
+	@Bean
+	OrchaCodeParser orchaTestCodeParser(){
 		return new OrchaCodeVisitor()
 	}
 	
