@@ -7,6 +7,10 @@ import orcha.lang.compiler.OrchaCompilationException
 import orcha.lang.compiler.referenceimpl.ExpressionParser;
 import orcha.lang.compiler.visitor.OrchaCodeParser
 import orcha.lang.configuration.Application;
+import org.springframework.expression.spel.SpelParseException
+import org.springframework.expression.spel.standard.SpelExpression
+import org.springframework.expression.spel.standard.SpelExpressionParser
+import org.springframework.expression.spel.SpelMessage
 
 class ExpressionParserImpl implements ExpressionParser{
 	
@@ -108,7 +112,17 @@ class ExpressionParserImpl implements ExpressionParser{
 					expression = expression.trim()
 					
 					int endOfConditionIndex = this.endOfConditionIndex(expression)
-					String condition = " [" + i + "].payload.output.value." + expression.substring(0, endOfConditionIndex) + " "
+					
+					boolean leftOperatorInExpression = this.leftOperatorInExpression(expression)
+					
+					String condition
+					
+					if(leftOperatorInExpression == true){
+						condition = " [" + i + "].payload.output.value." + expression.substring(0, endOfConditionIndex) + " "
+					} else {
+						condition = " [" + i + "].payload.output.value" + expression.substring(0, endOfConditionIndex) + " "
+					}
+					
 					
 					releaseExpression = releaseExpression + condition
 					
@@ -234,6 +248,7 @@ class ExpressionParserImpl implements ExpressionParser{
 	}
 	
 	private int endOfConditionIndex(String expression){
+		
 		int index
 		int min = expression.indexOf(')')
 		
@@ -252,6 +267,28 @@ class ExpressionParserImpl implements ExpressionParser{
 		}
 		
 		return min
+	}
+
+	/**
+	 * For expressions like this: when " ... condition <0"
+	 * there is no left operator
+	 *  
+	 * @param expression
+	 * @return true if there is a left operator, false otherwise
+	 */
+	private boolean leftOperatorInExpression(String expression){
+		
+		try{
+			SpelExpressionParser parser = new SpelExpressionParser();
+			SpelExpression se =	parser.parseRaw(expression)
+		}catch(SpelParseException e){
+			if(e.getMessageCode() == SpelMessage.LEFT_OPERAND_PROBLEM){
+				return false
+			}
+		}
+		
+		return true
+		
 	}
 	
 	public List<String> getApplicationsNamesInExpression(String expression, List<InstructionNode> graphOfInstructions){

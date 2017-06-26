@@ -976,6 +976,7 @@ class OrchaCodeVisitor extends OrchaCodeParser{
 					def m = constantExpression.getText()
 					log.debug m	+ " incomingMessageEvent.state=INCOMING_MESSAGE ConstantExpression" // receive event with constantExpression
 					if(method == 'condition'){
+						println m
 						instruction.condition = m
 					} else if(method == 'description'){
 						this.orchaMetadata.description = m

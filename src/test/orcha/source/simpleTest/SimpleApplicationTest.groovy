@@ -4,5 +4,5 @@ title 'simple test'
 
 receive variable from simpleApplicationTestInput
 compute simpleServiceToTest with variable.value
-when "simpleServiceToTest terminates with !=true"
+when "simpleServiceToTest terminates condition !=true"
 send simpleServiceToTest.result to simpleApplicationTestOutput
