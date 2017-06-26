@@ -11,8 +11,8 @@ import orcha.lang.configuration.OrchaSession
 @Configuration
 @ComponentScan(basePackages=["configuration","generated"])
 @ImportResource([
-	"test data for BenchmarkingVendors.xml",
-	"test data for BenchmarkingVendorsQoS.xml"
+	"simple test.xml",
+	"simple testQoS.xml"
 ])
 class OrchaForTestConfiguration {
 	
