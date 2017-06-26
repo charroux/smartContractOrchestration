@@ -27,6 +27,7 @@ import org.codehaus.groovy.ast.expr.PropertyExpression;
 import org.codehaus.groovy.ast.expr.VariableExpression;
 import org.codehaus.groovy.ast.stmt.Statement
 import org.codehaus.groovy.control.SourceUnit;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition
 import org.springframework.context.ApplicationContext;
@@ -765,43 +766,7 @@ class OrchaCodeVisitor extends OrchaCodeParser{
 		
 		return graphOfInstructions
 	}
-	
-	/*private Application getByName(def applicationName){
-		def application
-		for(int i=0; i<instructions.size(); i++){
-			if(instructions.getAt(i).springBean!=null && instructions.getAt(i).springBean.name==applicationName){
-				return instructions.getAt(i).springBean
-			}
-		}
-		return null
-	}
-
-	private Application[] getApplicationsInExpression(def expression){
-		def applications = []
-		String[] elements = expression.split(" ")
-		Application application
-		for(String element: elements){
-			
-			element = element.trim()
-			
-			while(element.charAt(0) == ')'){
-				element = element.substring(1)
-				element = element.trim()
-			}
-			
-			while(element.charAt(0) == '('){
-				element = element.substring(1)
-				element = element.trim()
-			}
-			
-			application = this.getByName(element)
-			if(application != null){
-				applications.add(application)
-			}
-		}
-		return applications
-	}*/
-	
+		
 	@Override
 	public void parseSourceFile(File orchaFile) throws OrchaCompilationException, OrchaConfigurationException {
 		
@@ -810,10 +775,20 @@ class OrchaCodeVisitor extends OrchaCodeParser{
 			
 			def myCL = new MyClassLoader(visitor: this)
 			
-			def script = myCL.parseClass(new GroovyCodeSource(orchaFile))
+			//try{
+			//	def script = myCL.parseClass(new GroovyCodeSource(orchaFile))
+			/*} catch(NoSuchBeanDefinitionException e){
+				println 'ooooooooooooooookkkkkkkkkkkkkkkkk'
+				String message = "Orcha configuration error while parsing the orcha file (" + orchaFile.getAbsolutePath() + "): no definition for "  + e.getBeanName() + ". Please define it as a bean in an Oche configuration class."
+				log.error "Orcha configuration error while parsing the orcha file (" + orchaFile.getAbsolutePath() + "): no definition for "  + e.getBeanName() + ". Please define it as a bean in an Oche configuration class."
+				throw new OrchaConfigurationException(message)					
+			}*/
+			
 	
 			try{
 	
+				def script = myCL.parseClass(new GroovyCodeSource(orchaFile))
+				
 				this.getGraphOfInstructions()
 				
 			} catch(org.codehaus.groovy.control.MultipleCompilationErrorsException e){
@@ -823,9 +798,8 @@ class OrchaCodeVisitor extends OrchaCodeParser{
 				}
 			}
 		}catch(org.springframework.beans.factory.NoSuchBeanDefinitionException e){
-			String[] object = e.getLocalizedMessage().split("'");
-			String message = object[1] + " from " + args[0] + " has not been configured yet."
-			log.error "transformer after the compute: " + message + '\n' + e + '\n' + this.stackTraceToString(e)
+			String message = "Orcha configuration error while parsing the orcha file (" + orchaFile.getAbsolutePath() + "): no definition for "  + e.getBeanName() + ". Please define it as a bean in an Oche configuration class."
+			log.error "Orcha configuration error while parsing the orcha file (" + orchaFile.getAbsolutePath() + "): no definition for "  + e.getBeanName() + ". Please define it as a bean in an Oche configuration class."
 			throw new OrchaConfigurationException(message)
 		}
 	}
