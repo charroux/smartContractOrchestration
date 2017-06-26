@@ -802,9 +802,14 @@ class ConfigurationMockGenerator {
 			new File(groovyFileName).withWriter('utf-8') { writer ->
 			   linesInJavaFile.each{ line ->
 				  if(line == 'import org.mockito.Mockito;'){	// to avoid unresolved class at compilation time !
-					  line = 'import org.mockito.Mockito.*;'
+					  line = 'import static org.mockito.Mockito.*;'
+				  } else {
+					  int index = line.indexOf("Mockito")
+					  if(index != -1){
+						  line = line.substring(0, index).concat(line.substring(index+8))
+					  }					  
 				  }
-				   writer.writeLine line
+				  writer.writeLine line
 			   }
 			}
 
