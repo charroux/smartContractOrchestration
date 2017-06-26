@@ -10,6 +10,7 @@ import orcha.lang.compiler.referenceimpl.CompileServiceWithSpringIntegration
 import orcha.lang.compiler.referenceimpl.OrchaLauncherGenerator
 import orcha.lang.compiler.referenceimpl.configurationproperties.ConfigurationPropertiesGenerator
 import orcha.lang.compiler.referenceimpl.testing.ConfigurationMockGenerator
+import orcha.lang.compiler.referenceimpl.xmlgenerator.impl.ApplicationsListToObjectsListTransformer
 import orcha.lang.compiler.referenceimpl.xmlgenerator.impl.ErrorUnwrapper;
 import orcha.lang.compiler.serviceOffer.ServiceOfferSelectionGenerator
 import orcha.lang.compiler.visitor.OrchaCodeParser
@@ -71,6 +72,21 @@ class Compiler implements CommandLineRunner{
 				
 		String pathToCode = "." + File.separator + "src" + File.separator + "main" + File.separator + "orcha" + File.separator + "source" + File.separator + orchaFile
 		File orchaSourceFile = new File(pathToCode)
+		
+		String testFolder = orchaSourceFile.getParent().replace("main", "test")
+		String[] files = new File(testFolder).list()
+		def testFiles = []
+		for(String file: files){
+			File f = new File(testFolder + File.separator + file)
+			println f.getAbsolutePath()
+			if(f.isFile()){
+				testFiles.add(f)
+			}
+		}
+		
+		testFiles.each { testFile ->
+			println testFile.getAbsolutePath()
+		}
 		
 		composeCodeParser.parseSourceFile(orchaSourceFile)
 		
