@@ -72,7 +72,7 @@ class XmlGeneratorForSpringIntegration implements XmlGenerator{
 	ApplicationContext context
 	
 	@Override
-	void generate(OrchaCodeParser orchaCodeParser, String xmlSpringContextFile, String xmlQoSSpringContextFile){
+	void generate(OrchaCodeParser orchaCodeParser, File xmlSpringContextFile, File xmlQoSSpringContextFile){
 		
 		this.propagateReceiveEvent(orchaCodeParser)
 				
@@ -83,13 +83,13 @@ class XmlGeneratorForSpringIntegration implements XmlGenerator{
 		
 		//this.resumeAtStoppingPoint(orchaCodeParser)
 		
-		BufferedWriter bufferedWriterSpringContext = new BufferedWriter(new FileWriter(new File(xmlSpringContextFile)))
+		BufferedWriter bufferedWriterSpringContext = new BufferedWriter(new FileWriter(xmlSpringContextFile))
 		bufferedWriterSpringContext.writeLine('<beans  xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:stream="http://www.springframework.org/schema/integration/stream" xmlns:int="http://www.springframework.org/schema/integration" xmlns:int-mail="http://www.springframework.org/schema/integration/mail" xmlns:util="http://www.springframework.org/schema/util" xmlns:int-file="http://www.springframework.org/schema/integration/file" xmlns:int-stream="http://www.springframework.org/schema/integration/stream" xmlns:int-http="http://www.springframework.org/schema/integration/http" xmlns:int-groovy="http://www.springframework.org/schema/integration/groovy" xmlns:context="http://www.springframework.org/schema/context" xmlns:task="http://www.springframework.org/schema/task" xmlns:jdbc="http://www.springframework.org/schema/jdbc" xmlns:int-jdbc="http://www.springframework.org/schema/integration/jdbc" xmlns:int-script="http://www.springframework.org/schema/integration/scripting" xmlns:int-event="http://www.springframework.org/schema/integration/event" xmlns:int-amqp="http://www.springframework.org/schema/integration/amqp" xmlns:rabbit="http://www.springframework.org/schema/rabbit" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration-4.3.xsd http://www.springframework.org/schema/integration/mail http://www.springframework.org/schema/integration/mail/spring-integration-mail-4.3.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd http://www.springframework.org/schema/integration/file http://www.springframework.org/schema/integration/file/spring-integration-file-4.3.xsd http://www.springframework.org/schema/integration/stream http://www.springframework.org/schema/integration/stream/spring-integration-stream-4.3.xsd http://www.springframework.org/schema/integration/jdbc http://www.springframework.org/schema/integration/jdbc/spring-integration-jdbc-4.3.xsd http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-4.3.xsd http://www.springframework.org/schema/integration/http http://www.springframework.org/schema/integration/http/spring-integration-http-4.3.xsd http://www.springframework.org/schema/integration/groovy http://www.springframework.org/schema/integration/groovy/spring-integration-groovy-4.3.xsd http://www.springframework.org/schema/integration/scripting http://www.springframework.org/schema/integration/scripting/spring-integration-scripting-4.3.xsd http://www.springframework.org/schema/integration/event http://www.springframework.org/schema/integration/event/spring-integration-event-4.3.xsd http://www.springframework.org/schema/rabbit http://www.springframework.org/schema/rabbit/spring-rabbit.xsd http://www.springframework.org/schema/integration/amqp http://www.springframework.org/schema/integration/amqp/spring-integration-amqp-4.3.xsd http://www.springframework.org/schema/integration/stream http://www.springframework.org/schema/integration/stream/spring-integration-stream-4.3.xsd">')
 
 		def xmlEvent = generateGeneralContext()
 		bufferedWriterSpringContext.writeLine(xmlEvent.toString())
 
-		BufferedWriter bufferedWriterQoSSpringContext = new BufferedWriter(new FileWriter(new File(xmlQoSSpringContextFile)))
+		BufferedWriter bufferedWriterQoSSpringContext = new BufferedWriter(new FileWriter(xmlQoSSpringContextFile))
 		bufferedWriterQoSSpringContext.writeLine('<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:stream="http://www.springframework.org/schema/integration/stream" xmlns:aop="http://www.springframework.org/schema/aop" xmlns:int="http://www.springframework.org/schema/integration" xmlns:int-file="http://www.springframework.org/schema/integration/file" xmlns:int-stream="http://www.springframework.org/schema/integration/stream" xmlns:int-http="http://www.springframework.org/schema/integration/http" xmlns:int-groovy="http://www.springframework.org/schema/integration/groovy" xmlns:context="http://www.springframework.org/schema/context" xmlns:task="http://www.springframework.org/schema/task" xmlns:jdbc="http://www.springframework.org/schema/jdbc" xmlns:int-jdbc="http://www.springframework.org/schema/integration/jdbc" xmlns:int-script="http://www.springframework.org/schema/integration/scripting" xmlns:int-event="http://www.springframework.org/schema/integration/event" xmlns:int-amqp="http://www.springframework.org/schema/integration/amqp" xmlns:rabbit="http://www.springframework.org/schema/rabbit" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration-4.3.xsd http://www.springframework.org/schema/integration/file http://www.springframework.org/schema/integration/file/spring-integration-file-4.3.xsd http://www.springframework.org/schema/integration/stream http://www.springframework.org/schema/integration/stream/spring-integration-stream-4.3.xsd http://www.springframework.org/schema/integration/jdbc http://www.springframework.org/schema/integration/jdbc/spring-integration-jdbc-4.3.xsd http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-4.3.xsd http://www.springframework.org/schema/integration/http http://www.springframework.org/schema/integration/http/spring-integration-http-4.3.xsd http://www.springframework.org/schema/integration/groovy http://www.springframework.org/schema/integration/groovy/spring-integration-groovy-4.3.xsd http://www.springframework.org/schema/integration/scripting http://www.springframework.org/schema/integration/scripting/spring-integration-scripting-4.3.xsd http://www.springframework.org/schema/integration/event http://www.springframework.org/schema/integration/event/spring-integration-event-4.3.xsd http://www.springframework.org/schema/rabbit http://www.springframework.org/schema/rabbit/spring-rabbit.xsd http://www.springframework.org/schema/integration/amqp http://www.springframework.org/schema/integration/amqp/spring-integration-amqp-4.3.xsd http://www.springframework.org/schema/integration/stream http://www.springframework.org/schema/integration/stream/spring-integration-stream-4.3.xsd">')
 
 		//xmlEvent = generateGeneralContextForQoS()
@@ -119,28 +119,28 @@ class XmlGeneratorForSpringIntegration implements XmlGenerator{
 		bufferedWriterSpringContext.close()
 		
 		// usefull to write line by line
-		String xmlContext = new File(xmlSpringContextFile).text
+		String xmlContext = xmlSpringContextFile.text
 		String springContexteAsText = XmlUtil.serialize(xmlContext)
-		new File(xmlSpringContextFile).withWriter('utf-8') { writer ->
+		xmlSpringContextFile.withWriter('utf-8') { writer ->
 			writer.writeLine springContexteAsText
 			writer.close()
 		}
 		
-		log.info 'Transpilatation complete successfully. Orcha orchestrator generated into ' + xmlSpringContextFile
+		log.info 'Transpilatation complete successfully. Orcha orchestrator generated into ' + xmlSpringContextFile.getAbsolutePath()
 		
 		bufferedWriterQoSSpringContext.writeLine('</beans>')
 		bufferedWriterQoSSpringContext.flush()
 		bufferedWriterQoSSpringContext.close()
 		
 		// usefull to write line by line
-		xmlContext = new File(xmlQoSSpringContextFile).text
+		xmlContext = xmlQoSSpringContextFile.text
 		springContexteAsText = XmlUtil.serialize(xmlContext)
-		new File(xmlQoSSpringContextFile).withWriter('utf-8') { writer ->
+		xmlQoSSpringContextFile.withWriter('utf-8') { writer ->
 			writer.writeLine springContexteAsText
 			writer.close()
 		}
 		
-		log.info 'Transpilatation complete successfully. QoS for Orcha orchestrator generated into ' + xmlQoSSpringContextFile
+		log.info 'Transpilatation complete successfully. QoS for Orcha orchestrator generated into ' + xmlQoSSpringContextFile.getAbsolutePath()
 	}
 	
 	public void propagateSameEvent(InstructionNode nextNode, InstructionNode node){

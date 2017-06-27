@@ -1,7 +1,5 @@
 package orcha.lang.compiler
 
-import java.util.List;
-import java.util.Map;
 import orcha.lang.compiler.visitor.OrchaCodeParser
 
 interface Compile{
@@ -12,6 +10,15 @@ interface Compile{
 	 * @throws OrchaCompilationException
 	 * @throws OrchaConfigurationException
 	 */
-	void compile(OrchaCodeParser orchaCodeParser)  throws OrchaCompilationException, OrchaConfigurationException
+	void compileForLaunching(OrchaCodeParser orchaCodeParser)  throws OrchaCompilationException, OrchaConfigurationException
+	
+	/**
+	 * Deduce from the orchaCodeParser the test program (if it exists), and compile it.
+	 * 
+	 * @param orchaCodeParser
+	 * @throws OrchaCompilationException
+	 * @throws OrchaConfigurationException
+	 */
+	void compileForTesting(OrchaCodeParser orchaCodeParser)  throws OrchaCompilationException, OrchaConfigurationException
 	
 }

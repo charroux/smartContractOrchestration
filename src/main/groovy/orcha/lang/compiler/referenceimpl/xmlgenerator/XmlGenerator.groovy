@@ -7,6 +7,6 @@ import orcha.lang.compiler.visitor.OrchaCodeParser
 
 interface XmlGenerator {
 	
-	void generate(OrchaCodeParser orchaCodeParser, String xmlSpringContextFile, String xmlQoSSpringContextFile)
+	void generate(OrchaCodeParser orchaCodeParser, File xmlSpringContextFile, File xmlQoSSpringContextFile)
 
 }

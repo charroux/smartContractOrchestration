@@ -84,7 +84,7 @@ class Compiler implements CommandLineRunner{
 		
 		if(isMockGenerated == false){
 			
-			compile.compile(orchaCodeParser)
+			compile.compileForLaunching(orchaCodeParser)
 			
 			configurationPropertiesGenerator.generate(orchaCodeParser)
 			
@@ -93,9 +93,8 @@ class Compiler implements CommandLineRunner{
 			File[] testFiles = orchaTestSourceDirectory.listFiles()
 			if(testFiles.length > 0){
 				orchaTestCodeParser.parseSourceFile(testFiles[0])
+				compile.compileForTesting(orchaTestCodeParser)
 			}
-			
-			compile.compile(orchaTestCodeParser)
 			
 		}
 		

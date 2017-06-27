@@ -41,26 +41,37 @@ class CompileServiceWithSpringIntegration implements Compile{
 	
 	@Autowired
 	OrchaLauncherGenerator orchaLauncherGenerator
-	
+
+	@Override
+	public void compileForLaunching(OrchaCodeParser orchaCodeParser) throws OrchaCompilationException, OrchaConfigurationException {
+		String path = "." + File.separator + "src" + File.separator + "main" + File.separator + "resources" + File.separator
+		log.info 'Transpilatation of the orcha program \"' + orchaCodeParser.getOrchaMetadata().getTitle() + '\" into the directory ' + path
+		this.compile(orchaCodeParser, new File(path));		
+	}
+
+	@Override
+	public void compileForTesting(OrchaCodeParser orchaCodeParser) throws OrchaCompilationException, OrchaConfigurationException {
+		String path = "." + File.separator + "src" + File.separator + "test" + File.separator + "resources" + File.separator
+		log.info 'Transpilatation of the orcha testing program \"' + orchaCodeParser.getOrchaMetadata().getTitle() + '\" into the directory ' + path
+		this.compile(orchaCodeParser, new File(path));
+	}
+
 	/**
 	 * @param orchaCodeParser
-	 * @param commandLineArgs
 	 * @throws OrchaCompilationException
 	 * @throws OrchaConfigurationException
 	 */
-	@Override
-	public void compile(OrchaCodeParser orchaCodeParser) throws OrchaCompilationException, OrchaConfigurationException {
+	private void compile(OrchaCodeParser orchaCodeParser, File destinationDirectory) throws OrchaCompilationException, OrchaConfigurationException {
 		
 		log.info 'Transpilatation of the Orcha program begins'
 		
 		String xmlSpringContextFileName = orchaCodeParser.getOrchaMetadata().getTitle() + ".xml"		
-		String xmlSpringContent = "." + File.separator + "src" + File.separator + "main" + File.separator + "resources" + File.separator + xmlSpringContextFileName 
+		String xmlSpringContent = destinationDirectory.getAbsolutePath() + File.separator + xmlSpringContextFileName
 		
-		//String xmlQoSSpringContent = "." + File.separator + "src" + File.separator + "main" + File.separator + "resources" + File.separator + "orchaQoSSpringContext.xml"
 		String xmlSpringContextQoSFileName = orchaCodeParser.getOrchaMetadata().getTitle() + "QoS.xml"
-		String xmlQoSSpringContent = "." + File.separator + "src" + File.separator + "main" + File.separator + "resources" + File.separator + xmlSpringContextQoSFileName 
+		String xmlQoSSpringContent = destinationDirectory.getAbsolutePath() + File.separator + xmlSpringContextQoSFileName
 				
-		xmlGenerator.generate(orchaCodeParser, xmlSpringContent, xmlQoSSpringContent)
+		xmlGenerator.generate(orchaCodeParser, new File(xmlSpringContent), new File(xmlQoSSpringContent))
 				
 		String xmlContext = new File(xmlSpringContent).text
 		String springContexteAsText = XmlUtil.serialize(xmlContext)
@@ -71,7 +82,6 @@ class CompileServiceWithSpringIntegration implements Compile{
 		File oldFile = new File(xmlSpringContent)
 		
 		// used when the an executable jar is built
-		//def xmlSpringContentInSrc = "." + File.separator + "bin" + File.separator + "orchaSpringContext.xml"
 		def xmlSpringContentInSrc = "." + File.separator + "bin" + File.separator + orchaCodeParser.getOrchaMetadata().getTitle() + ".xml"
 		File newFile = new File(xmlSpringContentInSrc);
 		FileOutputStream fos = new FileOutputStream(newFile)
@@ -90,7 +100,6 @@ class CompileServiceWithSpringIntegration implements Compile{
 		oldFile = new File(xmlQoSSpringContent)
 		
 		// used when the an executable jar is built
-		// xmlSpringContentInSrc = "." + File.separator + "bin" + File.separator + "orchaQoSSpringContext.xml"
 		xmlSpringContentInSrc = "." + File.separator + "bin" + File.separator + orchaCodeParser.getOrchaMetadata().getTitle() + "QoS.xml"
 		newFile = new File(xmlSpringContentInSrc);
 		fos = new FileOutputStream(newFile)
@@ -104,10 +113,5 @@ class CompileServiceWithSpringIntegration implements Compile{
 		
 	}
 
-/*	@Override
-	public int getExitCode() {
-		// TODO Auto-generated method stub
-		return 10;
-	}*/
 	
 }
