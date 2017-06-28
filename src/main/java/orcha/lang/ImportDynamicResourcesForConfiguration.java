@@ -9,8 +9,8 @@ import org.springframework.context.annotation.ImportResource;
  * 
  */
 @ImportResource({
-    "simple test.xml",
-    "simple testQoS.xml"
+    "simple application to test.xml",
+    "simple application to testQoS.xml"
 })
 public class ImportDynamicResourcesForConfiguration {
 

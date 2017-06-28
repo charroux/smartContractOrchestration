@@ -10,17 +10,17 @@ package orcha.lang.configure;
 @org.springframework.boot.context.properties.ConfigurationProperties(prefix = "driving")
 public class ConfigurationProperties {
 
-    public ConfigurationProperties.SimpleApplicationToTestOutput simpleApplicationToTestOutput = new SimpleApplicationToTestOutput();
+    public ConfigurationProperties.SimpleApplicationOutput simpleApplicationOutput = new SimpleApplicationOutput();
 
-    public ConfigurationProperties.SimpleApplicationToTestOutput getSimpleApplicationToTestOutput() {
-        return simpleApplicationToTestOutput;
+    public ConfigurationProperties.SimpleApplicationOutput getSimpleApplicationOutput() {
+        return simpleApplicationOutput;
     }
 
-    public void setSimpleApplicationToTestOutput(ConfigurationProperties.SimpleApplicationToTestOutput simpleApplicationToTestOutput) {
-        this.simpleApplicationToTestOutput = simpleApplicationToTestOutput;
+    public void setSimpleApplicationOutput(ConfigurationProperties.SimpleApplicationOutput simpleApplicationOutput) {
+        this.simpleApplicationOutput = simpleApplicationOutput;
     }
 
-    public class SimpleApplicationToTestOutput {
+    public class SimpleApplicationOutput {
 
         public String directory;
         public String filename;

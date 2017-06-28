@@ -3,6 +3,6 @@ package source.simpleTest
 title 'simple test'
 
 receive variable from simpleApplicationTestInput
-compute simpleServiceToTest with variable.value
-when "simpleServiceToTest terminates condition !=true"
-send simpleServiceToTest.result to simpleApplicationTestOutput
+compute simpleApplicationService with variable.value
+when "simpleApplicationService terminates condition ==true"
+send simpleApplicationService.result to simpleApplicationTestOutput

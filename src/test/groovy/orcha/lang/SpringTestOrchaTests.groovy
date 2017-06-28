@@ -22,37 +22,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.*;
 
 @RunWith(SpringRunner.class)
-//@SpringBootTest(classes=[orcha.lang.OrchaForTestConfiguration.class,  orcha.lang.AutoConfiguration.class])
-@SpringBootTest(classes=[orcha.lang.OrchaForTestConfiguration.class])
-class SpringTestOrchaTests {
-	
-/*	@Bean
-	VendorOrderConverter vendorOrderConverter(){
-		return new VendorOrderConverter()
-	}*/
-	
-	/*@SpyBean
-	@Qualifier("vendorOrderConverter")
-	VendorOrderConverter vendorOrderConverter
-	
-	@Bean
-	VendorOrderConverter vendorOrderConverter(){
-		vendorOrderConverter
-	}
-	
-	@Before
-	void init(){
-		VendorOrderConverter vendorOrderConverter  = spy(VendorOrderConverter.class)
-		Product p = new Product(specification: "TV")
-		Order order = new Order(number: 1, product: p);
-		when(vendorOrderConverter.convert(order)).thenReturn( new SpecificOrder(number: 1111, product: "azerty") );
-	}*/
-	
+@SpringBootTest(classes=[orcha.lang.ImportDynamicResourcesForTestConfiguration.class])
+class SpringTestOrchaTests {	
 	
 	@Test
-	void testContextLoads() throws Exception {
-		//assertThat(new String("essai")).isNotNull();
-		Thread.sleep(10000);
+	void test(){
+		Thread.sleep(5000)	// !!!!! to wait for file writing
 	}
 
 }

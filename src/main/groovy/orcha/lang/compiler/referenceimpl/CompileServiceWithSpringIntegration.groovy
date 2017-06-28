@@ -44,16 +44,30 @@ class CompileServiceWithSpringIntegration implements Compile{
 
 	@Override
 	public void compileForLaunching(OrchaCodeParser orchaCodeParser) throws OrchaCompilationException, OrchaConfigurationException {
+		
 		String path = "." + File.separator + "src" + File.separator + "main" + File.separator + "resources" + File.separator
 		log.info 'Transpilatation of the orcha program \"' + orchaCodeParser.getOrchaMetadata().getTitle() + '\" into the directory ' + path
-		this.compile(orchaCodeParser, new File(path));		
+		
+		this.compile(orchaCodeParser, new File(path))
+		
+		String xmlSpringContextFileName = orchaCodeParser.getOrchaMetadata().getTitle() + ".xml"
+		String xmlSpringContextQoSFileName = orchaCodeParser.getOrchaMetadata().getTitle() + "QoS.xml"
+		
+		orchaLauncherGenerator.generateForLaunching(xmlSpringContextFileName, xmlSpringContextQoSFileName)
 	}
 
 	@Override
 	public void compileForTesting(OrchaCodeParser orchaCodeParser) throws OrchaCompilationException, OrchaConfigurationException {
+		
 		String path = "." + File.separator + "src" + File.separator + "test" + File.separator + "resources" + File.separator
 		log.info 'Transpilatation of the orcha testing program \"' + orchaCodeParser.getOrchaMetadata().getTitle() + '\" into the directory ' + path
+		
 		this.compile(orchaCodeParser, new File(path));
+		
+		String xmlSpringContextFileName = orchaCodeParser.getOrchaMetadata().getTitle() + ".xml"
+		String xmlSpringContextQoSFileName = orchaCodeParser.getOrchaMetadata().getTitle() + "QoS.xml"
+		
+		orchaLauncherGenerator.generateForTesting(xmlSpringContextFileName, xmlSpringContextQoSFileName)
 	}
 
 	/**
@@ -109,7 +123,7 @@ class CompileServiceWithSpringIntegration implements Compile{
 
 		log.info 'Transpilatation complete successfully. QoS for Orcha orchestrator generated into ' + xmlSpringContentInSrc
 		
-		orchaLauncherGenerator.generate(xmlSpringContextFileName, xmlSpringContextQoSFileName)
+		//orchaLauncherGenerator.generate(xmlSpringContextFileName, xmlSpringContextQoSFileName)
 		
 	}
 
