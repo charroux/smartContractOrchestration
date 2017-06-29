@@ -1,0 +1,155 @@
+/*
+ * change mainClass
+ * gradle build
+ * java -jar build/libs/ComposeTools.jar
+ */
+
+buildscript {
+	ext {
+		springBootVersion = '1.5.2.RELEASE'
+	}
+	repositories {
+		mavenCentral()
+	}
+	dependencies {
+		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+	}
+}
+
+apply plugin: 'java' 
+apply plugin: 'eclipse' 
+apply plugin: 'idea'
+apply plugin: 'groovy'
+apply plugin: 'org.springframework.boot'
+
+repositories {
+	mavenCentral()
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+springBoot {
+	mainClass = "orcha.lang.OrchaSpringIntegrationLauncher"
+}
+
+jar {
+	baseName = 'Orcha'
+	version =  'alpha-1.1'
+}
+
+dependencies {
+
+	compile 'org.codehaus.groovy:groovy-all:2.4.5'
+	
+	compile 'org.codehaus.groovy.modules.http-builder:http-builder:0.7.1'
+	
+	compile('org.springframework.boot:spring-boot-starter')
+	
+	//compile("org.springframework.boot:spring-boot-starter-web")
+	compile("org.springframework.boot:spring-boot-devtools")
+	
+	// for auto completion in the properties files
+	compile("org.springframework.boot:spring-boot-configuration-processor")
+	
+	testCompile('org.springframework.boot:spring-boot-starter-test')
+	
+	/*compile("org.springframework.boot:spring-boot-starter-web:1.5.2.RELEASE")
+	compile("org.springframework.boot:spring-boot-starter:1.5.2.RELEASE")
+	compile("org.springframework.boot:spring-boot-devtools:1.5.2.RELEASE")
+	
+	// for auto completion in the properties files
+	compile("org.springframework.boot:spring-boot-configuration-processor:1.5.2.RELEASE")
+	
+	testCompile("org.springframework.boot:spring-boot-starter-test:1.5.2.RELEASE")
+	*/
+	compile("org.springframework:spring-tx")
+	
+	compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.19'
+	compile group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: '2.5'
+	
+	compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.5'
+	compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.5'
+	compile group: 'org.apache.logging.log4j', name: 'log4j-jcl', version: '2.5'
+	
+	compile group: 'org.hibernate', name: 'hibernate-validator', version: '5.4.0.Final'
+	
+	
+	compile group: 'com.sun.codemodel', name: 'codemodel', version: '2.6'
+	
+	compile 'org.springframework.integration:spring-integration-core:4.3.7.RELEASE'
+	compile 'org.springframework.integration:spring-integration-mail:4.3.7.RELEASE'
+	compile 'org.springframework.integration:spring-integration-file:4.3.7.RELEASE'
+	compile 'org.springframework.integration:spring-integration-stream:4.3.7.RELEASE'
+	compile 'org.springframework.integration:spring-integration-http:4.3.7.RELEASE'
+	compile 'org.springframework.integration:spring-integration-jdbc:4.3.7.RELEASE'
+	compile 'org.springframework.integration:spring-integration-event:4.3.7.RELEASE'
+	compile 'org.springframework.integration:spring-integration-scripting:4.3.7.RELEASE'
+	compile 'org.springframework.integration:spring-integration-amqp:4.3.7.RELEASE'
+	compile 'org.springframework.integration:spring-integration-mongodb:4.3.7.RELEASE'
+	
+	compile group: 'org.ow2.asm', name: 'asm', version: '5.2'
+	
+	// https://mvnrepository.com/artifact/org.mongodb/mongo-java-driver
+	compile group: 'org.mongodb', name: 'mongo-java-driver', version: '3.4.1'
+	
+	compile 'org.springframework.amqp:spring-rabbit:1.5.3.RELEASE'
+	
+	compile 'org.springframework.batch:spring-batch-core:3.0.7.RELEASE'
+	
+	compile 'com.h2database:h2:1.3.175'
+	
+	compile group: 'aspectj', name: 'aspectjweaver', version: '1.5.4'
+	
+	compile 'javax.mail:javax.mail-api:1.5.5'
+	compile 'com.sun.mail:javax.mail:1.5.5'
+	
+	// testCompile group: 'junit', name: 'junit', version: '4.12'
+	// https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-test
+	//compile 'org.springframework.boot:spring-boot-starter-test:1.3.5.RELEASE'
+	
+	//
+	
+}
+
+	
+compileJava.dependsOn(processResources)		// for auto completion in the properties files
+
+configurations.all {
+	exclude group: "ch.qos.logback", module: "logback-classic"
+}
+
+sourceSets {
+	main {
+		java {
+			srcDirs = [ 'src/main/java' ]
+			srcDir 'src/main/orcha'
+		}
+		groovy {
+			srcDirs = [ 'src/main/groovy' ]
+			srcDir 'src/main/orcha'
+		}
+	}
+	test {
+		java {
+			srcDirs = [ 'src/test/java' ]
+			srcDir 'src/main/orcha'
+		}
+		groovy {
+			srcDirs = [ 'src/test/groovy' ]
+			srcDir 'src/main/orcha'
+		}
+		resources {
+			srcDirs = ["src/test/resources"]
+		}
+	}
+}
+
+task compile(type: JavaExec) {
+	classpath = sourceSets.main.runtimeClasspath
+	main = 'orcha.lang.Compiler'
+	if(project.hasProperty("orchaFile")){
+		args Eval.me(orchaFile)
+	}	
+}
+
