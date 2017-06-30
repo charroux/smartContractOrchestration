@@ -2,7 +2,7 @@ package orcha.lang.compiler.qualityOfService
 
 import orcha.lang.compiler.InstructionNode;
 import orcha.lang.compiler.OrchaConfigurationException
-import orcha.lang.compiler.visitor.OrchaCodeParser
+import orcha.lang.compiler.visitor.OrchaCodeVisitor
 import orcha.lang.configuration.Retry
 import orcha.lang.configuration.EventSourcing.JoinPoint
 import orcha.lang.configuration.Queue
@@ -18,7 +18,7 @@ class QualityOfServiceImpl implements QualityOfService{
 	 * @param graphOfInstructions
 	 * @return
 	 */
-	void setQualityOfServiceToInstructions(OrchaCodeParser orchaCodeParser){
+	void setQualityOfServiceToInstructions(OrchaCodeVisitor orchaCodeParser){
 		
 		ArrayList<InstructionNode> nodes = orchaCodeParser.findAllNodes()
 		def instructionNodeAlreadyDone = []

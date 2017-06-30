@@ -6,22 +6,25 @@ title "orcha compiler"
 author "Ben C."
 version "1.0"
 
-receive orchaFile from orchaFolder
-compute parseOrchaFile with orchaFile.value
+receive orchaProgram from orchaFile
+compute parseOrcha with orchaProgram.value
 
-when "orchaFile terminates"		
-compute generateMockOfServices with parseOrchaFile.result
+/*when "parseOrcha terminates"
+compute generateServiceOfferSelection with parseOrcha.result
 
-when "generateMockOfServices terminates condition ==true"
-compute compileOrcha with parseOrchaFile.result
+when "parseOrchaFile terminates"		
+compute generateMockOfServices with parseOrcha.result
 
-when "compileOrcha terminates"
-compute generateConfigurationProperties with parseOrchaFile.result
+when "generateMockOfServices terminates condition ==false"
+compute compileForLaunching with parseOrcha.result
+
+when "compileForLaunching terminates"
+compute generateConfigurationProperties with parseOrcha.result
 
 when "generateConfigurationProperties terminates"
-compute searchForOrchaTestingFile with orchaFile.value
+compute searchForOrchaTestingFile with orchaProgram.value
 
 when "searchForOrchaTestingFile terminates"
-compute compileOrcha with searchForOrchaTestingFile.result
-
+compute compileForTesting with searchForOrchaTestingFile.result
+*/
 

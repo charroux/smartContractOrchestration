@@ -1,6 +1,6 @@
 package orcha.lang.compiler
 
-import orcha.lang.compiler.visitor.OrchaCodeParser
+import orcha.lang.compiler.visitor.OrchaCodeVisitor
 
 interface Compile{
 	
@@ -10,7 +10,7 @@ interface Compile{
 	 * @throws OrchaCompilationException
 	 * @throws OrchaConfigurationException
 	 */
-	void compileForLaunching(OrchaCodeParser orchaCodeParser)  throws OrchaCompilationException, OrchaConfigurationException
+	void compileForLaunching(OrchaCodeVisitor orchaCodeParser)  throws OrchaCompilationException, OrchaConfigurationException
 	
 	/**
 	 * Deduce from the orchaCodeParser the test program (if it exists), and compile it.
@@ -19,6 +19,6 @@ interface Compile{
 	 * @throws OrchaCompilationException
 	 * @throws OrchaConfigurationException
 	 */
-	void compileForTesting(OrchaCodeParser orchaCodeParser)  throws OrchaCompilationException, OrchaConfigurationException
+	void compileForTesting(OrchaCodeVisitor orchaCodeParser)  throws OrchaCompilationException, OrchaConfigurationException
 	
 }

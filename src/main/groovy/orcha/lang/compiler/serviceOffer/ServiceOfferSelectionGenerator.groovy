@@ -24,7 +24,7 @@ import java.util.zip.ZipInputStream
 import java.util.zip.ZipOutputStream
 import orcha.lang.compiler.Instruction
 import orcha.lang.compiler.InstructionNode
-import orcha.lang.compiler.visitor.OrchaCodeParser
+import orcha.lang.compiler.visitor.OrchaCodeVisitor
 import orcha.lang.configuration.Application
 import orcha.lang.configuration.Input
 import orcha.lang.configuration.JavaServiceAdapter
@@ -59,7 +59,7 @@ class ServiceOfferSelectionGenerator {
 	 * @param orchaCodeParser
 	 * @return
 	 */
-	boolean generate(OrchaCodeParser orchaCodeParser){
+	boolean generate(OrchaCodeVisitor orchaCodeParser){
 		
 		def beansByConfigurationClass = orchaCodeParser.findAllComputeNodesWithoutAdapterByConfigurationClass()
 		

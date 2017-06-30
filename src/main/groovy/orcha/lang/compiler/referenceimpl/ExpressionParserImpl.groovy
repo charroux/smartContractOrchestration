@@ -5,7 +5,7 @@ import java.util.List;
 import orcha.lang.compiler.InstructionNode;
 import orcha.lang.compiler.OrchaCompilationException
 import orcha.lang.compiler.referenceimpl.ExpressionParser;
-import orcha.lang.compiler.visitor.OrchaCodeParser
+import orcha.lang.compiler.visitor.OrchaCodeVisitor
 import orcha.lang.configuration.Application;
 import org.springframework.expression.spel.SpelParseException
 import org.springframework.expression.spel.standard.SpelExpression
@@ -15,7 +15,7 @@ import org.springframework.expression.spel.SpelMessage
 class ExpressionParserImpl implements ExpressionParser{
 	
 	@Override
-	public String failChannel(InstructionNode computeNode, OrchaCodeParser orchaCodeParser){
+	public String failChannel(InstructionNode computeNode, OrchaCodeVisitor orchaCodeParser){
 		if(computeNode.instruction.instruction != "compute"){
 			return null
 		}

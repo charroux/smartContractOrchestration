@@ -2,7 +2,7 @@ package orcha.lang.compiler.referenceimpl.configurationproperties
 
 import orcha.lang.compiler.Instruction
 import orcha.lang.compiler.InstructionNode
-import orcha.lang.compiler.visitor.OrchaCodeParser
+import orcha.lang.compiler.visitor.OrchaCodeVisitor
 import orcha.lang.configuration.Output
 import com.sun.codemodel.JCodeModel
 import com.sun.codemodel.JDefinedClass
@@ -28,7 +28,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 @Slf4j
 class ConfigurationPropertiesGenerator {
 	
-	void generate(OrchaCodeParser orchaCodeParser){
+	void generate(OrchaCodeVisitor orchaCodeParser){
 		
 		log.info 'Configuration property generation begins'
 		

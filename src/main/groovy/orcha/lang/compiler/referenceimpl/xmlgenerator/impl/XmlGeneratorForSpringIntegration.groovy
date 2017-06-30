@@ -32,7 +32,7 @@ import orcha.lang.compiler.qualityOfService.RetryOption;
 import orcha.lang.compiler.referenceimpl.ExpressionParser;
 import orcha.lang.compiler.referenceimpl.xmlgenerator.XmlGenerator
 import orcha.lang.compiler.referenceimpl.xmlgenerator.connectors.SpringIntegrationConnectors
-import orcha.lang.compiler.visitor.OrchaCodeParser
+import orcha.lang.compiler.visitor.OrchaCodeVisitor
 import orcha.lang.configuration.AMQP_Adapter
 import orcha.lang.configuration.Application
 import orcha.lang.configuration.ComposeEventAdapter
@@ -72,7 +72,7 @@ class XmlGeneratorForSpringIntegration implements XmlGenerator{
 	ApplicationContext context
 	
 	@Override
-	void generate(OrchaCodeParser orchaCodeParser, File xmlSpringContextFile, File xmlQoSSpringContextFile){
+	void generate(OrchaCodeVisitor orchaCodeParser, File xmlSpringContextFile, File xmlQoSSpringContextFile){
 		
 		this.propagateReceiveEvent(orchaCodeParser)
 				
@@ -176,7 +176,7 @@ class XmlGeneratorForSpringIntegration implements XmlGenerator{
 	 * @param graphOfInstructions
 	 * @return
 	 */
-	private propagateReceiveEvent(OrchaCodeParser orchaCodeParser){
+	private propagateReceiveEvent(OrchaCodeVisitor orchaCodeParser){
 		
 		def receiveInstructions = orchaCodeParser.findAllReceiveNodes()
 		def nodesAlreadyDone = []
@@ -368,7 +368,7 @@ class XmlGeneratorForSpringIntegration implements XmlGenerator{
 		}
 	}*/
 	
-	private void resumeAtStoppingPoint(OrchaCodeParser orchaCodeParser){
+	private void resumeAtStoppingPoint(OrchaCodeVisitor orchaCodeParser){
 
 		// did resume at stopping point option has been chosen ? 
 		List<InstructionNode> computeInstructions = orchaCodeParser.findAllComputeNodes()
@@ -608,7 +608,7 @@ class XmlGeneratorForSpringIntegration implements XmlGenerator{
 	 * Connect together mainly channels of Spring integration
 	 * @param orchaCodeParser
 	 */
-	private void generateInputOutputChannelNames(OrchaCodeParser orchaCodeParser){
+	private void generateInputOutputChannelNames(OrchaCodeVisitor orchaCodeParser){
 		
 		List<InstructionNode> nodes = orchaCodeParser.findAllReceiveNodes()
 		
@@ -785,7 +785,7 @@ class XmlGeneratorForSpringIntegration implements XmlGenerator{
 		bufferedWriter.writeLine(xml.bind(connectors.eventSourcing(eventsSourcing)).toString())
 	}
 	
-	private void generateXMLForInstruction(InstructionNode instructionNode, OrchaCodeParser orchaCodeParser, List<Instruction>alreadyDoneInstructions, BufferedWriter bufferedWriter){
+	private void generateXMLForInstruction(InstructionNode instructionNode, OrchaCodeVisitor orchaCodeParser, List<Instruction>alreadyDoneInstructions, BufferedWriter bufferedWriter){
 		
 		List<Instruction> graphOfInstructions = orchaCodeParser.findAllNodes()
 		

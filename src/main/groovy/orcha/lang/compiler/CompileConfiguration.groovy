@@ -17,7 +17,9 @@ import orcha.lang.compiler.referenceimpl.xmlgenerator.XmlGenerator
 import orcha.lang.compiler.referenceimpl.xmlgenerator.impl.XmlGeneratorForSpringIntegration
 import orcha.lang.compiler.serviceOffer.ServiceOfferSelectionGenerator
 import orcha.lang.compiler.visitor.OrchaCodeParser
-import orcha.lang.compiler.visitor.impl.OrchaCodeVisitor
+import orcha.lang.compiler.visitor.OrchaCodeVisitor
+import orcha.lang.compiler.visitor.impl.OrchaCodeParserImpl
+import orcha.lang.compiler.visitor.impl.OrchaCodeVisitorImpl
 
 @Configuration
 //@Component
@@ -35,12 +37,12 @@ class CompileConfiguration {
 	
 	@Bean
 	OrchaCodeParser orchaCodeParser(){
-		return new OrchaCodeVisitor()
+		return new OrchaCodeParserImpl()
 	}
 	
 	@Bean
 	OrchaCodeParser orchaTestCodeParser(){
-		return new OrchaCodeVisitor()
+		return new OrchaCodeParserImpl()
 	}
 	
 	@Bean

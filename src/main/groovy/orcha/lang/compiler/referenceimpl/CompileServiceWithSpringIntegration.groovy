@@ -12,7 +12,7 @@ import orcha.lang.compiler.referenceimpl.xmlgenerator.XmlGenerator
 import orcha.lang.compiler.referenceimpl.xmlgenerator.connectors.SpringIntegrationConnectors
 import orcha.lang.compiler.referenceimpl.xmlgenerator.impl.ErrorUnwrapper;
 import orcha.lang.compiler.referenceimpl.xmlgenerator.impl.XmlGeneratorForSpringIntegration
-import orcha.lang.compiler.visitor.OrchaCodeParser
+import orcha.lang.compiler.visitor.OrchaCodeVisitor
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext
@@ -43,7 +43,7 @@ class CompileServiceWithSpringIntegration implements Compile{
 	OrchaLauncherGenerator orchaLauncherGenerator
 
 	@Override
-	public void compileForLaunching(OrchaCodeParser orchaCodeParser) throws OrchaCompilationException, OrchaConfigurationException {
+	public void compileForLaunching(OrchaCodeVisitor orchaCodeParser) throws OrchaCompilationException, OrchaConfigurationException {
 		
 		String path = "." + File.separator + "src" + File.separator + "main" + File.separator + "resources" + File.separator
 		log.info 'Transpilatation of the orcha program \"' + orchaCodeParser.getOrchaMetadata().getTitle() + '\" into the directory ' + path
@@ -57,7 +57,7 @@ class CompileServiceWithSpringIntegration implements Compile{
 	}
 
 	@Override
-	public void compileForTesting(OrchaCodeParser orchaCodeParser) throws OrchaCompilationException, OrchaConfigurationException {
+	public void compileForTesting(OrchaCodeVisitor orchaCodeParser) throws OrchaCompilationException, OrchaConfigurationException {
 		
 		String path = "." + File.separator + "src" + File.separator + "test" + File.separator + "resources" + File.separator
 		log.info 'Transpilatation of the orcha testing program \"' + orchaCodeParser.getOrchaMetadata().getTitle() + '\" into the directory ' + path
@@ -75,7 +75,7 @@ class CompileServiceWithSpringIntegration implements Compile{
 	 * @throws OrchaCompilationException
 	 * @throws OrchaConfigurationException
 	 */
-	private void compile(OrchaCodeParser orchaCodeParser, File destinationDirectory) throws OrchaCompilationException, OrchaConfigurationException {
+	private void compile(OrchaCodeVisitor orchaCodeParser, File destinationDirectory) throws OrchaCompilationException, OrchaConfigurationException {
 		
 		log.info 'Transpilatation of the Orcha program begins'
 		

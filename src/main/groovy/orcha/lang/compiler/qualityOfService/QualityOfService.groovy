@@ -1,3 +1,3 @@
-package orcha.lang.compiler.qualityOfServiceimport orcha.lang.compiler.visitor.OrchaCodeParser;
+package orcha.lang.compiler.qualityOfServiceimport orcha.lang.compiler.visitor.OrchaCodeVisitor;
 interface QualityOfService {	
-		void setQualityOfServiceToInstructions(OrchaCodeParser orchaCodeParser)}
+		void setQualityOfServiceToInstructions(OrchaCodeVisitor orchaCodeParser)}

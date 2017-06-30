@@ -14,7 +14,8 @@ import orcha.lang.compiler.referenceimpl.xmlgenerator.impl.ApplicationsListToObj
 import orcha.lang.compiler.referenceimpl.xmlgenerator.impl.ErrorUnwrapper;
 import orcha.lang.compiler.serviceOffer.ServiceOfferSelectionGenerator
 import orcha.lang.compiler.visitor.OrchaCodeParser
-import orcha.lang.compiler.visitor.impl.OrchaCodeVisitor
+import orcha.lang.compiler.visitor.OrchaCodeVisitor
+import orcha.lang.compiler.visitor.impl.OrchaCodeVisitorImpl
 
 import org.codehaus.groovy.ast.ClassCodeVisitorSupport;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -76,24 +77,24 @@ class Compiler implements CommandLineRunner{
 		String pathToCode = "." + File.separator + "src" + File.separator + "main" + File.separator + "orcha" + File.separator + "source" + File.separator + orchaFile
 		File orchaSourceFile = new File(pathToCode)
 				
-		orchaCodeParser.parseSourceFile(orchaSourceFile)
+		OrchaCodeVisitor orchaCodeVisitor = orchaCodeParser.parse(orchaSourceFile)
 		
-		serviceOfferSelectionGenerator.generate(orchaCodeParser)
+		serviceOfferSelectionGenerator.generate(orchaCodeVisitor)
 		
-		boolean isMockGenerated = configurationMockGenerator.generate(orchaCodeParser)
+		boolean isMockGenerated = configurationMockGenerator.generate(orchaCodeVisitor)
 		
 		if(isMockGenerated == false){
 			
-			compile.compileForLaunching(orchaCodeParser)
+			compile.compileForLaunching(orchaCodeVisitor)
 			
-			configurationPropertiesGenerator.generate(orchaCodeParser)
+			configurationPropertiesGenerator.generate(orchaCodeVisitor)
 			
 			String testFolder = orchaSourceFile.getParent().replace("main", "test")
 			File orchaTestSourceDirectory = new File(testFolder)
 			File[] testFiles = orchaTestSourceDirectory.listFiles()
 			if(testFiles.length > 0){
-				orchaTestCodeParser.parseSourceFile(testFiles[0])
-				compile.compileForTesting(orchaTestCodeParser)
+				OrchaCodeVisitor orchaTestCodeVisitor = orchaTestCodeParser.parse(testFiles[0])
+				compile.compileForTesting(orchaTestCodeVisitor)
 			}
 			
 		}

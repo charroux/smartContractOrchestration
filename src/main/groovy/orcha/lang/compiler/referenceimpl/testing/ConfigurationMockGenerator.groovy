@@ -23,7 +23,7 @@ import groovy.util.logging.Slf4j
 import orcha.lang.compiler.Instruction
 import orcha.lang.compiler.InstructionNode
 import orcha.lang.compiler.OrchaConfigurationException
-import orcha.lang.compiler.visitor.OrchaCodeParser
+import orcha.lang.compiler.visitor.OrchaCodeVisitor
 import orcha.lang.configuration.Application
 import orcha.lang.configuration.EventHandler
 import orcha.lang.configuration.JavaServiceAdapter
@@ -64,7 +64,7 @@ class ConfigurationMockGenerator {
 	
 	boolean isMockGenerated
 	
-	private Map<Class, List<InstructionNode>> getBeansByConfigurationClass(OrchaCodeParser orchaCodeParser){
+	private Map<Class, List<InstructionNode>> getBeansByConfigurationClass(OrchaCodeVisitor orchaCodeParser){
 		
 		def beansByConfigurationClass = [:]
 		
@@ -228,7 +228,7 @@ class ConfigurationMockGenerator {
 		return asmExpression
 	}
 	
-	boolean generate(OrchaCodeParser orchaCodeParser) throws OrchaConfigurationException{
+	boolean generate(OrchaCodeVisitor orchaCodeParser) throws OrchaConfigurationException{
 			
 		def beansByConfigurationClass = this.getBeansByConfigurationClass(orchaCodeParser)
 		
