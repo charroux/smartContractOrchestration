@@ -9,13 +9,13 @@ version "1.0"
 receive orchaProgram from orchaFile
 compute parseOrcha with orchaProgram.value
 
-/*when "parseOrcha terminates"
+when "parseOrcha terminates"
 compute generateServiceOfferSelection with parseOrcha.result
 
-when "parseOrchaFile terminates"		
+when "parseOrcha terminates"		
 compute generateMockOfServices with parseOrcha.result
 
-when "generateMockOfServices terminates condition ==false"
+/*when "generateMockOfServices terminates condition ==false"
 compute compileForLaunching with parseOrcha.result
 
 when "compileForLaunching terminates"

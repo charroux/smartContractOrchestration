@@ -233,7 +233,11 @@ class ConfigurationMockGenerator {
 		def beansByConfigurationClass = this.getBeansByConfigurationClass(orchaCodeParser)
 		
 		if(beansByConfigurationClass.size() == 0){
+			
 			isMockGenerated = false
+			
+			log.info 'Configuration of the Orcha program is complete => no need to generate a configuration.'
+			
 			return false
 		}
 		

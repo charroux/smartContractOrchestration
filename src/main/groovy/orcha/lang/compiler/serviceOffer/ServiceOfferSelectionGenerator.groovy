@@ -64,6 +64,9 @@ class ServiceOfferSelectionGenerator {
 		def beansByConfigurationClass = orchaCodeParser.findAllComputeNodesWithoutAdapterByConfigurationClass()
 		
 		if(beansByConfigurationClass.size() == 0){
+			
+			log.info 'All services are well configured => no need to generate a project for the selection of services.'
+			
 			return false
 		}
 		

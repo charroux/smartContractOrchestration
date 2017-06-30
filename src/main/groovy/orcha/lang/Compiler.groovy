@@ -92,7 +92,7 @@ class Compiler implements CommandLineRunner{
 			String testFolder = orchaSourceFile.getParent().replace("main", "test")
 			File orchaTestSourceDirectory = new File(testFolder)
 			File[] testFiles = orchaTestSourceDirectory.listFiles()
-			if(testFiles.length > 0){
+			if(testFiles!=null && testFiles.length > 0){
 				OrchaCodeVisitor orchaTestCodeVisitor = orchaTestCodeParser.parse(testFiles[0])
 				compile.compileForTesting(orchaTestCodeVisitor)
 			}
