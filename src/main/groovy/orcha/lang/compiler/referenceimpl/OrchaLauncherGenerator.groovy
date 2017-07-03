@@ -22,6 +22,7 @@ import org.objectweb.asm.ClassWriter
 import org.objectweb.asm.FieldVisitor
 import org.objectweb.asm.MethodVisitor
 import org.objectweb.asm.Opcodes
+
 import org.springframework.context.annotation.ComponentScan
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.ImportResource
@@ -124,23 +125,40 @@ class OrchaLauncherGenerator {
 			
 			log.info 'Preparing of the Orcha tets program launching by the generation of the importation of Orcha orchestration files ' + xmlSpringContextFileName + ' and ' + xmlSpringContextQoSFileName + ' into ' + className + ' (' + s + ')'
 			
-/*			// generate java class file (useful to avoid refreshing the IDE like Eclipse
+			// generate java class file (useful to avoid refreshing the IDE like Eclipse)
 			
 			ClassWriter cw = new ClassWriter(0);
 			FieldVisitor fv;
 			MethodVisitor mv;
 			AnnotationVisitor av0;
 			
-			cw.visit(52, Opcodes.ACC_PUBLIC + Opcodes.ACC_SUPER, "orcha/lang/ImportDynamicResourcesForConfiguration", null, "java/lang/Object", null);
+			className = className.replace('.', '/')
+						
+			cw.visit(52, Opcodes.ACC_PUBLIC + Opcodes.ACC_SUPER, className, null, "java/lang/Object", null);
+			
+			av0 = cw.visitAnnotation("Lorg/springframework/context/annotation/Configuration;", true);
+			av0.visitEnd();
+			
+			
+			av0 = cw.visitAnnotation("Lorg/springframework/context/annotation/ComponentScan;", true);
+			
+			AnnotationVisitor av1 = av0.visitArray("basePackages");
+			av1.visit(null, "configuration");
+			av1.visit(null, "generated");
+			av1.visitEnd();
+			
+			av0.visitEnd();
+			
 			
 			av0 = cw.visitAnnotation("Lorg/springframework/context/annotation/ImportResource;", true);
 			
-			AnnotationVisitor av1 = av0.visitArray("value");
+			av1 = av0.visitArray("value");
 			av1.visit(null, xmlSpringContextFileName);
 			av1.visit(null, xmlSpringContextQoSFileName);
 			av1.visitEnd();
 			
 			av0.visitEnd();
+			
 			
 			mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "<init>", "()V", null, null);
 			mv.visitCode();
@@ -150,18 +168,34 @@ class OrchaLauncherGenerator {
 			mv.visitMaxs(1, 1);
 			mv.visitEnd();
 			
-			cw.visitEnd();
 			
+			mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "orchaSession", "()Lorcha/lang/configuration/OrchaSession;", null, null);
+			
+			av0 = mv.visitAnnotation("Lorg/springframework/context/annotation/Bean;", true);
+			av0.visitEnd();
+			
+			mv.visitCode();
+			mv.visitTypeInsn(Opcodes.NEW, "orcha/lang/configuration/OrchaSession");
+			mv.visitInsn(Opcodes.DUP);
+			mv.visitMethodInsn(Opcodes.INVOKESPECIAL, "orcha/lang/configuration/OrchaSession", "<init>", "()V", false);
+			mv.visitVarInsn(Opcodes.ASTORE, 1);
+			mv.visitVarInsn(Opcodes.ALOAD, 1);
+			mv.visitInsn(Opcodes.ARETURN);
+			mv.visitMaxs(2, 2);
+			mv.visitEnd();
+			
+			cw.visitEnd();
+
 			byte[] bytes = cw.toByteArray()
 			
-			String fichier = "." + File.separator + "bin" + File.separator + "orcha" + File.separator + "lang" + File.separator +"ImportDynamicResourcesForConfiguration.class";
+			String fichier = "." + File.separator + "bin" + File.separator + "orcha" + File.separator + "lang" + File.separator +"ImportDynamicResourcesForTestConfiguration.class";
 			File file = new File(fichier);
 			FileOutputStream fos = new FileOutputStream(file);
 			fos.write(bytes);
 			fos.close();
 	
 			log.info 'Preparing of the test Orcha program launching by the generation of the importation (binary version) of Orcha orchestration files ' + xmlSpringContextFileName + ', ' + xmlSpringContextQoSFileName + ' into ' + fichier
-*/			
+
 			log.info 'Preparing of the test Orcha program launching done successfully'
 	
 	}
