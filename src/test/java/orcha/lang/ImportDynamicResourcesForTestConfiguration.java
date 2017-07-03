@@ -27,7 +27,6 @@ public class ImportDynamicResourcesForTestConfiguration {
     @Bean
     public OrchaSession orchaSession() {
         OrchaSession orchaSession = new OrchaSession();
-        
         return orchaSession;
     }
 
