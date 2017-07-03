@@ -1,5 +1,7 @@
 package source.failsHandling
 
+title "fails handling"
+
 receive event from anInputFile
 compute aService with event.value
 

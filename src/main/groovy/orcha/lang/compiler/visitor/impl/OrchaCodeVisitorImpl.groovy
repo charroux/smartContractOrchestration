@@ -71,6 +71,14 @@ class OrchaCodeVisitorImpl extends OrchaCodeVisitor{
 	}
 	
 	InstructionNode findAdjacentNode(InstructionNode node){
+		def nodes = graphOfInstructions.findAll { it.instruction == node.instruction }
+		nodes.each{
+			println 'it=' + it
+		}
+		println nodes.size()
+		/*InstructionNode rootNode = graphOfInstructions.find { it.next == node }
+		int index = graphOfInstructions.indexOf(rootNode)
+		println index*/ 
 		return graphOfInstructions.find { it.instruction == node.instruction }
 	}
 	
@@ -242,6 +250,8 @@ class OrchaCodeVisitorImpl extends OrchaCodeVisitor{
 	 */
 	List<InstructionNode> findAllPrecedingNodes(InstructionNode node){
 		
+		println 'node = ' + node
+		
 		List<InstructionNode> nodes = graphOfInstructions.findAll{ it.next!=null && it.next.instruction == node.instruction }
 		
 		InstructionNode previous
@@ -266,6 +276,11 @@ class OrchaCodeVisitorImpl extends OrchaCodeVisitor{
 				}
 			}
 		}
+		
+		nodes.each{
+			println 'i = ' + it
+		}
+		
 		return nodes
 	}
 	
@@ -537,15 +552,27 @@ class OrchaCodeVisitorImpl extends OrchaCodeVisitor{
 			
 			Iterator<Instruction> listOfInsctructions = instructions.iterator()
 			
+			int lineNumber = 1
+			
 			while(listOfInsctructions.hasNext()){
 				instruction = listOfInsctructions.next()
+				instruction.id = lineNumber
+				lineNumber++
 				InstructionNode instructionNode = new InstructionNode(instruction: instruction, next: null)
 				graphOfInstructions.add(instructionNode)
 			}
 			
+			String[] instructions = this.toStringGraphOfInstructions()
+			for(String s: instructions){
+				println s
+			}
+			
+			
+			println "----------------------------"
+
 			Iterator<InstructionNode> listOfNodes = graphOfInstructions.iterator()
 			
-			int lineNumber = 1
+			lineNumber = 1
 			InstructionNode instructionNode
 			
 			while(listOfNodes.hasNext()){
@@ -564,15 +591,12 @@ class OrchaCodeVisitorImpl extends OrchaCodeVisitor{
 						
 						if(i<graphOfInstructions.size()){
 							instructionNode.next = new InstructionNode(instruction: graphOfInstructions.get(i).instruction, next: null)
-							/*def list = []
-							list.add(instructionNode)
-							predecedings.put(graphOfInstructions.get(i), list);*/
 						}
 					}
 		
 				} else if(instructionNode.instruction.instruction == "when"){	// when "program1 terminates"
 				
-					Application[] applications = expressionParser.getApplicationsInExpression(instructionNode.instruction.variable, graphOfInstructions) // applications containing program1
+/*					Application[] applications = expressionParser.getApplicationsInExpression(instructionNode.instruction.variable, graphOfInstructions) // applications containing program1
 					
 					if(applications.length == 0){
 						Throwable error = new OrchaConfigurationException("Unable to find such application " + instructionNode.instruction.variable + " in a compute instruction")
@@ -584,24 +608,16 @@ class OrchaCodeVisitorImpl extends OrchaCodeVisitor{
 						
 						InstructionNode computeNode = graphOfInstructions.find { it.instruction.instruction=="compute" && it.instruction.variable==applications[i].name }
 						
+						println 'instructionNode=' + instructionNode
+						println 'computeNode=' + computeNode
+						
 						String orchaExpression = instructionNode.instruction.variable
 						
 						if(expressionParser.isComputeFailsInExpression(computeNode, orchaExpression) == false){
 							computeNode.next = new InstructionNode(instruction: instructionNode.instruction, next: null)
 						}
 						
-						
-/*						int j=0
-						while(j<graphOfInstructions.size() && (graphOfInstructions.get(j).instruction.instruction!="compute" || graphOfInstructions.get(j).instruction.variable!=applications[i].name)){
-							j++
-						}
-							
-						if(j<graphOfInstructions.size()){
-							graphOfInstructions.get(j).next = new InstructionNode(instruction: instructionNode.instruction, next: null)
-						} else {
-						}
-*/						
-					}
+					}*/
 					
 					InstructionNode instructionAfterWhen = listOfNodes.next()
 					instructionNode.next = new InstructionNode(instruction: instructionAfterWhen.instruction, next: null)
@@ -609,6 +625,11 @@ class OrchaCodeVisitorImpl extends OrchaCodeVisitor{
 				
 				lineNumber++
 				
+			}
+
+			instructions = this.toStringGraphOfInstructions()
+			for(String s: instructions){
+				println s
 			}
 			
 			def alreadyHandledNodes = []
@@ -670,8 +691,11 @@ class OrchaCodeVisitorImpl extends OrchaCodeVisitor{
 			
 				InstructionNode node
 				Application[] applicationsArray
+				
 				while(i<allWhenNodes.size()){
+					
 					node = allWhenNodes.getAt(i)
+
 					if(node!=whenNode && alreadyHandledNodes.contains(node)==false){
 						applicationsArray = expressionParser.getApplicationsInExpression(node.instruction.variable, graphOfInstructions)
 						if(Arrays.equals(applications, applicationsArray)){					
@@ -703,10 +727,21 @@ class OrchaCodeVisitorImpl extends OrchaCodeVisitor{
 					
 					newRootNode = new InstructionNode(instruction: genericReceiveInstruction, next: null)
 
-					List<InstructionNode> precedingNodes = this.findAllPrecedingNodes(whenNode)
-					precedingNodes.each { precedingNode ->
-						precedingNode.next = newRootNode
+					//List<InstructionNode> precedingNodes = this.findAllPrecedingNodes(whenNode)
+					for(i=0; i<applications.length; i++){
+					
+						def precedingNodes = graphOfInstructions.find{ it.instruction.instruction=="compute" && it.instruction.variable==applications[i].name }
+						
+						//println 'ok = ' + precedingNodes.size()
+						
+						precedingNodes.each { precedingNode ->
+							precedingNode.next = newRootNode
+							
+							println 'precedingNode = ' + precedingNode
+							println 'newRootNode = ' + newRootNode
+						}
 					}
+					
 					
 					int index = 0;
 					while(graphOfInstructions.getAt(index)!=whenNode){
@@ -1056,6 +1091,24 @@ class OrchaCodeVisitorImpl extends OrchaCodeVisitor{
 	
 	protected SourceUnit getSourceUnit() {
 		return source;
+	}
+
+	@Override
+	public String[] toStringGraphOfInstructions() {
+		
+		List<String> instructions = new ArrayList<String>()
+		
+		graphOfInstructions.each{ instructionNode ->
+			instructions.add(instructionNode.toString())
+			instructions.add('Adjacente nodes:');
+			instructionNode = instructionNode.next
+			while(instructionNode != null){
+				instructions.add('	' + instructionNode.toString())
+				instructionNode = instructionNode.next
+			}
+		}
+		
+		return instructions.toArray(new String[0]);
 	}
 
 

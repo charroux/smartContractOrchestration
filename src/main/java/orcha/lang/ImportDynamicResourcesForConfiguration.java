@@ -9,8 +9,8 @@ import org.springframework.context.annotation.ImportResource;
  * 
  */
 @ImportResource({
-    "orcha compiler.xml",
-    "orcha compilerQoS.xml"
+    "simple application to test.xml",
+    "simple application to testQoS.xml"
 })
 public class ImportDynamicResourcesForConfiguration {
 

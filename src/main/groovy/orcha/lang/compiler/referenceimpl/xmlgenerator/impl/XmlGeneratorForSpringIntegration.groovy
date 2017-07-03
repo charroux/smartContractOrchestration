@@ -608,9 +608,9 @@ class XmlGeneratorForSpringIntegration implements XmlGenerator{
 	 * Connect together mainly channels of Spring integration
 	 * @param orchaCodeParser
 	 */
-	private void generateInputOutputChannelNames(OrchaCodeVisitor orchaCodeParser){
+	private void generateInputOutputChannelNames(OrchaCodeVisitor orchaCodeVisitor){
 		
-		List<InstructionNode> nodes = orchaCodeParser.findAllReceiveNodes()
+		List<InstructionNode> nodes = orchaCodeVisitor.findAllReceiveNodes()
 		
 		nodes.each { node ->
 			
@@ -619,16 +619,16 @@ class XmlGeneratorForSpringIntegration implements XmlGenerator{
 			
 		}
 		
-		List<InstructionNode> graphOfInstructions = orchaCodeParser.findAllNodes()
+		List<InstructionNode> graphOfInstructions = orchaCodeVisitor.findAllNodes()
 		
 		graphOfInstructions.each{ node ->
-			InstructionNode nextNode = orchaCodeParser.findNextRawNode(node)
+			InstructionNode nextNode = orchaCodeVisitor.findNextRawNode(node)
 			if(nextNode != null){
 				nextNode.inputName = node.outputName
 			}			
 		}
 		
-		nodes = orchaCodeParser.findAllReceiveNodesWithTheSameEvent()
+		nodes = orchaCodeVisitor.findAllReceiveNodesWithTheSameEvent()
 		
 		InstructionNode rootNode
 		
@@ -646,10 +646,10 @@ class XmlGeneratorForSpringIntegration implements XmlGenerator{
 				node.next.inputName = rootNode.outputName
 				node.next.outputName = rootNode.outputName + "Route" + index
 							
-				InstructionNode receiveNode = orchaCodeParser.findNextRawNode(node, alreadyDoneInstructions)
+				InstructionNode receiveNode = orchaCodeVisitor.findNextRawNode(node, alreadyDoneInstructions)
 				alreadyDoneInstructions.add(receiveNode)
 				
-				InstructionNode nextToReceiveNode = orchaCodeParser.findNextRawNode(receiveNode)
+				InstructionNode nextToReceiveNode = orchaCodeVisitor.findNextRawNode(receiveNode)
 				nextToReceiveNode.inputName = node.next.outputName
 				
 				node = node.next
@@ -657,12 +657,12 @@ class XmlGeneratorForSpringIntegration implements XmlGenerator{
 			}
 		}
 		
-		nodes = orchaCodeParser.findAllComputeNodes()
+		nodes = orchaCodeVisitor.findAllComputeNodes()
 		nodes.each { node ->
 			node.outputName = node.instruction.springBean.name + "Output"
 		}
 		
-		nodes = orchaCodeParser.findAllWhenNodesWithDifferentApplicationsInExpression()
+		nodes = orchaCodeVisitor.findAllWhenNodesWithDifferentApplicationsInExpression()
 		
 		nodes.each { node ->
 			
@@ -678,7 +678,7 @@ class XmlGeneratorForSpringIntegration implements XmlGenerator{
 			node.inputName = aggregatorName + "AggregatorInput"
 			node.outputName = aggregatorName + "AggregatorOutputTransformer"
 				
-			InstructionNode nextToWhenNode = orchaCodeParser.findNextRawNode(node)
+			InstructionNode nextToWhenNode = orchaCodeVisitor.findNextRawNode(node)
 			nextToWhenNode.inputName = node.outputName
 		}
 		
@@ -687,7 +687,7 @@ class XmlGeneratorForSpringIntegration implements XmlGenerator{
 		// when  "selectBestVendor terminates condition price<=1000"
 		// send selectBestVendor.result to outputFile2
 		
-		nodes = orchaCodeParser.findAllWhenNodesWithTheSameApplicationsInExpression()
+		nodes = orchaCodeVisitor.findAllWhenNodesWithTheSameApplicationsInExpression()
 		
 		nodes.each { node ->
 			
@@ -713,28 +713,34 @@ class XmlGeneratorForSpringIntegration implements XmlGenerator{
 					
 				orchaExpressionForNode = node.instruction.variable
 					
-				if(expressionParser.isFailExpression(node, orchaCodeParser.findAllNodes()) == true){
+				if(expressionParser.isFailExpression(node, orchaCodeVisitor.findAllNodes()) == true){
 					
 					String failChannel = expressionParser.failChannel(node, graphOfInstructions)
 					failChannel = failChannel  + "-output"
 					
-					List<InstructionNode> nextNodes = orchaCodeParser.findNextNode(node)
+					List<InstructionNode> nextNodes = orchaCodeVisitor.findNextNode(node)
 					nextNodes.each { nextNode ->
 						nextNode.inputName = failChannel
 					}
 					
 				} else if(expressionParser.isSeveralWhenWithSameApplicationsInExpression(node)){
-				
+					
 					node.inputName = rootNode.inputName
 					node.outputName = rootNode.inputName + "Route" + index
 	
-					InstructionNode whenNode = orchaCodeParser.findAdjacentNode(node)
+					InstructionNode whenNode = orchaCodeVisitor.findAdjacentNode(node)
 				
 					whenNode.inputName = node.outputName
 					whenNode.outputName = rootNode.outputName + "Route" + index
 					
-					InstructionNode nextTowhenNode = orchaCodeParser.findNextRawNode(whenNode)
+					InstructionNode nextTowhenNode = orchaCodeVisitor.findNextRawNode(whenNode)
 					nextTowhenNode.inputName = whenNode.outputName
+					
+					println node.hashCode() + '-----------' + node
+					println node.instruction.hashCode() + '-----------' + node.instruction
+					println whenNode.hashCode() + '-----------' + whenNode
+					println nextTowhenNode.hashCode() + '-------------' + nextTowhenNode
+					println '-----------------'
 					
 					index++
 
@@ -743,7 +749,7 @@ class XmlGeneratorForSpringIntegration implements XmlGenerator{
 					node.inputName = aggregatorName + "AggregatorInput"
 					node.outputName = aggregatorName + "AggregatorOutputTransformer"
 				
-					List<InstructionNode> nextNodes = orchaCodeParser.findNextNode(node)
+					List<InstructionNode> nextNodes = orchaCodeVisitor.findNextNode(node)
 					InstructionNode nextNode = nextNodes.getAt(0)
 					nextNode.inputName = node.outputName
 				}
@@ -755,11 +761,11 @@ class XmlGeneratorForSpringIntegration implements XmlGenerator{
 		
 		InstructionNode node
 		
-		nodes = orchaCodeParser.findAllNodes()
+		nodes = orchaCodeVisitor.findAllNodes()
 		for(int i=nodes.size()-1; i>=0; i--){
 			node = nodes.getAt(i)
 			if(node.instruction.instruction == "when"){
-				List<InstructionNode> previousNodes = orchaCodeParser.findAllRawPrecedingNodes(node)
+				List<InstructionNode> previousNodes = orchaCodeVisitor.findAllRawPrecedingNodes(node)
 				previousNodes.each { beforeWhenNode ->
 					if(beforeWhenNode.instruction.instruction != "when"){
 						// isn't a when node with a fails :

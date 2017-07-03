@@ -116,4 +116,6 @@ abstract class OrchaCodeVisitor extends ClassCodeVisitorSupport{
 	
 	//abstract Map<Instruction, List<Instruction>> getPredecedingInstructions()
 	
+	abstract String[] toStringGraphOfInstructions()
+	
 }

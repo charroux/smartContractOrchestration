@@ -8,6 +8,7 @@ import groovy.transform.EqualsAndHashCode
 @ToString
 class Instruction {
 	
+	int id
 	String instruction			// receive						compute				send
 	String variable				// event of receive									code1 of send
 	String variableProperty		//													result of code1

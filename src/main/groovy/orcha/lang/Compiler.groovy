@@ -79,6 +79,11 @@ class Compiler implements CommandLineRunner{
 				
 		OrchaCodeVisitor orchaCodeVisitor = orchaCodeParser.parse(orchaSourceFile)
 		
+		String[] instructions = orchaCodeVisitor.toStringGraphOfInstructions()
+		for(String s: instructions){
+			println s
+		}
+		
 		serviceOfferSelectionGenerator.generate(orchaCodeVisitor)
 		
 		boolean isMockGenerated = configurationMockGenerator.generate(orchaCodeVisitor)
