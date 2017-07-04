@@ -562,13 +562,13 @@ class OrchaCodeVisitorImpl extends OrchaCodeVisitor{
 				graphOfInstructions.add(instructionNode)
 			}
 			
-			String[] instructions = this.toStringGraphOfInstructions()
+/*			String[] instructions = this.toStringGraphOfInstructions()
 			for(String s: instructions){
 				println s
 			}
 			
 			
-			println "----------------------------"
+			println "----------------------------"*/
 
 			Iterator<InstructionNode> listOfNodes = graphOfInstructions.iterator()
 			
@@ -604,10 +604,10 @@ class OrchaCodeVisitorImpl extends OrchaCodeVisitor{
 				
 			}
 			
-			instructions = this.toStringGraphOfInstructions()
+/*			instructions = this.toStringGraphOfInstructions()
 			for(String s: instructions){
 				println s
-			}
+			}*/
 			
 			def alreadyHandledNodes = []
 			
@@ -656,6 +656,47 @@ class OrchaCodeVisitorImpl extends OrchaCodeVisitor{
 			
 			def allWhenNodes = graphOfInstructions.findAll { it.instruction.instruction == "when" }
 
+			InstructionNode node
+			Application[] applicationsArray
+			
+			def whenNodesWithSameApplications = []
+			def whenNodesWithFailExpression = []
+			
+			for(InstructionNode whenNode: allWhenNodes){
+				
+				Application[] applications = expressionParser.getApplicationsInExpression(whenNode.instruction.variable, graphOfInstructions)
+				
+				int i=0;
+			
+				// build a list of when nodes with the same applications in expression (whenNodesWithSameApplications) an a list of when nodes with fails in expression (whenNodesWithFailExpression)
+				
+			   while(i<allWhenNodes.size()){
+				   
+				   node = allWhenNodes.getAt(i)
+
+				   if(node!=whenNode){
+					   applicationsArray = expressionParser.getApplicationsInExpression(node.instruction.variable, graphOfInstructions)
+					   if(Arrays.equals(applications, applicationsArray)){
+						   whenNodesWithSameApplications.add(node)
+					   }
+					   String[] applicationNames = expressionParser.getApplicationsNamesInExpression(node.instruction.variable, graphOfInstructions)
+					   applicationNames.each { appliName ->
+						   InstructionNode n = graphOfInstructions.find { it.instruction.instruction=="when" && it.instruction.variable!=null && expressionParser.isComputeFailsInExpression(appliName, it.instruction.variable)}
+						   if(n != null){
+							   whenNodesWithFailExpression.add(n)
+						   }
+					   }
+				   }
+			
+				   i++
+			   }
+				
+			}
+			
+			whenNodesWithSameApplications.each {
+				println "when node i = " + it
+			}
+		
 			// select all the when instructions nodes having the same application in their expression
 			// then put all those nodes after a generic node: they are adjacent (leads to 2 branches)
 		 
@@ -663,13 +704,12 @@ class OrchaCodeVisitorImpl extends OrchaCodeVisitor{
 				
 				Application[] applications = expressionParser.getApplicationsInExpression(whenNode.instruction.variable, graphOfInstructions)
 				
-				def whenNodesWithSameApplications = []
-				def whenNodesWithFailExpression = []
+				whenNodesWithSameApplications = []
+				whenNodesWithFailExpression = []
 				
-				int i=0;
+				i=0;
 			
-				InstructionNode node
-				Application[] applicationsArray
+				
 				
 				// build a list of when nodes with the same applications in expression (whenNodesWithSameApplications) an a list of when nodes with fails in expression (whenNodesWithFailExpression)
 				 
@@ -692,6 +732,8 @@ class OrchaCodeVisitorImpl extends OrchaCodeVisitor{
 					} 
 					i++
 				}
+				
+				
 				
 				InstructionNode newRootNode
 				

@@ -18,7 +18,7 @@ import orcha.lang.configuration.ScriptServiceAdapter
 import orcha.lang.configuration.OutputFileAdapter.WritingMode
 
 @SpringBootConfiguration
-class OrchaTestConfiguration {
+class OrchaCodeVisitorTestConfiguration {
 
 	@Bean
 	OrchaCodeParser orchaCodeParser(){

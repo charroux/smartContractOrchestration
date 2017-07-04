@@ -32,7 +32,7 @@ class SpringTestOrchaTests {
 	
 	@Test
 	void test(){
-		Thread.sleep(5000)	// !!!!! to wait for file writing
+		Thread.sleep(3000)	// !!!!! to wait for file writing
 	}
 	
 }
