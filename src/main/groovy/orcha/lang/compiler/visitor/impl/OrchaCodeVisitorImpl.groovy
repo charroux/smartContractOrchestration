@@ -603,11 +603,15 @@ class OrchaCodeVisitorImpl extends OrchaCodeVisitor{
 				lNumber++
 				
 			}
-			
-/*			instructions = this.toStringGraphOfInstructions()
+
+			println 'ddeeeeeeeeeeebbbbbbbbbbbbbbuuuuutttttttt'
+						
+			instructions = this.toStringGraphOfInstructions()
 			for(String s: instructions){
 				println s
-			}*/
+			}
+			
+			println 'ddeeeeeeeeeeebbbbbbbbbbbbbbuuuuutttttttt'
 			
 			def alreadyHandledNodes = []
 			
@@ -652,51 +656,14 @@ class OrchaCodeVisitorImpl extends OrchaCodeVisitor{
 				}
 			}
 			
-			alreadyHandledNodes = []
+			def alreadyHandledInstructions = []
 			
 			def allWhenNodes = graphOfInstructions.findAll { it.instruction.instruction == "when" }
 
-			InstructionNode node
-			Application[] applicationsArray
 			
-			def whenNodesWithSameApplications = []
-			def whenNodesWithFailExpression = []
 			
-			for(InstructionNode whenNode: allWhenNodes){
-				
-				Application[] applications = expressionParser.getApplicationsInExpression(whenNode.instruction.variable, graphOfInstructions)
-				
-				int i=0;
 			
-				// build a list of when nodes with the same applications in expression (whenNodesWithSameApplications) an a list of when nodes with fails in expression (whenNodesWithFailExpression)
-				
-			   while(i<allWhenNodes.size()){
-				   
-				   node = allWhenNodes.getAt(i)
-
-				   if(node!=whenNode){
-					   applicationsArray = expressionParser.getApplicationsInExpression(node.instruction.variable, graphOfInstructions)
-					   if(Arrays.equals(applications, applicationsArray)){
-						   whenNodesWithSameApplications.add(node)
-					   }
-					   String[] applicationNames = expressionParser.getApplicationsNamesInExpression(node.instruction.variable, graphOfInstructions)
-					   applicationNames.each { appliName ->
-						   InstructionNode n = graphOfInstructions.find { it.instruction.instruction=="when" && it.instruction.variable!=null && expressionParser.isComputeFailsInExpression(appliName, it.instruction.variable)}
-						   if(n != null){
-							   whenNodesWithFailExpression.add(n)
-						   }
-					   }
-				   }
 			
-				   i++
-			   }
-				
-			}
-			
-			whenNodesWithSameApplications.each {
-				println "when node i = " + it
-			}
-		
 			// select all the when instructions nodes having the same application in their expression
 			// then put all those nodes after a generic node: they are adjacent (leads to 2 branches)
 		 
@@ -704,20 +671,20 @@ class OrchaCodeVisitorImpl extends OrchaCodeVisitor{
 				
 				Application[] applications = expressionParser.getApplicationsInExpression(whenNode.instruction.variable, graphOfInstructions)
 				
-				whenNodesWithSameApplications = []
-				whenNodesWithFailExpression = []
-				
-				i=0;
-			
-				
-				
 				// build a list of when nodes with the same applications in expression (whenNodesWithSameApplications) an a list of when nodes with fails in expression (whenNodesWithFailExpression)
-				 
+			
+				def whenNodesWithSameApplications = []
+				def whenNodesWithFailExpression = []
+				
+				int i=0;
+				
 				while(i<allWhenNodes.size()){
-					
-					node = allWhenNodes.getAt(i)
+			
+					InstructionNode node = allWhenNodes.getAt(i)
 
-					if(node!=whenNode && alreadyHandledNodes.contains(node)==false){
+					Application[] applicationsArray
+					
+					if(node!=whenNode && alreadyHandledInstructions.contains(node.instruction.id)==false){
 						applicationsArray = expressionParser.getApplicationsInExpression(node.instruction.variable, graphOfInstructions)
 						if(Arrays.equals(applications, applicationsArray)){					
 							whenNodesWithSameApplications.add(node)							
@@ -733,17 +700,23 @@ class OrchaCodeVisitorImpl extends OrchaCodeVisitor{
 					i++
 				}
 				
-				
+				println "when node j = " + whenNode
+				whenNodesWithSameApplications.each {
+					println "when node j = " + it
+				}
 				
 				InstructionNode newRootNode
 				
-				if(whenNodesWithSameApplications.size()>0 && whenNodesWithSameApplications.contains(whenNode)){
+				if(whenNodesWithSameApplications.size() > 0){		// whenNode has other nodes with the same applications
 					
-					alreadyHandledNodes.add(whenNode)
-					alreadyHandledNodes.addAll(whenNodesWithSameApplications)
+					alreadyHandledInstructions.add(whenNode.instruction.id)
+					whenNodesWithSameApplications.each{
+						alreadyHandledInstructions.add(it.instruction.id)
+					}
 					
 					//Instruction genericWhenInstruction = new Instruction(instruction: "when", variable: null, variableProperty: null, springBean: null, withs: null, condition: null)
-					Instruction genericWhenInstruction = this.getGenericWhenInstruction()
+					Instruction genericWhenInstruction = this.getGenericWhenInstruction(lineNumber)
+					lineNumber++
 					
 					newRootNode = new InstructionNode(instruction: genericWhenInstruction, next: null)
 
@@ -768,18 +741,17 @@ class OrchaCodeVisitorImpl extends OrchaCodeVisitor{
 					}
 					
 					// add the new generic node at the right place in the graphOfInstructions
-					// put all the when nodes at the end of the adjacency list
 					
 					int index = 0;
 					while(graphOfInstructions.getAt(index)!=whenNode){
 						index++
 					}
 					
-					graphOfInstructions.add(index, newRootNode)
+					graphOfInstructions.add(index, newRootNode)					
 					
+					// put whenNode as adjacency node of the generic when node
+					 
 					InstructionNode newNode = new InstructionNode(instruction: whenNode.instruction, next: null)
-					
-					
 					
 					if(newNode.options == null){							
 						newNode.options = new QualityOfServicesOptions()
@@ -789,6 +761,8 @@ class OrchaCodeVisitorImpl extends OrchaCodeVisitor{
 					
 					newRootNode.next = newNode
 					newRootNode = newNode
+					
+					// add all the nodes with the same application as adjacancy node
 					
 					whenNodesWithSameApplications.each {
 						newNode = new InstructionNode(instruction: it.instruction, next: null)
@@ -803,46 +777,75 @@ class OrchaCodeVisitorImpl extends OrchaCodeVisitor{
 						newRootNode = newNode
 					}		
 								
-				} else {	// when node has no other nodes with the same applications
+				} else if(alreadyHandledInstructions.contains(whenNode.instruction.id)==false){	// when node has no other nodes with the same applications
 					
+					alreadyHandledInstructions.add(whenNode.instruction.id)
 					
 					println 'whhhhennn : ' + whenNode
 
-					String[] applicationNames = expressionParser.getApplicationsNamesInExpression(whenNode.instruction.variable, graphOfInstructions)
+/*					String[] applicationNames = expressionParser.getApplicationsNamesInExpression(whenNode.instruction.variable, graphOfInstructions)
 					
 					println 'applicationNames : ' + applicationNames.length + ' ' + applicationNames[0]
 					
+
+					
 					for(i=0; i<applications.length; i++){
-								
-						def precedingNodes = graphOfInstructions.find{ it.instruction.instruction=="compute" && it.instruction.variable==applications[i].name && applicationNames.contains(it.instruction.variable) }
-		
-						precedingNodes.each { precedingNode ->
+
+						// from the when instruction : find backward the related compute node having applications[i].name has variable
+						
+						int instructionIndex = graphOfInstructions.indexOf(whenNode)
+						
+						int j=instructionIndex
+						InstructionNode n
+						boolean computedNode = false
+						while(j>=0 && computedNode==false){
+							n = graphOfInstructions.get(j)
 							
-							println 'precedingNode : ' + precedingNode
-							println 'newRootNode : ' + newRootNode
+							println 'found = ' + n
 							
-							precedingNode.next = new InstructionNode(instruction: whenNode.instruction, next: null)
+							computedNode = n.instruction.instruction=="compute" && n.instruction.variable==applications[i].name									
+							j--
 						}
+						
+						// put the when node has an adjacency node of compute
+						
+						println 'node before when : ' + n
+						 
+						n.next = new InstructionNode(instruction: whenNode.instruction, next: null)
+						
 					}
+					
+					// put the instruction next to when as an adjacency node
 					
 					def nodeAfterWhen = graphOfInstructions.find{ it.instruction.id == (whenNode.instruction.id+1) }
 					
 					println 'nodeAfterWhen = ' + nodeAfterWhen
 					
 					whenNode.next = new InstructionNode(instruction: nodeAfterWhen.instruction, next: null)
-	
+	*/
 				}	
+				
+				// put the instruction next to when as an adjacency node
+				
+				def nodeAfterWhen = graphOfInstructions.find{ it.instruction.id == (whenNode.instruction.id+1) }
+				
+				println 'nodeAfterWhen = ' + nodeAfterWhen
+				
+				whenNode.next = new InstructionNode(instruction: nodeAfterWhen.instruction, next: null)
 				
 				if(whenNodesWithFailExpression.size()>0  && whenNodesWithFailExpression.contains(whenNode)){
 
-					alreadyHandledNodes.add(whenNode)
-					alreadyHandledNodes.addAll(whenNodesWithFailExpression)
+					alreadyHandledInstructions.add(whenNode.instruction.id)
+					whenNodesWithFailExpression.each{
+						alreadyHandledInstructions.add(it.instruction.id)
+					}
 					
 					if(whenNodesWithSameApplications.size() == 0){
 						
 						//Instruction genericWhenInstruction = new Instruction(instruction: "when", variable: null, variableProperty: null, springBean: null, withs: null, condition: null)
-						Instruction genericWhenInstruction = this.getGenericWhenInstruction()
-
+						Instruction genericWhenInstruction = this.getGenericWhenInstruction(lineNumber)
+						lineNumber++
+						
 						newRootNode = new InstructionNode(instruction: genericWhenInstruction, next: null)
 						
 						String[] applicationNames = expressionParser.getApplicationsNamesInExpression(whenNode.instruction.variable, graphOfInstructions)
