@@ -72,10 +72,10 @@ class OrchaCodeVisitorImpl extends OrchaCodeVisitor{
 	
 	InstructionNode findAdjacentNode(InstructionNode node){
 		def nodes = graphOfInstructions.findAll { it.instruction == node.instruction }
-		nodes.each{
+/*		nodes.each{
 			println 'it=' + it
 		}
-		println nodes.size()
+		println nodes.size()*/
 		/*InstructionNode rootNode = graphOfInstructions.find { it.next == node }
 		int index = graphOfInstructions.indexOf(rootNode)
 		println index*/ 
@@ -252,14 +252,51 @@ class OrchaCodeVisitorImpl extends OrchaCodeVisitor{
 		
 		println 'node = ' + node
 		
-		List<InstructionNode> nodes = graphOfInstructions.findAll{ it.next!=null && it.next.instruction == node.instruction }
+		def nodes = []
 		
+		if(node.instruction.instruction != "when"){
+			nodes = graphOfInstructions.findAll{ it.next!=null && it.next.instruction==node.instruction }
+		} else {
+		
+			for(int i=0; i<graphOfInstructions.size(); i++){
+				
+				InstructionNode rootNode = graphOfInstructions.get(i)
+				
+				if(rootNode.instruction.instruction == 'compute'){
+
+					InstructionNode n = rootNode
+					
+					println 'rootNode = ' + rootNode
+					
+					while(n!=null && n.instruction.id!=node.instruction.id){
+						n = n.next
+					}
+					
+					println 'n = ' + n
+					
+					if(n != null){
+						nodes.add(rootNode)
+					}
+	
+				}
+				
+			}
+		}
+		
+		nodes.each{
+			println 'i = ' + it
+		}
+		
+		return nodes
+		/*
 		InstructionNode previous
 		InstructionNode beforePrevious 
 		
 		for(int index=0; index<nodes.size(); index++){
 			
 			previous = nodes.getAt(index)
+			
+			println 'previous = ' + previous
 			
 			if(previous.instruction.instruction=="when" && node.instruction.instruction=="when"){
 				
@@ -281,7 +318,7 @@ class OrchaCodeVisitorImpl extends OrchaCodeVisitor{
 			println 'i = ' + it
 		}
 		
-		return nodes
+		return nodes*/
 	}
 	
 	List<InstructionNode> findAllRawPrecedingNodes(InstructionNode node){
@@ -604,14 +641,14 @@ class OrchaCodeVisitorImpl extends OrchaCodeVisitor{
 				
 			}
 
-			println 'ddeeeeeeeeeeebbbbbbbbbbbbbbuuuuutttttttt'
+	/*		println 'ddeeeeeeeeeeebbbbbbbbbbbbbbuuuuutttttttt'
 						
 			instructions = this.toStringGraphOfInstructions()
 			for(String s: instructions){
 				println s
 			}
 			
-			println 'ddeeeeeeeeeeebbbbbbbbbbbbbbuuuuutttttttt'
+			println 'ddeeeeeeeeeeebbbbbbbbbbbbbbuuuuutttttttt'*/
 			
 			def alreadyHandledNodes = []
 			
@@ -700,10 +737,10 @@ class OrchaCodeVisitorImpl extends OrchaCodeVisitor{
 					i++
 				}
 				
-				println "when node j = " + whenNode
+/*				println "when node j = " + whenNode
 				whenNodesWithSameApplications.each {
 					println "when node j = " + it
-				}
+				}*/
 				
 				InstructionNode newRootNode
 				
@@ -735,8 +772,8 @@ class OrchaCodeVisitorImpl extends OrchaCodeVisitor{
 						precedingNodes.each { precedingNode ->
 							precedingNode.next = newRootNode
 							
-							println 'precedingNode = ' + precedingNode
-							println 'newRootNode = ' + newRootNode
+							//println 'precedingNode = ' + precedingNode
+							//println 'newRootNode = ' + newRootNode
 						}
 					}
 					
@@ -781,11 +818,11 @@ class OrchaCodeVisitorImpl extends OrchaCodeVisitor{
 					
 					alreadyHandledInstructions.add(whenNode.instruction.id)
 					
-					println 'whhhhennn : ' + whenNode
+					//println 'whhhhennn : ' + whenNode
 
-/*					String[] applicationNames = expressionParser.getApplicationsNamesInExpression(whenNode.instruction.variable, graphOfInstructions)
+					String[] applicationNames = expressionParser.getApplicationsNamesInExpression(whenNode.instruction.variable, graphOfInstructions)
 					
-					println 'applicationNames : ' + applicationNames.length + ' ' + applicationNames[0]
+					//println 'applicationNames : ' + applicationNames.length + ' ' + applicationNames[0]
 					
 
 					
@@ -801,7 +838,7 @@ class OrchaCodeVisitorImpl extends OrchaCodeVisitor{
 						while(j>=0 && computedNode==false){
 							n = graphOfInstructions.get(j)
 							
-							println 'found = ' + n
+							//println 'found = ' + n
 							
 							computedNode = n.instruction.instruction=="compute" && n.instruction.variable==applications[i].name									
 							j--
@@ -809,29 +846,24 @@ class OrchaCodeVisitorImpl extends OrchaCodeVisitor{
 						
 						// put the when node has an adjacency node of compute
 						
-						println 'node before when : ' + n
+						//println 'node before when : ' + n
 						 
 						n.next = new InstructionNode(instruction: whenNode.instruction, next: null)
 						
 					}
 					
-					// put the instruction next to when as an adjacency node
-					
-					def nodeAfterWhen = graphOfInstructions.find{ it.instruction.id == (whenNode.instruction.id+1) }
-					
-					println 'nodeAfterWhen = ' + nodeAfterWhen
-					
-					whenNode.next = new InstructionNode(instruction: nodeAfterWhen.instruction, next: null)
-	*/
+	
 				}	
 				
 				// put the instruction next to when as an adjacency node
 				
 				def nodeAfterWhen = graphOfInstructions.find{ it.instruction.id == (whenNode.instruction.id+1) }
 				
-				println 'nodeAfterWhen = ' + nodeAfterWhen
+				//println 'nodeAfterWhen = ' + nodeAfterWhen
 				
 				whenNode.next = new InstructionNode(instruction: nodeAfterWhen.instruction, next: null)
+				
+				
 				
 				if(whenNodesWithFailExpression.size()>0  && whenNodesWithFailExpression.contains(whenNode)){
 
@@ -908,12 +940,12 @@ class OrchaCodeVisitorImpl extends OrchaCodeVisitor{
 				}
 			}
 			
-			instructions = this.toStringGraphOfInstructions()
+/*			instructions = this.toStringGraphOfInstructions()
 			for(String s: instructions){
 				println s
 			}
 			
-			println 'ffffffffffffiiiiiiiiiiiiiiiiinnnnnnnnnnnnnnnnnnn'
+			println 'ffffffffffffiiiiiiiiiiiiiiiiinnnnnnnnnnnnnnnnnnn'*/
 			
 			log.info 'Syntax analysis of the the Orcha program complete successfully'
 			
@@ -1128,7 +1160,7 @@ class OrchaCodeVisitorImpl extends OrchaCodeVisitor{
 					def m = constantExpression.getText()
 					log.debug m	+ " incomingMessageEvent.state=INCOMING_MESSAGE ConstantExpression" // receive event with constantExpression
 					if(method == 'condition'){
-						println m
+						//println m
 						instruction.condition = m
 					} else if(method == 'description'){
 						this.orchaMetadata.description = m

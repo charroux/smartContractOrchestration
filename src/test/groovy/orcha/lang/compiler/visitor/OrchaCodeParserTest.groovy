@@ -27,7 +27,7 @@ class OrchaCodeParserTest {
 	String expression = '"simpleApplicationService terminates with !=true"'
 	
 	@Test
-	void orchaCodeParserTest(){
+	void orchaCodeParserTest1(){
 		
 		String orchaProgram = 	"package source.simpleTest\n" +
 								"title 'simple application to test'\n" +
@@ -70,8 +70,8 @@ class OrchaCodeParserTest {
 		Assert.assertEquals(computeApplication.name, 'simpleApplicationService')
 		Assert.assertNull(compute.instruction.condition)
 		
-		/*InstructionNode adjacentToReceive = orchaCodeVisitor.findAdjacentNode(receive)
-		Assert.assertEquals(adjacentToReceive.instruction, compute.instruction)*/
+		//InstructionNode adjacentToReceive = orchaCodeVisitor.findAdjacentNode(receive)
+		//Assert.assertEquals(adjacentToReceive.instruction, compute.instruction)
 		
 		def whenNodes = orchaCodeVisitor.findAllWhenNodes()
 		Assert.assertTrue(whenNodes.size() == 1)
@@ -81,6 +81,13 @@ class OrchaCodeParserTest {
 		Assert.assertTrue(when.instruction.id == 3)
 		Assert.assertTrue(when.instruction.withs.size() == 0)
 		Assert.assertNull(when.instruction.condition)
+		
+		def precedingNodes = orchaCodeVisitor.findAllPrecedingNodes(when)
+		Assert.assertTrue(precedingNodes.size() == 1)
+		InstructionNode precedingNode = precedingNodes.get(0)
+		Assert.assertTrue(precedingNode.instruction.instruction == 'compute')
+		Assert.assertTrue(precedingNode.instruction.id == 2)
+		
 		
 		def sendNodes = orchaCodeVisitor.findAllSendNodes()
 		Assert.assertTrue(sendNodes.size() == 1)
@@ -96,6 +103,98 @@ class OrchaCodeParserTest {
 		Assert.assertEquals(sendEventHandler.name, 'simpleApplicationOutput')
 		Assert.assertNotNull(sendEventHandler.output)
 		Assert.assertNull(send.instruction.condition)
+	}
+
+	@Test
+	void orchaCodeParserTest2(){
+		
+		String orchaProgram = 	"package source.orcha\n" +
+								"domain orcha\n" +
+								"description 'orcha compiler'\n" +
+								"title 'orcha compiler'\n" +
+								"author 'Ben C.'\n" +
+								"version '1.0'\n" +
+								"receive orchaProgram from orchaFile\n" +
+								"compute parseOrcha with orchaProgram.value\n" +
+								"when 'parseOrcha terminates'\n" +
+								"compute generateServiceOfferSelection with parseOrcha.result\n" +
+								"when 'parseOrcha terminates'\n" +
+								"compute generateServiceOfferSelection with parseOrcha.result"								
+								
+		OrchaCodeVisitor orchaCodeVisitor = orchaCodeParser.parse(orchaProgram)
+		Assert.assertEquals(orchaCodeVisitor.getOrchaMetadata().getDomain(), "orcha")
+		Assert.assertEquals(orchaCodeVisitor.getOrchaMetadata().getDescription(), "orcha compiler")
+		Assert.assertEquals(orchaCodeVisitor.getOrchaMetadata().getAuthor(), "Ben C.")
+		Assert.assertEquals(orchaCodeVisitor.getOrchaMetadata().getVersion(), "1.0")
+		
+		def allNodes = orchaCodeVisitor.findAllNodes()
+		Assert.assertTrue(allNodes.size() > 0)
+		InstructionNode node = allNodes.get(0)
+		Assert.assertTrue(node.instruction.instruction == 'receive')
+		Assert.assertTrue(node.instruction.id == 1)
+		
+		def nextNodes = orchaCodeVisitor.findNextNode(node)
+		Assert.assertTrue(nextNodes.size() == 1)
+		node = nextNodes.get(0)
+		Assert.assertTrue(node.instruction.instruction == 'compute')
+		Assert.assertTrue(node.instruction.id == 2)
+		
+		def precedingNodes = orchaCodeVisitor.findAllPrecedingNodes(node)	
+		Assert.assertTrue(precedingNodes.size() == 1)
+		InstructionNode precedingNode = precedingNodes.get(0)
+		Assert.assertTrue(precedingNode.instruction.instruction == 'receive')
+		Assert.assertTrue(precedingNode.instruction.id == 1)
+		
+		
+		nextNodes = orchaCodeVisitor.findNextNode(node)
+		Assert.assertTrue(nextNodes.size() == 2)
+		InstructionNode whenNode1 = nextNodes.get(0)
+		Assert.assertTrue(whenNode1.instruction.instruction == 'when')
+		Assert.assertTrue(whenNode1.instruction.id == 3)
+		
+		precedingNodes = orchaCodeVisitor.findAllPrecedingNodes(whenNode1)
+		Assert.assertTrue(precedingNodes.size() == 1)
+		precedingNode = precedingNodes.get(0)
+		Assert.assertTrue(precedingNode.instruction.instruction == 'compute')
+		Assert.assertTrue(precedingNode.instruction.id == 2)
+		
+		
+		InstructionNode whenNode2 = nextNodes.get(1)
+		Assert.assertTrue(whenNode2.instruction.instruction == 'when')
+		Assert.assertTrue(whenNode2.instruction.id == 5)
+		
+		precedingNodes = orchaCodeVisitor.findAllPrecedingNodes(whenNode2)
+		Assert.assertTrue(precedingNodes.size() == 1)
+		precedingNode = precedingNodes.get(0)
+		Assert.assertTrue(precedingNode.instruction.instruction == 'compute')
+		Assert.assertTrue(precedingNode.instruction.id == 2)
+		
+		
+		nextNodes = orchaCodeVisitor.findNextNode(whenNode1)
+		Assert.assertTrue(nextNodes.size() == 1)
+		node = nextNodes.get(0)
+		Assert.assertTrue(node.instruction.instruction == 'compute')
+		Assert.assertTrue(node.instruction.id == 4)
+		
+		precedingNodes = orchaCodeVisitor.findAllPrecedingNodes(node)
+		Assert.assertTrue(precedingNodes.size() == 1)
+		precedingNode = precedingNodes.get(0)
+		Assert.assertTrue(precedingNode.instruction.instruction == 'when')
+		Assert.assertTrue(precedingNode.instruction.id == 3)
+		
+		
+		nextNodes = orchaCodeVisitor.findNextNode(whenNode2)
+		Assert.assertTrue(nextNodes.size() == 1)
+		node = nextNodes.get(0)
+		Assert.assertTrue(node.instruction.instruction == 'compute')
+		Assert.assertTrue(node.instruction.id == 6)
+
+		precedingNodes = orchaCodeVisitor.findAllPrecedingNodes(node)
+		Assert.assertTrue(precedingNodes.size() == 1)
+		precedingNode = precedingNodes.get(0)
+		Assert.assertTrue(precedingNode.instruction.instruction == 'when')
+		Assert.assertTrue(precedingNode.instruction.id == 5)
+
 	}
 
 

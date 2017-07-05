@@ -838,15 +838,24 @@ class XmlGeneratorForSpringIntegration implements XmlGenerator{
 			if(instructionNode.next.instruction.instruction == "when"){
 				
 				if(expressionParser.isSeveralWhenWithSameApplicationsInExpression(instructionNode.next)){
+					
+					//println 'instructionNode = ' + instructionNode
+					
 					def xmlEvent = generateRouterForAggregator(instructionNode)
 					bufferedWriter.writeLine(xmlEvent.toString())
 				}
 								
 			} else {
+				
+				println 'instructionNode = ' + instructionNode
 			
 				String orchaExpression = instruction.variable
 			
 				List<InstructionNode> precedingNodes = orchaCodeParser.findAllPrecedingNodes(instructionNode)
+				
+				precedingNodes.each { nn ->
+					println "preceding: " + nn
+				}
 				
 				if(precedingNodes.size()>0 && expressionParser.isComputeFailsInExpression(precedingNodes.getAt(0), orchaExpression)==false){
 
