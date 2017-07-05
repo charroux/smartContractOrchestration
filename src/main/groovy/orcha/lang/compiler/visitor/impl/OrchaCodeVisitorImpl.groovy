@@ -249,9 +249,7 @@ class OrchaCodeVisitorImpl extends OrchaCodeVisitor{
 	 * Replace the artificial when nodes with the same applications by the related compute instruction 
 	 */
 	List<InstructionNode> findAllPrecedingNodes(InstructionNode node){
-		
-		println 'node = ' + node
-		
+	
 		def nodes = []
 		
 		if(node.instruction.instruction != "when"){
@@ -263,28 +261,15 @@ class OrchaCodeVisitorImpl extends OrchaCodeVisitor{
 				InstructionNode rootNode = graphOfInstructions.get(i)
 				
 				if(rootNode.instruction.instruction == 'compute'){
-
-					InstructionNode n = rootNode
-					
-					println 'rootNode = ' + rootNode
-					
+					InstructionNode n = rootNode					
 					while(n!=null && n.instruction.id!=node.instruction.id){
 						n = n.next
-					}
-					
-					println 'n = ' + n
-					
+					}					
 					if(n != null){
 						nodes.add(rootNode)
-					}
-	
-				}
-				
+					}	
+				}				
 			}
-		}
-		
-		nodes.each{
-			println 'i = ' + it
 		}
 		
 		return nodes
