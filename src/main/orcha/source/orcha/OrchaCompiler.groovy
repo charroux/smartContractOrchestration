@@ -15,10 +15,10 @@ compute generateServiceOfferSelection with parseOrcha.result
 when "parseOrcha terminates"		
 compute generateMockOfServices with parseOrcha.result
 
-/*when "generateMockOfServices terminates condition ==false"
+when "generateMockOfServices terminates condition ==false"
 compute compileForLaunching with parseOrcha.result
 
-when "compileForLaunching terminates"
+/*when "compileForLaunching terminates"
 compute generateConfigurationProperties with parseOrcha.result
 
 when "generateConfigurationProperties terminates"

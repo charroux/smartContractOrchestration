@@ -901,6 +901,9 @@ class SpringIntegrationConnectors{
 		def clos = {
 		
 			if(sameEvent == true){
+				
+				println 'releaseExpression: ' + releaseExpression
+				
 				"int:aggregator"(id:"aggregator-"+instructionNode.inputName+"-id", "input-channel":instructionNode.inputName, "output-channel": instructionNode.inputName + "Transformer", "correlation-strategy-expression":"headers['messageID']", "release-strategy-expression":releaseExpression){
 				}
 			} else {

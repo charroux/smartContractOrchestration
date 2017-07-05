@@ -24,7 +24,7 @@ class OrchaCodeParserTest {
 	@Autowired
 	OrchaCodeParser orchaCodeParser
 	
-	String expression = '"simpleApplicationService terminates with !=true"'
+	String expression = '"simpleApplicationService terminates condition ==true"'
 	
 	@Test
 	void orchaCodeParserTest1(){

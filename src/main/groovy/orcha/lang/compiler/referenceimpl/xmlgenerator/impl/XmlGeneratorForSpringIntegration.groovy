@@ -863,6 +863,8 @@ class XmlGeneratorForSpringIntegration implements XmlGenerator{
 					String transformerExpression = expressionParser.aggregatorTransformerExpression(orchaExpression, instructionNode, graphOfInstructions)
 					boolean isMultipleArgumentsInExpression = expressionParser.isMultipleArgumentsInExpression(orchaExpression, instructionNode, graphOfInstructions)
 					
+					println 'releaseExpression1: ' + releaseExpression
+					
 					def xmlEvent = generateAggregator(instructionNode, releaseExpression, transformerExpression, isMultipleArgumentsInExpression)
 					
 					bufferedWriter.writeLine(xmlEvent.toString())
