@@ -27,14 +27,14 @@ class OrchaCodeParserTest {
 	String expression = '"simpleApplicationService terminates condition ==true"'
 	
 	@Test
-	void orchaCodeParserTest1(){
+	void orchaCodeParserSimpleApplicationTest(){
 		
 		String orchaProgram = 	"package source.simpleTest\n" +
 								"title 'simple application to test'\n" +
-								"receive variable from simpleApplicationInput\n" +
-								"compute simpleApplicationService with variable.value\n" +
-								"when " + expression + "\n" +
-								"send simpleApplicationService.result to simpleApplicationOutput"
+								"receive variable from simpleApplicationInput\n" +						// instruction 1
+								"compute simpleApplicationService with variable.value\n" +				// instruction 2
+								"when " + expression + "\n" +											// instruction 3
+								"send simpleApplicationService.result to simpleApplicationOutput"		// instruction 4
 								
 		OrchaCodeVisitor orchaCodeVisitor = orchaCodeParser.parse(orchaProgram)		
 		Assert.assertTrue(orchaCodeVisitor.getOrchaMetadata().getTitle() == "simple application to test")
@@ -106,7 +106,7 @@ class OrchaCodeParserTest {
 	}
 
 	@Test
-	void orchaCodeParserTest2(){
+	void orchaCodeParserOrchaCompilerTest(){
 		
 		String orchaProgram = 	"package source.orcha\n" +
 								"domain orcha\n" +
@@ -114,12 +114,12 @@ class OrchaCodeParserTest {
 								"title 'orcha compiler'\n" +
 								"author 'Ben C.'\n" +
 								"version '1.0'\n" +
-								"receive orchaProgram from orchaFile\n" +
-								"compute parseOrcha with orchaProgram.value\n" +
-								"when 'parseOrcha terminates'\n" +
-								"compute generateServiceOfferSelection with parseOrcha.result\n" +
-								"when 'parseOrcha terminates'\n" +
-								"compute generateServiceOfferSelection with parseOrcha.result"								
+								"receive orchaProgram from orchaFile\n" +							// instruction 1
+								"compute parseOrcha with orchaProgram.value\n" +					// instruction 2
+								"when 'parseOrcha terminates'\n" +									// instruction 3
+								"compute generateServiceOfferSelection with parseOrcha.result\n" +	// instruction 4
+								"when 'parseOrcha terminates'\n" +									// instruction 5
+								"compute generateServiceOfferSelection with parseOrcha.result"		// instruction 6		
 								
 		OrchaCodeVisitor orchaCodeVisitor = orchaCodeParser.parse(orchaProgram)
 		Assert.assertEquals(orchaCodeVisitor.getOrchaMetadata().getDomain(), "orcha")
@@ -194,6 +194,106 @@ class OrchaCodeParserTest {
 		precedingNode = precedingNodes.get(0)
 		Assert.assertTrue(precedingNode.instruction.instruction == 'when')
 		Assert.assertTrue(precedingNode.instruction.id == 5)
+		
+		
+		def whenNodes = orchaCodeVisitor.findAllWhenNodes()
+		Assert.assertTrue(whenNodes.size() == 3)				// one fictive node + the two when instructions
+		InstructionNode when = (InstructionNode)whenNodes[1]
+		Assert.assertTrue(when.instruction.instruction == 'when')
+		Assert.assertTrue(when.instruction.id == 3)
+		
+		when = (InstructionNode)whenNodes[2]
+		Assert.assertTrue(when.instruction.instruction == 'when')
+		Assert.assertTrue(when.instruction.id == 5)
+
+	}
+
+	@Test
+	void orchaCodeParserOrchaBenchmarkingVendorTest(){
+		
+		String orchaProgram = 	"package source.order\n" +
+								"domain productSales\n" +
+								"description 'sales TV'\n" +
+								"title 'select best TV vendors'\n" +
+								"author 'Ben C.'\n" +
+								"version '1.0'\n" +
+								"receive order from customer condition \"order.product.specification == 'TV'\"\n" +	// instruction 1
+								"compute orderConverter with order.value\n" +										// instruction 2
+								"when 'orderConverter terminates'\n" +												// instruction 3
+								"compute vendor1 with orderConverter.result\n" +									// instruction 4
+								"receive order from customer condition \"order.product.specification == 'TV'\"\n" +	// instruction 5
+								"compute vendor2 with order.value\n" +												// instruction 6
+								"receive order from customer condition \"order.product.specification == 'TV'\"\n" +	// instruction 7
+								"compute vendor3 with order.value\n" +												// instruction 8
+								"when '(vendor1 terminates) and (vendor2 terminates) and (vendor3 terminates)'\n" +	// instruction 9
+								"compute selectBestVendor with vendor1.result, vendor2.result, vendor3.result\n" +	// instruction  10			
+								"when  'selectBestVendor terminates condition price>1000'\n" +						// instruction 11
+								"send selectBestVendor.result to outputFile1\n" +									// instruction 12
+								"when 'selectBestVendor terminates condition price<=1000'\n" + 						// instruction 13
+								"send selectBestVendor.result to outputFile2"										// instruction 14
+								
+		OrchaCodeVisitor orchaCodeVisitor = orchaCodeParser.parse(orchaProgram)
+		
+		def allReceiveNodes = orchaCodeVisitor.findAllReceiveNodes()
+		Assert.assertTrue(allReceiveNodes.size() == 4)
+		InstructionNode node = allReceiveNodes.get(1)
+		Assert.assertTrue(node.instruction.instruction == 'receive')
+		Assert.assertTrue(node.instruction.id == 1)
+		
+		def nextNodes = orchaCodeVisitor.findNextNode(node)
+		Assert.assertTrue(nextNodes.size() == 1)
+		node = nextNodes.get(0)
+		Assert.assertTrue(node.instruction.instruction == 'compute')
+		Assert.assertTrue(node.instruction.id == 2)
+		
+		def precedingNodes = orchaCodeVisitor.findAllPrecedingNodes(node)
+		Assert.assertTrue(precedingNodes.size() == 1)
+		InstructionNode precedingNode = precedingNodes.get(0)
+		Assert.assertTrue(precedingNode.instruction.instruction == 'receive')
+		Assert.assertTrue(precedingNode.instruction.id == 1)
+		
+		
+		node = allReceiveNodes.get(2)
+		Assert.assertTrue(node.instruction.instruction == 'receive')
+		Assert.assertTrue(node.instruction.id == 5)
+		
+		nextNodes = orchaCodeVisitor.findNextNode(node)
+		Assert.assertTrue(nextNodes.size() == 1)
+		node = nextNodes.get(0)
+		Assert.assertTrue(node.instruction.instruction == 'compute')
+		Assert.assertTrue(node.instruction.id == 6)
+		
+		precedingNodes = orchaCodeVisitor.findAllPrecedingNodes(node)
+		Assert.assertTrue(precedingNodes.size() == 1)
+		precedingNode = precedingNodes.get(0)
+		Assert.assertTrue(precedingNode.instruction.instruction == 'receive')
+		Assert.assertTrue(precedingNode.instruction.id == 5)
+		
+		
+		node = allReceiveNodes.get(3)
+		Assert.assertTrue(node.instruction.instruction == 'receive')
+		Assert.assertTrue(node.instruction.id == 7)
+		
+		nextNodes = orchaCodeVisitor.findNextNode(node)
+		Assert.assertTrue(nextNodes.size() == 1)
+		node = nextNodes.get(0)
+		Assert.assertTrue(node.instruction.instruction == 'compute')
+		Assert.assertTrue(node.instruction.id == 8)
+		
+		precedingNodes = orchaCodeVisitor.findAllPrecedingNodes(node)
+		Assert.assertTrue(precedingNodes.size() == 1)
+		precedingNode = precedingNodes.get(0)
+		Assert.assertTrue(precedingNode.instruction.instruction == 'receive')
+		Assert.assertTrue(precedingNode.instruction.id == 7)
+		
+		
+		def whenNodes = orchaCodeVisitor.findAllWhenNodes()
+		Assert.assertTrue(whenNodes.size() == 5)
+		Assert.assertTrue(whenNodes[0] instanceof InstructionNode)
+		InstructionNode when = (InstructionNode)whenNodes[3]
+		Assert.assertTrue(when.instruction.instruction == 'when')
+		Assert.assertTrue(when.instruction.id == 11)
+		//Assert.assertEquals(when.instruction.condition, 'price<=1000')
 
 	}
 

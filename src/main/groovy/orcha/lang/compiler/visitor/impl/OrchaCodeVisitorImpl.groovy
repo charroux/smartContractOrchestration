@@ -925,12 +925,12 @@ class OrchaCodeVisitorImpl extends OrchaCodeVisitor{
 				}
 			}
 			
-/*			instructions = this.toStringGraphOfInstructions()
+			instructions = this.toStringGraphOfInstructions()
 			for(String s: instructions){
 				println s
 			}
 			
-			println 'ffffffffffffiiiiiiiiiiiiiiiiinnnnnnnnnnnnnnnnnnn'*/
+			println 'ffffffffffffiiiiiiiiiiiiiiiiinnnnnnnnnnnnnnnnnnn'
 			
 			log.info 'Syntax analysis of the the Orcha program complete successfully'
 			
