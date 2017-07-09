@@ -86,6 +86,9 @@ dependencies {
 	compile 'org.springframework.integration:spring-integration-amqp:4.3.7.RELEASE'
 	compile 'org.springframework.integration:spring-integration-mongodb:4.3.7.RELEASE'
 	
+	compile group: 'org.jdom', name: 'jdom2', version: '2.0.6'
+	compile group: 'jaxen', name: 'jaxen', version: '1.1.6'
+	
 	compile group: 'org.ow2.asm', name: 'asm', version: '5.2'
 	
 	compile group: 'org.mongodb', name: 'mongo-java-driver', version: '3.4.1'

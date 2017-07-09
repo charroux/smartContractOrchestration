@@ -226,7 +226,7 @@ class OrchaCodeParserTest {
 								"receive order from customer condition \"order.product.specification == 'TV'\"\n" +	// instruction 7
 								"compute vendor3 with order.value\n" +												// instruction 8
 								"when '(vendor1 terminates) and (vendor2 terminates) and (vendor3 terminates)'\n" +	// instruction 9
-								"compute selectBestVendor with vendor1.result, vendor2.result, vendor3.result\n" +	// instruction  10			
+								"compute selectBestVendor with vendor1.result, vendor2.result, vendor3.result\n" +	// instruction 10			
 								"when  'selectBestVendor terminates condition price>1000'\n" +						// instruction 11
 								"send selectBestVendor.result to outputFile1\n" +									// instruction 12
 								"when 'selectBestVendor terminates condition price<=1000'\n" + 						// instruction 13

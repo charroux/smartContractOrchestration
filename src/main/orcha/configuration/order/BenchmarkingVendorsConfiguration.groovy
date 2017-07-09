@@ -38,31 +38,9 @@ import service.order.Order
 import service.order.Product
 import service.order.SpecificOrder
 import service.order.VendorComparison
+import service.order.VendorOrderConverter
 
-/*import org.aspectj.lang.JoinPoint
-import org.aspectj.lang.annotation.After
-import org.aspectj.lang.annotation.Aspect*/
-
-/*class MyAdvice{
-	
-	@Autowired
-	ApplicationContext context
-	
-	public void essai(Object retVal){
-		println "kkkkkkkkkkkpppppppppppp: " + retVal + " " + context
-		retVal.product = "Hifi"
-		MyInterface myInterface = context.getBean("myInterface")
-		myInterface.myMethod(retVal)
-	}
-	
-}
-
-interface MyInterface{
-	void myMethod(Object object)	
-}
-*/
-
-@Queue(capacity=20L, fixedRate=100L)
+/*@Queue(capacity=20L, fixedRate=100L)
 //@EventSourcing(messageStore=MessageStore.mongoDB, joinPoint=JoinPoint.after, eventName="")
 class CustomerEventHandler extends EventHandler{
 }
@@ -84,63 +62,20 @@ class Vendor1Application extends Application{
 
 @BranchPoint(configurationFile="dataConfig", position=BranchingPosition.after)
 class SelectBestVendorApplication extends Application{
-}
-
-/*@EventSourcing(messageStore=MessageStore.mongoDB, joinPoint=JoinPoint.before, eventName="")
-class OutputFile1EventHandler extends EventHandler{
 }*/
 
-//@EventSourcing(messageStore=MessageStore.mongoDB, joinPoint=JoinPoint.before, eventName="")
-/*class OutputFile2EventHandler extends EventHandler{
-}*/
-
-/**
- * This file defines.
- * It should be written by an operational.
- * See source/order for the configuration
- * @author Ben C.
- *
- */
 @Configuration
 @Slf4j
 //@Profile("myBusinessProfile")
 class BenchmarkingVendorsConfiguration {
 	
-	/**
-	 * Defines a customer used in: receive order from customer condition "order.product.specification == 'TV'"
-	 * customer is an EventHandler (a source for an event).
-	 * The source of the event is a file (InputFileAdapter) defined by a directory (should match your system).
-	 * The name of the fine is orderTV.json.
-	 * It must be formatted according the MIME type json. The format is defined by Order (see service/order/Order.groovy)  
-	 * @return
-	 */
-	@Bean
+/*	@Bean
 	EventHandler customer(){
 		def eventHandler = new CustomerEventHandler(name: "customer")
-		//def fileAdapter = new InputFileAdapter(directory: 'C:/Users/Charroux_std/Documents/projet/ExecAndShare/orcha/Orcha/input', filenamePattern: "orderTV.json")
-		//eventHandler.input = new Input(mimeType: "application/json", type: "service.order.Order", adapter: fileAdapter)
 		eventHandler.input = new Input(mimeType: "application/json", type: "service.order.Order")
 		return eventHandler
 	}
 	
-	/**
-	 * Defines orderConverter used in: compute orderConverter with order.value
-	 * orderConverter defines an application by its name (orderConverter), programming language (Groovy/Java), 
-	 * the program launched (VendorOrderConverter), the function called in the program (convert)program, input and output.
-	 * The program receives as input the type Order (see service/order/Order), 
-	 * and returns the type SpecificOrder (see service/order/SpecificOrder)
-	 * @return
-	 */
-/*	@Bean
-	Application orderConverter(){
-		def program = new OrderConverterApplication(name: "orderConverter", language: "Groovy")
-		//def javaAdapter = new JavaServiceAdapter(javaClass: 'service.order.VendorOrderConverter', method:'convert')
-		def javaAdapter = new JavaServiceAdapter(javaClass: 'VendorOrderConverterInterface', method:'convert')
-		program.input = new Input(type: "service.order.Order", adapter: javaAdapter)
-		program.output = new Output(type: "service.order.SpecificOrder", adapter: javaAdapter)
-		return program
-	}*/
-
 	@Bean
 	Application orderConverter(){
 		def program = new OrderConverterApplication(name: "orderConverter", specifications: "bla bla", description: "bla bla")
@@ -149,60 +84,6 @@ class BenchmarkingVendorsConfiguration {
 		return program
 	}
 	
-/*	{
-		"name": "orderConverter", 
-		"specifications": "bla bla", 
-		"description": "bla bla"),
-		"input" : {
-			"type": "service.order.Order"
-		} 
-		"output" : {
-			"type": "service.order.Order"
-		}
-	}*/
-	
-	/**
-	 * Defines the program to be launched by "compute orderConverter"
-	 * See service/order/VendorOrderConverter.groovy
-	 * @return
-	 */
-/*	@Bean
-	VendorOrderConverter vendorOrderConverter(){
-		return new VendorOrderConverter()
-	}*/
-	
-	/*@Bean
-	VendorOrderConverter vendorOrderConverter(){
-		VendorOrderConverter vendorOrderConverter  = org.mockito.Mockito.spy(VendorOrderConverter.class)
-		Product p = new Product();
-		p.setSpecification("TV");
-		Order order = new Order();
-		order.setNumber(1);
-		order.setProduct(p);
-		SpecificOrder specificOrder = new SpecificOrder();
-		specificOrder.setNumber(1111);
-		specificOrder.setProduct("azerty");
-		org.mockito.Mockito.when(vendorOrderConverter.convert(order)).thenReturn( specificOrder );
-		return vendorOrderConverter
-	}*/
-	
-/*	@Bean
-	VendorOrderConverterInterface vendorOrderConverterInterface(){
-		VendorOrderConverterInterface vendorOrderConverter  = org.mockito.Mockito.mock(VendorOrderConverterInterface.class)
-		Product p = new Product(specification: "TV")
-		Order order = new Order(number: 1, product: p);
-		org.mockito.Mockito.when(vendorOrderConverter.convert(order)).thenReturn( new SpecificOrder(number: 1111, product: "azerty") );
-		log.info "-------------------------------------------vendorOrderConverterInterface : " + vendorOrderConverter
-		return vendorOrderConverter
-	}*/
-	
-	/**
-	 * Defines vendor1 used in: compute vendor1 with orderConverter.result
-	 * The program launched is a Javascript program (see service/order/vendor1.js).
-	 * It receives as input the type SpecificOrder (see service/order/SpecificOrder.groovy)
-	 * and returns the type Bill (see service/order/Bill.groovy)
-	 * @return
-	 */
 	@Bean
 	Application vendor1(){
 		def jsApp = new Vendor1Application(name: "vendor1", language: "js")
@@ -212,11 +93,6 @@ class BenchmarkingVendorsConfiguration {
 		return jsApp
 	}
 	
-	/**
-	 * Defines vendor2 used in: compute vendor2 with order.value
-	 * The program launched is a Javascript program (see service/order/vendor2.js)
-	 * @return
-	 */
 	@Bean
 	Application vendor2(){
 		def jsApp = new Application(name: "vendor2", language: "js")
@@ -251,21 +127,100 @@ class BenchmarkingVendorsConfiguration {
 		
 	@Bean
 	EventHandler outputFile1(){
-		//def eventHandler = new OutputFile1EventHandler(name: "outputFile1")
 		def eventHandler = new EventHandler(name: "outputFile1")
-		//def fileAdapter = new OutputFileAdapter(directory: 'C:/Users/Charroux_std/Documents/projet/ExecAndShare/orcha/Orcha/output', createDirectory: true, filename:'output1.txt', appendNewLine: true, writingMode: WritingMode.REPLACE)
-		//eventHandler.output = new Output(mimeType: "application/json", type: "service.order.Bill", adapter: fileAdapter)
 		eventHandler.output = new Output(mimeType: "application/json", type: "service.order.Bill")
 		return eventHandler
 	}
 	
 	@Bean
 	EventHandler outputFile2(){
-		//def eventHandler = new OutputFile2EventHandler(name: "outputFile2")
 		def eventHandler = new EventHandler(name: "outputFile2")
 		def fileAdapter = new OutputFileAdapter(directory: 'C:/Users/Charroux_std/Documents/projet/ExecAndShare/orcha/Orcha/output', createDirectory: true, filename:'output2.txt', appendNewLine: true, writingMode: WritingMode.REPLACE)
+		eventHandler.output = new Output(mimeType: "application/json", type: "service.order.Bill", adapter: fileAdapter)
+		return eventHandler
+	}*/
+	
+	@Bean
+	EventHandler customer(){
+		EventHandler eventHandler = new EventHandler(name: "customer")
+		def fileAdapter = new InputFileAdapter(directory: 'C:/Users/Charroux_std/Documents/projet/ExecAndShare/orcha/Orcha/input', filenamePattern: "orderTV.json")
+		eventHandler.input = new Input(mimeType: "application/json", type: "service.order.Order", adapter: fileAdapter)
+		//eventHandler.input = new Input(mimeType: "application/json", type: "service.order.Order")
+		return eventHandler
+	}
+	
+	@Bean
+	Application orderConverter(){
+		def program = new Application(name: "orderConverter", specifications: "bla bla", description: "bla bla")
+		def javaAdapter = new JavaServiceAdapter(javaClass: 'service.order.VendorOrderConverter', method:'convert')
+		program.input = new Input(type: "service.order.Order", adapter: javaAdapter)
+		program.output = new Output(type: "service.order.SpecificOrder", adapter: javaAdapter)
+		//program.input = new Input(type: "service.order.Order")
+		//program.output = new Output(type: "service.order.SpecificOrder")
+		return program
+	}
+	
+	@Bean
+	VendorOrderConverter vendorOrderConverter(){
+		return new VendorOrderConverter()
+	}
+	
+	@Bean
+	Application vendor1(){
+		def jsApp = new Application(name: "vendor1", language: "js")
+		def scriptAdapter = new ScriptServiceAdapter(file: 'file:src/main/orcha/service/order/vendor1.js')
+		jsApp.input = new Input(type: "service.order.SpecificOrder", adapter: scriptAdapter)
+		jsApp.output = new Output(type: "service.order.Bill", adapter: scriptAdapter)
+		return jsApp
+	}
+	
+	@Bean
+	Application vendor2(){
+		def jsApp = new Application(name: "vendor2", language: "js")
+		def scriptAdapter = new ScriptServiceAdapter(file: 'file:src/main/orcha/service/order/vendor2.js')
+		jsApp.input = new Input(type: "service.order.Order", adapter: scriptAdapter)
+		jsApp.output = new Output(type: "service.order.Bill", adapter: scriptAdapter)
+		return jsApp
+	}
+
+	@Bean
+	Application vendor3(){
+		def jsApp = new Application(name: "vendor3", language: "js")
+		def scriptAdapter = new ScriptServiceAdapter(file: 'file:src/main/orcha/service/order/vendor3.js')
+		jsApp.input = new Input(type: "service.order.Order", adapter: scriptAdapter)
+		jsApp.output = new Output(type: "service.order.Bill", adapter: scriptAdapter)
+		return jsApp
+	}
+
+	@Bean
+	Application selectBestVendor(){
+		def program = new Application(name: "selectBestVendor", language: "Java")
+		def javaAdapter = new JavaServiceAdapter(javaClass: 'service.order.VendorComparison', method:'compare')
+		program.input = new Input(type: "java.util.List<service.order.Bill>", adapter: javaAdapter)
+		program.output = new Output(type: "service.order.Bill", adapter: javaAdapter)
+		return program
+	}
+	
+	@Bean
+	VendorComparison vendorComparison(){
+		return new VendorComparison()
+	}
+		
+	@Bean
+	EventHandler outputFile1(){
+		def eventHandler = new EventHandler(name: "outputFile1")
+		def fileAdapter = new OutputFileAdapter(directory: 'C:/Users/Charroux_std/Documents/projet/ExecAndShare/orcha/Orcha/output', createDirectory: true, filename:'output1.txt', appendNewLine: true, writingMode: WritingMode.REPLACE)
 		eventHandler.output = new Output(mimeType: "application/json", type: "service.order.Bill", adapter: fileAdapter)
 		//eventHandler.output = new Output(mimeType: "application/json", type: "service.order.Bill")
 		return eventHandler
 	}
+	
+	@Bean
+	EventHandler outputFile2(){
+		def eventHandler = new EventHandler(name: "outputFile2")
+		def fileAdapter = new OutputFileAdapter(directory: 'C:/Users/Charroux_std/Documents/projet/ExecAndShare/orcha/Orcha/output', createDirectory: true, filename:'output2.txt', appendNewLine: true, writingMode: WritingMode.REPLACE)
+		eventHandler.output = new Output(mimeType: "application/json", type: "service.order.Bill", adapter: fileAdapter)
+		return eventHandler
+	}
+
 }

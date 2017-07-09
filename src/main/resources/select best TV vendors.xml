@@ -4,8 +4,8 @@
   <bean id="errorUnwrapper" class="orcha.lang.compiler.referenceimpl.xmlgenerator.impl.ErrorUnwrapper"/>
   <int:channel id="recoveryChannel"/>
   <int:transformer input-channel="recoveryChannel" output-channel="loggingChannel" expression="'Failure after many attemps for the message :' + payload.failedMessage.payload"/>
-<int-file:inbound-channel-adapter id="file-customer-InputChannel-id" directory="C:/Users/Charroux_std/Documents/projet/ExecAndShare/orcha/Orcha/OrchaBeforeLibrary/bin/data/order/customer/" channel="customer-InputChannel" prevent-duplicates="true" queue-size="20">
-    <int:poller fixed-rate="100"/>
+<int-file:inbound-channel-adapter id="file-customer-InputChannel-id" directory="C:/Users/Charroux_std/Documents/projet/ExecAndShare/orcha/Orcha/input" channel="customer-InputChannel" prevent-duplicates="true" filename-pattern="orderTV.json">
+    <int:poller id="poller-customer-InputChannel-id" fixed-delay="1000"/>
   </int-file:inbound-channel-adapter>
   <int-file:file-to-string-transformer input-channel="customer-InputChannel" output-channel="customer-InputChannelTransformer" delete-files="false"/>
   <int:chain input-channel="customer-InputChannelTransformer" output-channel="customer-OutputChannel">
@@ -24,7 +24,7 @@
   <int:channel id="customer-OutputChannelRoute2"/>
   <int:channel id="customer-OutputChannelRoute3"/>
 <int:chain id="service-activator-chain-orderConverterChannel-id" input-channel="customer-OutputChannelRoute1" output-channel="orderConverterServiceAcivatorOutput">
-    <int:service-activator id="service-activator-orderConverterChannel-id" expression="@orderConverterService.service(payload)"/>
+    <int:service-activator id="service-activator-orderConverterChannel-id" expression="@vendorOrderConverter.convert(payload)"/>
   </int:chain>
   <int:transformer id="transformer-orderConverterServiceAcivatorOutput-id" input-channel="orderConverterServiceAcivatorOutput" output-channel="orderConverterAggregatorInput" ref="orderConverterTransformerBean" method="transform"/>
   <bean id="orderConverterTransformerBean" class="orcha.lang.compiler.referenceimpl.xmlgenerator.impl.ObjectToApplicationTransformer">
@@ -37,16 +37,9 @@
 <int:chain id="service-activator-chain-vendor1Channel-id" input-channel="orderConverterAggregatorOutputTransformer" output-channel="vendor1ServiceAcivatorOutput">
     <int:service-activator id="service-activator-vendor1Channel-id">
       <int-script:script lang="js" location="file:src/main/orcha/service/order/vendor1.js"/>
-      <int:request-handler-advice-chain>
-        <ref bean="eventSourcingAdvice"/>
-      </int:request-handler-advice-chain>
     </int:service-activator>
   </int:chain>
-  <int:transformer id="transformer-vendor1ServiceAcivatorOutput-id" input-channel="vendor1ServiceAcivatorOutput" output-channel="vendor1vendor2vendor3AggregatorInput" ref="vendor1TransformerBean" method="transform">
-    <int:request-handler-advice-chain>
-      <ref bean="eventSourcingAdvice"/>
-    </int:request-handler-advice-chain>
-  </int:transformer>
+  <int:transformer id="transformer-vendor1ServiceAcivatorOutput-id" input-channel="vendor1ServiceAcivatorOutput" output-channel="vendor1vendor2vendor3AggregatorInput" ref="vendor1TransformerBean" method="transform"/>
   <bean id="vendor1TransformerBean" class="orcha.lang.compiler.referenceimpl.xmlgenerator.impl.ObjectToApplicationTransformer">
     <property name="application" ref="vendor1"/>
   </bean>
@@ -91,7 +84,7 @@
     <int:object-to-json-transformer/>
   </int:chain>
   <int:channel id="selectBestVendorOutputFileChannelAdapteroutputFile1"/>
-  <int-file:outbound-channel-adapter id="file-selectBestVendoroutputFile1Channel-id" channel="selectBestVendorOutputFileChannelAdapteroutputFile1" directory-expression="@outputFile1.output.adapter.directory" filename-generator-expression="@outputFile1.output.adapter.filename" append-new-line="true" mode="APPEND" auto-create-directory="true" delete-source-files="false"/>
+  <int-file:outbound-channel-adapter id="file-selectBestVendoroutputFile1Channel-id" channel="selectBestVendorOutputFileChannelAdapteroutputFile1" directory-expression="@outputFile1.output.adapter.directory" filename-generator-expression="@outputFile1.output.adapter.filename" append-new-line="true" mode="REPLACE" auto-create-directory="true" delete-source-files="false"/>
 <int:aggregator id="aggregator-selectBestVendorAggregatorInputRoute2-id" input-channel="selectBestVendorAggregatorInputRoute2" output-channel="selectBestVendorAggregatorInputRoute2Transformer" correlation-strategy-expression="headers['messageID']" release-strategy-expression="size()==1 and ( ([0].payload instanceof T(orcha.lang.configuration.Application) AND [0].payload.state==T(orcha.lang.configuration.State).TERMINATED)  and  [0].payload.output.value.price&lt;=1000 )"/>
   <int:transformer id="transformer-selectBestVendorAggregatorInputRoute2-id" input-channel="selectBestVendorAggregatorInputRoute2Transformer" output-channel="selectBestVendorAggregatorInputRoute2AggregatorOutput" expression="payload.?[name=='selectBestVendor']"/>
   <int:transformer id="transformer-selectBestVendorAggregatorInputRoute2AggregatorOutput-id" input-channel="selectBestVendorAggregatorInputRoute2AggregatorOutput" output-channel="selectBestVendorAggregatorOutputTransformerRoute2" ref="selectBestVendorAggregatorOutputTransformerRoute2ApplicationToObjectTransformerBean" method="transform"/>
