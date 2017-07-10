@@ -78,7 +78,7 @@ class BenchmarkingVendorsConfiguration {
 	
 	@Bean
 	Application orderConverter(){
-		def program = new OrderConverterApplication(name: "orderConverter", specifications: "bla bla", description: "bla bla")
+		def program = new Application(name: "orderConverter", specifications: "Convert an order format into another one. Argument: service.order.Order. Return: service.order.SpecificOrder", description: "Convert a specific vendor order to a generic one.")
 		program.input = new Input(type: "service.order.Order")
 		program.output = new Output(type: "service.order.SpecificOrder")
 		return program
@@ -86,7 +86,7 @@ class BenchmarkingVendorsConfiguration {
 	
 	@Bean
 	Application vendor1(){
-		def jsApp = new Vendor1Application(name: "vendor1", language: "js")
+		def jsApp = new Application(name: "vendor1", language: "js", specifications: "Get a bill from the vendor from the given order. Argument: service.order.SpecificOrder. Return: service.order.Bill", description: "Get a bill from the vendor from the given order.")
 		def scriptAdapter = new ScriptServiceAdapter(file: 'file:src/main/orcha/service/order/vendor1.js')
 		jsApp.input = new Input(type: "service.order.SpecificOrder", adapter: scriptAdapter)
 		jsApp.output = new Output(type: "service.order.Bill", adapter: scriptAdapter)
@@ -151,7 +151,7 @@ class BenchmarkingVendorsConfiguration {
 	
 	@Bean
 	Application orderConverter(){
-		def program = new Application(name: "orderConverter", specifications: "bla bla", description: "bla bla")
+		def program = new Application(name: "orderConverter", specifications: "Convert an order format into another one. Argument: service.order.Order. Return: service.order.SpecificOrder", description: "Convert a specific vendor order to a generic one.")
 		def javaAdapter = new JavaServiceAdapter(javaClass: 'service.order.VendorOrderConverter', method:'convert')
 		program.input = new Input(type: "service.order.Order", adapter: javaAdapter)
 		program.output = new Output(type: "service.order.SpecificOrder", adapter: javaAdapter)
@@ -167,7 +167,7 @@ class BenchmarkingVendorsConfiguration {
 	
 	@Bean
 	Application vendor1(){
-		def jsApp = new Application(name: "vendor1", language: "js")
+		def jsApp = new Application(name: "vendor1", language: "js", specifications: "Get a bill from the vendor from the given order. Argument: service.order.SpecificOrder. Return: service.order.Bill", description: "Get a bill from the vendor from the given order.")
 		def scriptAdapter = new ScriptServiceAdapter(file: 'file:src/main/orcha/service/order/vendor1.js')
 		jsApp.input = new Input(type: "service.order.SpecificOrder", adapter: scriptAdapter)
 		jsApp.output = new Output(type: "service.order.Bill", adapter: scriptAdapter)

@@ -10,17 +10,17 @@ import org.jdom2.input.SAXBuilder
 import org.jdom2.input.sax.XMLReaderJDOMFactory
 import org.jdom2.input.sax.XMLReaderSchemaFactory
 import org.jdom2.input.sax.XMLReaderXSDFactory
+import org.jdom2.output.XMLOutputter
 import org.jdom2.xpath.XPathExpression
 import org.jdom2.xpath.XPathFactory
 import org.jdom2.filter.Filters
+import org.jdom2.output.Format
 
 class JDomEssai {
 	
 	public static void main(String[] a){
 		
-		//String xmlSchema = "." + File.separator + "src" + File.separator + "main" + File.separator + "resources" + File.separator + "note.xsd"
-		String xmlSchema = "." + File.separator + "src" + File.separator + "main" + File.separator + "resources" + File.separator + "maven-4.0.0.xsd"
-		//String xmlFile = "." + File.separator + "src" + File.separator + "main" + File.separator + "resources" + File.separator + "note.xml"
+		String xmlSchema = "." + File.separator + "src" + File.separator + "main" + File.separator + "resources" + File.separator + "contract.xsd"
 		
 		String xmlFile = "." + File.separator + "src" + File.separator + "main" + File.separator + "resources" + File.separator + "contract.xml"
 		
@@ -43,17 +43,25 @@ class JDomEssai {
 		//Document doc = sb.build(urlFile);
 		System.out.println(doc.getRootElement().getName());
 		
-/*		List<Content> contents = doc.getContent()
-		for(Content content: contents){
-			println content
-			if(content instanceof Element){
-				Element element = (Element)content
-				java.util.List<Element> children =element.getChildren()
-				for(Element e: children){
-					println e
-				}
-			}
-		}*/
+		// use the default implementation
+		XPathFactory xFactory = XPathFactory.instance();
+		// System.out.println(xFactory.getClass());
+  
+		// select all links
+		//XPathExpression<Element> expr = xFactory.compile("//version[namespace()='http://orchalang.com/schema']", Filters.element());
+		XPathExpression<Element> expr = xFactory.compile("//*[local-name() = 'commitments']", Filters.element())
+		//XPathExpression<Element> expr = xFactory.compile("//contractModelVersion", Filters.element());
+		List<Element> elements = expr.evaluate(doc)
+		if(elements.size() == 1){
+			Element commitments = elements.get(0)	// commitments
+			Element element = new Element("commitment")
+			element.addContent(new Element("name").addContent("essai"))
+			commitments.addContent(element)
+		}
+		
+		XMLOutputter xml = new XMLOutputter();
+		xml.setFormat(Format.getPrettyFormat());
+		System.out.println(xml.outputString(doc));
 		
 	}
 
