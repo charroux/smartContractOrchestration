@@ -130,43 +130,44 @@ class ContractGeneratorImpl implements ContractGenerator{
 		
 		OrchaMetadata orchaMetadata = orchaCodeVisitor.getOrchaMetadata()
 		
-		println orchaMetadata
-		
 		XPathFactory xFactory = XPathFactory.instance()
 		
 		XPathExpression<Element> expr = xFactory.compile("//*[local-name() = 'domain']/*[local-name() = 'name']", Filters.element())
 		List<Element> elements = expr.evaluate(document)		
 		Element element = elements.getAt(0)
 				
-		if(orchaMetadata.getDomain() != null){
-			element.setText(orchaMetadata.getDomain())
+		String metadata = orchaMetadata.getDomain() 
+		if(metadata != null){
+			element.setText(metadata)
 		}
 		
 		expr = xFactory.compile("//*[local-name() = 'title']", Filters.element())
 		elements = expr.evaluate(document)
 		element = elements.getAt(0)
 				 
-		if(orchaMetadata.getDomain() != null){
-			element.setText(orchaMetadata.getTitle())
+		metadata = orchaMetadata.getTitle()
+		if(metadata != null){
+			element.setText(metadata)
 		}
 		
 		expr = xFactory.compile("//*[local-name() = 'description']", Filters.element())
 		elements = expr.evaluate(document)
 		element = elements.getAt(0)
-				  
-		if(orchaMetadata.getDescription() != null){
-			element.setText(orchaMetadata.getDescription())
-		}
 		
-				
+		metadata = orchaMetadata.getDescription()
+		if(metadata != null){
+			element.setText(metadata)
+		}
+						
 		expr = xFactory.compile("//*[local-name() = 'version']", Filters.element())
 		elements = expr.evaluate(document)
 		element = elements.getAt(0)
-				   
-		if(orchaMetadata.getVersion() != null){
-			element.setText(orchaMetadata.getVersion())
+		
+		metadata = orchaMetadata.getVersion()
+		if(metadata != null){
+			element.setText(metadata)
 		}
-
+		
 		expr = xFactory.compile("//*[local-name() = 'authors']/*[local-name() = 'author']/*[local-name() = 'name']", Filters.element())
 		elements = expr.evaluate(document)
 		def names = []
@@ -174,16 +175,16 @@ class ContractGeneratorImpl implements ContractGenerator{
 			names.add(elt.getValue())
 		}
 
-		if(orchaMetadata.getAuthor() != null){
+		metadata = orchaMetadata.getAuthor()
+		if(metadata != null){
 			String author = orchaMetadata.getAuthor()
 			if(names.contains(author) == false){
 				elements = xFactory.compile("//*[local-name() = 'authors']", Filters.element()).evaluate(document)
-				 Element authors = elements.get(0)	// authors
-				 authors.addContent(new Element("author", namespace).addContent(new Element("name", namespace).setText(author)))				 
+				Element authors = elements.get(0)	// authors
+				authors.addContent(new Element("author", namespace).addContent(new Element("name", namespace).setText(metadata)))				 
 			}	
 		}
-		
-		 		 
+				 		
 		log.info "Requirements updated in XML document"
 				
 	}
