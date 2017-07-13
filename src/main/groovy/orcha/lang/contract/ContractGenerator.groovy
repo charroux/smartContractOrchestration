@@ -1,9 +1,23 @@
 package orcha.lang.contract
 
+import java.io.File
+
 import orcha.lang.compiler.visitor.OrchaCodeVisitor
 
 interface ContractGenerator {
 	
-	String generate(OrchaCodeVisitor orchaCodeVisitor)
+	enum Format{
+		PrettyFormat,
+		CompactFormat,
+		RawFormat 
+	}
+	
+	void generateAll(OrchaCodeVisitor orchaCodeVisitor)
+	
+	void updateCommitments(OrchaCodeVisitor orchaCodeVisitor)
+	
+	void exportToXML(File xmlFile)
+	
+	public void exportToXML(File xmlFile, Format format)
 	
 }

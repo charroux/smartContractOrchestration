@@ -1,5 +1,7 @@
 package orcha.lang
 
+import java.io.File
+
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.CommandLineRunner
 import org.springframework.boot.SpringApplication
@@ -53,9 +55,13 @@ class ContractGeneration  implements CommandLineRunner{
 				
 		OrchaCodeVisitor orchaCodeVisitor = orchaCodeParser.parse(orchaSourceFile)
 		
-		String xmlContractPath = contractGenerator.generate(orchaCodeVisitor)
+		contractGenerator.generateAll(orchaCodeVisitor)
 		
-		log.info "Contract generation compplete successfully: " + xmlContractPath
+		String outputXMLPath = "." + File.separator + "src" + File.separator + "main" + File.separator + "resources" + File.separator + "contract1.xml"
+		File outputXMLFile = new File(outputXMLPath)
+		contractGenerator.exportToXML(outputXMLFile)
+		
+		log.info "Contract generation complete successfully into: " + outputXMLFile.getAbsolutePath()
 		
 	}
 	
