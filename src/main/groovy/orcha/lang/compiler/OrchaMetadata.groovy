@@ -1,5 +1,8 @@
 package orcha.lang.compiler
 
+import groovy.transform.ToString
+
+@ToString
 class OrchaMetadata {
 	
 	String title
