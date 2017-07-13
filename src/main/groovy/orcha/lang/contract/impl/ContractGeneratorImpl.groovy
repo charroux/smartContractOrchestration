@@ -8,6 +8,7 @@ import javax.xml.validation.SchemaFactory
 
 import orcha.lang.compiler.Instruction
 import orcha.lang.compiler.InstructionNode
+import orcha.lang.compiler.OrchaMetadata
 import orcha.lang.compiler.visitor.OrchaCodeVisitor
 import orcha.lang.configuration.Application
 import orcha.lang.contract.ContractGenerator
@@ -36,16 +37,13 @@ class ContractGeneratorImpl implements ContractGenerator{
 	public ContractGeneratorImpl() {
 		super();
 		
-		//URL xmlContractSchemaUrl = new URL("http://orchalang.com/schema/contract.xsd")
-		
 		String contractXmlSchema = "." + File.separator + "src" + File.separator + "main" + File.separator + "resources" + File.separator + "contract.xsd"
 		
 		xmlContract = "." + File.separator + "src" + File.separator + "main" + File.separator + "resources" + File.separator + "contract.xml"
 		
 		SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
 		Schema schema = schemaFactory.newSchema(new File(contractXmlSchema));
-		//Schema schema = schemaFactory.newSchema(xmlContractSchemaUrl);
-		 
+		
 		XMLReaderJDOMFactory factory = new XMLReaderSchemaFactory(schema);
 		SAXBuilder sb = new SAXBuilder(factory);
 		document = sb.build(new File(xmlContract))
@@ -56,6 +54,8 @@ class ContractGeneratorImpl implements ContractGenerator{
 	
 	@Override
 	public void generateAll(OrchaCodeVisitor orchaCodeVisitor) {
+		
+		updateRequirements(orchaCodeVisitor)
 		
 		updateCommitments(orchaCodeVisitor)
 		
@@ -122,6 +122,69 @@ class ContractGeneratorImpl implements ContractGenerator{
 		}
 		
 		log.info "Commitments updated in XML document"
+				
+	}
+
+	@Override
+	public void updateRequirements(OrchaCodeVisitor orchaCodeVisitor){
+		
+		OrchaMetadata orchaMetadata = orchaCodeVisitor.getOrchaMetadata()
+		
+		println orchaMetadata
+		
+		XPathFactory xFactory = XPathFactory.instance()
+		
+		XPathExpression<Element> expr = xFactory.compile("//*[local-name() = 'domain']/*[local-name() = 'name']", Filters.element())
+		List<Element> elements = expr.evaluate(document)		
+		Element element = elements.getAt(0)
+				
+		if(orchaMetadata.getDomain() != null){
+			element.setText(orchaMetadata.getDomain())
+		}
+		
+		expr = xFactory.compile("//*[local-name() = 'title']", Filters.element())
+		elements = expr.evaluate(document)
+		element = elements.getAt(0)
+				 
+		if(orchaMetadata.getDomain() != null){
+			element.setText(orchaMetadata.getTitle())
+		}
+		
+		expr = xFactory.compile("//*[local-name() = 'description']", Filters.element())
+		elements = expr.evaluate(document)
+		element = elements.getAt(0)
+				  
+		if(orchaMetadata.getDescription() != null){
+			element.setText(orchaMetadata.getDescription())
+		}
+		
+				
+		expr = xFactory.compile("//*[local-name() = 'version']", Filters.element())
+		elements = expr.evaluate(document)
+		element = elements.getAt(0)
+				   
+		if(orchaMetadata.getVersion() != null){
+			element.setText(orchaMetadata.getVersion())
+		}
+
+		expr = xFactory.compile("//*[local-name() = 'authors']/*[local-name() = 'author']/*[local-name() = 'name']", Filters.element())
+		elements = expr.evaluate(document)
+		def names = []
+		for(Element elt: elements){
+			names.add(elt.getValue())
+		}
+
+		if(orchaMetadata.getAuthor() != null){
+			String author = orchaMetadata.getAuthor()
+			if(names.contains(author) == false){
+				elements = xFactory.compile("//*[local-name() = 'authors']", Filters.element()).evaluate(document)
+				 Element authors = elements.get(0)	// authors
+				 authors.addContent(new Element("author", namespace).addContent(new Element("name", namespace).setText(author)))				 
+			}	
+		}
+		
+		 		 
+		log.info "Requirements updated in XML document"
 				
 	}
 

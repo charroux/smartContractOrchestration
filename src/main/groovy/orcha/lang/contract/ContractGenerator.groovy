@@ -15,6 +15,8 @@ interface ContractGenerator {
 	void generateAll(OrchaCodeVisitor orchaCodeVisitor)
 	
 	void updateCommitments(OrchaCodeVisitor orchaCodeVisitor)
+
+	void updateRequirements(OrchaCodeVisitor orchaCodeVisitor)
 	
 	void exportToXML(File xmlFile)
 	

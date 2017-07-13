@@ -18,7 +18,6 @@ package source.order
 domain productSales
 description "sales TV"
 title "select best TV vendors"
-author "Ben C."
 version "1.0"
 
 receive order from customer condition "order.product.specification == 'TV'"
