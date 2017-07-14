@@ -16,7 +16,7 @@ package source.order
 // The when instruction waits for program orderConverter to be terminated.
 // So the comp
 domain productSales
-description "sales TV"
+description "Choose among TV vendors the cheapiest one."
 title "select best TV vendors"
 author "Ben C."
 version "1.0"

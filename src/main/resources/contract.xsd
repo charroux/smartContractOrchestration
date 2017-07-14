@@ -30,7 +30,7 @@
           <xs:documentation source="description">Declares to which version of contract descriptor this contract conforms.</xs:documentation>
         </xs:annotation>
       </xs:element>
-      <xs:element minOccurs="0" name="version" type="xs:string">
+      <xs:element name="version" type="xs:string">
         <xs:annotation>
           <xs:documentation source="version">0.0.1</xs:documentation>
           <xs:documentation source="description">The current version of the contract.</xs:documentation>
@@ -42,7 +42,7 @@
           <xs:documentation source="description">The full title of the contract.</xs:documentation>
         </xs:annotation>
       </xs:element>
-      <xs:element minOccurs="0" name="description" type="xs:string">
+      <xs:element name="description" type="xs:string">
         <xs:annotation>
           <xs:documentation source="version">0.0.1</xs:documentation>
           <xs:documentation source="description">A detailed description of the contract.</xs:documentation>
@@ -69,14 +69,14 @@
         </xs:annotation>
       </xs:element>
       
-      <xs:element minOccurs="0" name="commitments">
+      <xs:element name="commitments">
         <xs:annotation>
           <xs:documentation source="version">0.0.1</xs:documentation>
           <xs:documentation source="description">This element defines witch domain this contract belongs.</xs:documentation>
         </xs:annotation>
         <xs:complexType>
           <xs:sequence>
-            <xs:element name="commitment" minOccurs="0" maxOccurs="unbounded" type="Commitment"/>
+            <xs:element name="commitment" minOccurs="1" maxOccurs="unbounded" type="Commitment"/>
           </xs:sequence>
         </xs:complexType>
       </xs:element>
@@ -132,18 +132,16 @@
       </xs:element>
       <xs:element minOccurs="0" name="prerequisites" type="Prerequisites">
         <xs:annotation>
-          <xs:documentation source="version">4.0.0+</xs:documentation>
-          <xs:documentation source="description">Describes the prerequisites in the build environment for this project.</xs:documentation>
+          <xs:documentation source="version">0.0.1</xs:documentation>
+          <xs:documentation source="description">Describes the prerequisites for this contract.</xs:documentation>
         </xs:annotation>
       </xs:element>
       <xs:element minOccurs="0" name="properties">
         <xs:annotation>
-          <xs:documentation source="version">4.0.0+</xs:documentation>
+          <xs:documentation source="version">0.0.1</xs:documentation>
           <xs:documentation source="description">
             
-            Properties that can be used throughout the POM as a substitution, and
-            are used as filters in resources if enabled.
-            The format is &lt;code&gt;&amp;lt;name&amp;gt;value&amp;lt;/name&amp;gt;&lt;/code&gt;.
+            Properties that can be used.
             
           </xs:documentation>
         </xs:annotation>
@@ -164,7 +162,7 @@
     <xs:all>
       <xs:element minOccurs="0" name="name" type="xs:string">
         <xs:annotation>
-          <xs:documentation source="version">3.0.0+</xs:documentation>
+          <xs:documentation source="version">0.0.1</xs:documentation>
           <xs:documentation source="description">The full name of the organization.</xs:documentation>
         </xs:annotation>
       </xs:element>
@@ -201,41 +199,33 @@
   <xs:complexType name="Commitment">
     <xs:annotation>
       <xs:documentation source="version">0.0.1</xs:documentation>
-      <xs:documentation source="description">Information about one of the commitments on this contrat.</xs:documentation>
+      <xs:documentation source="description">Information about one of the commitments on this contract.</xs:documentation>
     </xs:annotation>
     <xs:all>
-      <xs:element minOccurs="0" name="name" type="xs:string">
+      <xs:element name="name" type="xs:string">
         <xs:annotation>
-          <xs:documentation source="version">3.0.0+</xs:documentation>
-          <xs:documentation source="description">The unique ID of the author.</xs:documentation>
+          <xs:documentation source="version">0.0.1</xs:documentation>
+          <xs:documentation source="description"></xs:documentation>
         </xs:annotation>
       </xs:element>
       <xs:element minOccurs="0" name="description" type="xs:string">
         <xs:annotation>
-          <xs:documentation source="version">3.0.0+</xs:documentation>
-          <xs:documentation source="description">The unique ID of the author.</xs:documentation>
+          <xs:documentation source="version">0.0.1</xs:documentation>
+          <xs:documentation source="description"></xs:documentation>
         </xs:annotation>
       </xs:element>
       <xs:element minOccurs="0" name="specifications" type="xs:string">
         <xs:annotation>
           <xs:documentation source="version">0.0.1</xs:documentation>
-          <xs:documentation source="description">The unique ID of the author.</xs:documentation>
+          <xs:documentation source="description"></xs:documentation>
         </xs:annotation>
       </xs:element>
-      
-      
-      
       <xs:element minOccurs="0" name="checkpoint" type="Checkpoint">
         <xs:annotation>
           <xs:documentation source="version">0.0.1</xs:documentation>
           <xs:documentation source="description">A checkpoint is a point (join point) in a process where messages are logged.</xs:documentation>
         </xs:annotation>
       </xs:element>
-      
-      
-      
-      
-      
       </xs:all>
   </xs:complexType>
   
@@ -262,7 +252,7 @@
       <xs:documentation source="description">A checkpoint is a point (joint point) in a process where messages are logged.</xs:documentation>
     </xs:annotation>
     <xs:all>
-      <xs:element name="eventName" type="xs:string">
+      <xs:element minOccurs="0" name="eventName" type="xs:string">
       </xs:element>
       <xs:element name="joinpoint">
       		<xs:annotation>
@@ -282,44 +272,44 @@
 
   <xs:complexType name="Contributor">
     <xs:annotation>
-      <xs:documentation source="version">3.0.0+</xs:documentation>
-      <xs:documentation source="description">Description of a person who has contributed to the project, but who does not have
+      <xs:documentation source="version">0.0.1</xs:documentation>
+      <xs:documentation source="description">Description of a person who has contributed to the contract, but who does not have
         commit privileges. Usually, these contributions come in the form of patches submitted.</xs:documentation>
     </xs:annotation>
     <xs:all>
       <xs:element minOccurs="0" name="name" type="xs:string">
         <xs:annotation>
-          <xs:documentation source="version">3.0.0+</xs:documentation>
+          <xs:documentation source="version">0.0.1</xs:documentation>
           <xs:documentation source="description">The full name of the contributor.</xs:documentation>
         </xs:annotation>
       </xs:element>
       <xs:element minOccurs="0" name="email" type="xs:string">
         <xs:annotation>
-          <xs:documentation source="version">3.0.0+</xs:documentation>
+          <xs:documentation source="version">0.0.1</xs:documentation>
           <xs:documentation source="description">The email address of the contributor.</xs:documentation>
         </xs:annotation>
       </xs:element>
       <xs:element minOccurs="0" name="url" type="xs:string">
         <xs:annotation>
-          <xs:documentation source="version">3.0.0+</xs:documentation>
+          <xs:documentation source="version">0.0.1</xs:documentation>
           <xs:documentation source="description">The URL for the homepage of the contributor.</xs:documentation>
         </xs:annotation>
       </xs:element>
       <xs:element minOccurs="0" name="organization" type="xs:string">
         <xs:annotation>
-          <xs:documentation source="version">3.0.0+</xs:documentation>
+          <xs:documentation source="version">0.0.1</xs:documentation>
           <xs:documentation source="description">The organization to which the contributor belongs.</xs:documentation>
         </xs:annotation>
       </xs:element>
       <xs:element minOccurs="0" name="organizationUrl" type="xs:string">
         <xs:annotation>
-          <xs:documentation source="version">3.0.0+</xs:documentation>
+          <xs:documentation source="version">0.0.1</xs:documentation>
           <xs:documentation source="description">The URL of the organization.</xs:documentation>
         </xs:annotation>
       </xs:element>
       <xs:element minOccurs="0" name="roles">
         <xs:annotation>
-          <xs:documentation source="version">3.0.0+</xs:documentation>
+          <xs:documentation source="version">0.0.1</xs:documentation>
           <xs:documentation source="description">
             
             The roles the contributor plays in the contract. Each role is described by a
@@ -336,7 +326,7 @@
       </xs:element>
       <xs:element minOccurs="0" name="timezone" type="xs:string">
         <xs:annotation>
-          <xs:documentation source="version">3.0.0+</xs:documentation>
+          <xs:documentation source="version">0.0.1</xs:documentation>
           <xs:documentation source="description">
             
               The timezone the contributor is in. Typically, this is a number in the range
@@ -403,14 +393,14 @@
   </xs:complexType>
   <xs:complexType name="MailingList">
     <xs:annotation>
-      <xs:documentation source="version">3.0.0+</xs:documentation>
+      <xs:documentation source="version">0.0.1</xs:documentation>
       <xs:documentation source="description">This element describes all of the mailing lists associated with a project. The
         auto-generated site references this information.</xs:documentation>
     </xs:annotation>
     <xs:all>
       <xs:element minOccurs="0" name="name" type="xs:string">
         <xs:annotation>
-          <xs:documentation source="version">3.0.0+</xs:documentation>
+          <xs:documentation source="version">0.0.1</xs:documentation>
           <xs:documentation source="description">
             
             The name of the mailing list.
@@ -420,7 +410,7 @@
       </xs:element>
       <xs:element minOccurs="0" name="subscribe" type="xs:string">
         <xs:annotation>
-          <xs:documentation source="version">3.0.0+</xs:documentation>
+          <xs:documentation source="version">0.0.1</xs:documentation>
           <xs:documentation source="description">
             
             The email address or link that can be used to subscribe to
@@ -433,7 +423,7 @@
       </xs:element>
       <xs:element minOccurs="0" name="unsubscribe" type="xs:string">
         <xs:annotation>
-          <xs:documentation source="version">3.0.0+</xs:documentation>
+          <xs:documentation source="version">0.0.1</xs:documentation>
           <xs:documentation source="description">
             
             The email address or link that can be used to unsubscribe to
@@ -446,7 +436,7 @@
       </xs:element>
       <xs:element minOccurs="0" name="post" type="xs:string">
         <xs:annotation>
-          <xs:documentation source="version">3.0.0+</xs:documentation>
+          <xs:documentation source="version">0.0.1</xs:documentation>
           <xs:documentation source="description">
             
             The email address or link that can be used to post to
@@ -459,13 +449,13 @@
       </xs:element>
       <xs:element minOccurs="0" name="archive" type="xs:string">
         <xs:annotation>
-          <xs:documentation source="version">3.0.0+</xs:documentation>
+          <xs:documentation source="version">0.0.1</xs:documentation>
           <xs:documentation source="description">The link to a URL where you can browse the mailing list archive.</xs:documentation>
         </xs:annotation>
       </xs:element>
       <xs:element minOccurs="0" name="otherArchives">
         <xs:annotation>
-          <xs:documentation source="version">3.0.0+</xs:documentation>
+          <xs:documentation source="version">0.0.1</xs:documentation>
           <xs:documentation source="description">The link to alternate URLs where you can browse the list archive.</xs:documentation>
         </xs:annotation>
         <xs:complexType>
@@ -484,37 +474,37 @@
     <xs:all>
       <xs:element minOccurs="0" name="id" type="xs:string">
         <xs:annotation>
-          <xs:documentation source="version">3.0.0+</xs:documentation>
+          <xs:documentation source="version">0.0.1</xs:documentation>
           <xs:documentation source="description">The unique ID of the author.</xs:documentation>
         </xs:annotation>
       </xs:element>
       <xs:element minOccurs="0" name="name" type="xs:string">
         <xs:annotation>
-          <xs:documentation source="version">3.0.0+</xs:documentation>
+          <xs:documentation source="version">0.0.1</xs:documentation>
           <xs:documentation source="description">The full name of the contributor.</xs:documentation>
         </xs:annotation>
       </xs:element>
       <xs:element minOccurs="0" name="email" type="xs:string">
         <xs:annotation>
-          <xs:documentation source="version">3.0.0+</xs:documentation>
+          <xs:documentation source="version">0.0.1</xs:documentation>
           <xs:documentation source="description">The email address of the contributor.</xs:documentation>
         </xs:annotation>
       </xs:element>
       <xs:element minOccurs="0" name="url" type="xs:string">
         <xs:annotation>
-          <xs:documentation source="version">3.0.0+</xs:documentation>
+          <xs:documentation source="version">0.0.1</xs:documentation>
           <xs:documentation source="description">The URL for the homepage of the contributor.</xs:documentation>
         </xs:annotation>
       </xs:element>
       <xs:element minOccurs="0" name="organization" type="xs:string">
         <xs:annotation>
-          <xs:documentation source="version">3.0.0+</xs:documentation>
+          <xs:documentation source="version">0.0.1</xs:documentation>
           <xs:documentation source="description">The organization to which the contributor belongs.</xs:documentation>
         </xs:annotation>
       </xs:element>
       <xs:element minOccurs="0" name="organizationUrl" type="xs:string">
         <xs:annotation>
-          <xs:documentation source="version">3.0.0+</xs:documentation>
+          <xs:documentation source="version">0.0.1</xs:documentation>
           <xs:documentation source="description">The URL of the organization.</xs:documentation>
         </xs:annotation>
       </xs:element>
@@ -537,7 +527,7 @@
       </xs:element>
       <xs:element minOccurs="0" name="timezone" type="xs:string">
         <xs:annotation>
-          <xs:documentation source="version">3.0.0+</xs:documentation>
+          <xs:documentation source="version">0.0.1</xs:documentation>
           <xs:documentation source="description">
             
               The timezone the contributor is in. Typically, this is a number in the range
@@ -549,7 +539,7 @@
       </xs:element>
       <xs:element minOccurs="0" name="properties">
         <xs:annotation>
-          <xs:documentation source="version">3.0.0+</xs:documentation>
+          <xs:documentation source="version">0.0.1</xs:documentation>
           <xs:documentation source="description">Properties about the contributor, such as an instant messenger handle.</xs:documentation>
         </xs:annotation>
         <xs:complexType>

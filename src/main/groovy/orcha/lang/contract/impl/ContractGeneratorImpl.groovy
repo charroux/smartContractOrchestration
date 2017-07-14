@@ -9,7 +9,9 @@ import javax.xml.validation.SchemaFactory
 import orcha.lang.compiler.Instruction
 import orcha.lang.compiler.InstructionNode
 import orcha.lang.compiler.OrchaMetadata
+import orcha.lang.compiler.qualityOfService.EventSourcingOption
 import orcha.lang.compiler.qualityOfService.QualityOfService
+import orcha.lang.compiler.qualityOfService.QualityOfServicesOptions
 import orcha.lang.compiler.visitor.OrchaCodeVisitor
 import orcha.lang.configuration.Application
 import orcha.lang.contract.ContractGenerator
@@ -128,6 +130,8 @@ class ContractGeneratorImpl implements ContractGenerator{
 			}
 		}
 		
+		this.updateQualityOfServices(orchaCodeVisitor)
+		
 		log.info "Commitments updated in XML document"
 				
 	}
@@ -196,10 +200,37 @@ class ContractGeneratorImpl implements ContractGenerator{
 				
 	}
 
-	@Override
-	public void updateQualityOfServices(OrchaCodeVisitor orchaCodeVisitor) {
+	private void updateQualityOfServices(OrchaCodeVisitor orchaCodeVisitor) {
 		
 		qualityOfService.setQualityOfServiceToInstructions(orchaCodeVisitor)
+		
+		XPathFactory xFactory = XPathFactory.instance()
+		XPathExpression<Element> expr = xFactory.compile("//*[local-name() = 'commitments']/*[local-name() = 'commitment']", Filters.element())
+		List<Element> commitments = expr.evaluate(document)
+
+		List<InstructionNode> computeNodes = orchaCodeVisitor.findAllComputeNodes()
+		
+		computeNodes.each { computeNode ->
+			if(computeNode.options != null){
+				QualityOfServicesOptions qoSOption = computeNode.options
+				EventSourcingOption eventSourcingOption = qoSOption.eventSourcing
+				if(eventSourcingOption != null){
+					// look for the xml commitment that matches the compute node 
+					Element commitment = commitments.find{ it.getChildText("name", namespace) == computeNode.instruction.springBean.name }
+					Element checkPoint = commitment.getChild("checkpoint", namespace)
+					Element eventName
+					if(checkPoint == null){	// there is no checkpoint yet
+						checkPoint = new Element("checkpoint", namespace)
+						eventName = new Element("eventName", namespace)
+						checkPoint.addContent(eventName)
+						commitment.addContent(checkPoint)
+					} else {
+						eventName = checkPoint.getChild("eventName", namespace)
+					}
+					eventName.setText(eventSourcingOption.eventName)
+				}				
+			}
+		}
 		
 		log.info "Quality of Services updated in XML document"
 	}

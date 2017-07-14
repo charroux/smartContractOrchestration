@@ -46,12 +46,7 @@ class CustomerEventHandler extends EventHandler{
 }
 
 
-//@Queue(capacity=20L, fixedDelay=1000L)
-//@CircuitBreaker(numberOfFailuresBeforeOpening=2, intervalBeforeHalfOpening=2000L)
-//@Retry(maxNumberOfAttempts=3, intervalBetweenTheFirstAndSecondAttempt=5000L, intervalMultiplierBetwennAttemps=2, maximumIntervalBetweenAttempts=20000L)
-//@EventSourcing(messageStore=MessageStore.mongoDB, joinPoint=JoinPoint.after, eventName="")
-class OrderConverterApplication extends Application{
-}
+
 
 //@EventSourcing(messageStore=MessageStore.mongoDB, eventName="")
 //@Queue(capacity=30L, fixedRate=1000L)
@@ -63,6 +58,13 @@ class Vendor1Application extends Application{
 @BranchPoint(configurationFile="dataConfig", position=BranchingPosition.after)
 class SelectBestVendorApplication extends Application{
 }*/
+
+//@Queue(capacity=20L, fixedDelay=1000L)
+//@CircuitBreaker(numberOfFailuresBeforeOpening=2, intervalBeforeHalfOpening=2000L)
+//@Retry(maxNumberOfAttempts=3, intervalBetweenTheFirstAndSecondAttempt=5000L, intervalMultiplierBetwennAttemps=2, maximumIntervalBetweenAttempts=20000L)
+@EventSourcing(messageStore=MessageStore.mongoDB, joinPoint=JoinPoint.after, eventName="check order conversion")
+class OrderConverterApplication extends Application{
+}
 
 @Configuration
 @Slf4j
@@ -151,7 +153,7 @@ class BenchmarkingVendorsConfiguration {
 	
 	@Bean
 	Application orderConverter(){
-		def program = new Application(name: "orderConverter", specifications: "Convert an order format into another one. Argument: service.order.Order. Return: service.order.SpecificOrder", description: "Convert a specific vendor order to a generic one.")
+		def program = new OrderConverterApplication(name: "orderConverter", specifications: "Convert an order format into another one. Argument: service.order.Order. Return: service.order.SpecificOrder", description: "Convert a specific vendor order into a generic one.")
 		def javaAdapter = new JavaServiceAdapter(javaClass: 'service.order.VendorOrderConverter', method:'convert')
 		program.input = new Input(type: "service.order.Order", adapter: javaAdapter)
 		program.output = new Output(type: "service.order.SpecificOrder", adapter: javaAdapter)
