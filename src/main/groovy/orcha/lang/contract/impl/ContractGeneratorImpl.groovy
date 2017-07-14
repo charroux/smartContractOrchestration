@@ -9,6 +9,7 @@ import javax.xml.validation.SchemaFactory
 import orcha.lang.compiler.Instruction
 import orcha.lang.compiler.InstructionNode
 import orcha.lang.compiler.OrchaMetadata
+import orcha.lang.compiler.qualityOfService.QualityOfService
 import orcha.lang.compiler.visitor.OrchaCodeVisitor
 import orcha.lang.configuration.Application
 import orcha.lang.contract.ContractGenerator
@@ -17,6 +18,7 @@ import org.jdom2.Element
 import org.jdom2.Namespace
 import org.jdom2.xpath.XPathExpression
 import org.jdom2.xpath.XPathFactory
+import org.springframework.beans.factory.annotation.Autowired
 
 import groovy.util.logging.Slf4j
 
@@ -29,6 +31,9 @@ import org.jdom2.output.support.XMLOutputProcessor
 
 @Slf4j
 class ContractGeneratorImpl implements ContractGenerator{
+	
+	@Autowired
+	QualityOfService qualityOfService
 
 	Document document
 	String xmlContract
@@ -55,9 +60,11 @@ class ContractGeneratorImpl implements ContractGenerator{
 	@Override
 	public void generateAll(OrchaCodeVisitor orchaCodeVisitor) {
 		
-		updateRequirements(orchaCodeVisitor)
+		this.updateRequirements(orchaCodeVisitor)
 		
-		updateCommitments(orchaCodeVisitor)
+		this.updateCommitments(orchaCodeVisitor)
+		
+		this.updateQualityOfServices(orchaCodeVisitor)
 		
 	}
 	
@@ -187,6 +194,14 @@ class ContractGeneratorImpl implements ContractGenerator{
 				 		
 		log.info "Requirements updated in XML document"
 				
+	}
+
+	@Override
+	public void updateQualityOfServices(OrchaCodeVisitor orchaCodeVisitor) {
+		
+		qualityOfService.setQualityOfServiceToInstructions(orchaCodeVisitor)
+		
+		log.info "Quality of Services updated in XML document"
 	}
 
 }

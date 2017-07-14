@@ -1,0 +1,52 @@
+<?xml version="1.0"  encoding="UTF-8"?>
+<contract
+    xmlns="http://orchalang.com/schema"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://orchalang.com/schema http://orchalang.com/schema/contract.xsd">
+        
+  <contractModelVersion>0.0.1</contractModelVersion>
+  <version>1.0</version>
+  <title>Benchmarking TV vendors</title>
+
+ <inceptionYear>2017</inceptionYear>
+  <description>Chose among TV vendors the best one</description>
+  
+  <domain>
+  	<name>Sale</name>
+  </domain>
+  
+  <commitments>
+  </commitments>
+  
+  <organization>
+  	<name>OLabDymanics</name>
+  	<url>http://olab-dynamics.org</url>
+  </organization>
+  
+  <prerequisites>
+    <orcha>3.0</orcha>
+  </prerequisites>
+  
+  <licenses>
+  	<license>
+  		<name>free</name>
+  	</license>
+  </licenses>
+
+  <authors>
+    <author>
+      <name>Ben C</name>
+      <email></email>
+      <organization>OLabDymanics</organization>
+    </author>
+  </authors>
+
+  <contributors>
+    <contributor>
+      <name>Morgane C</name>
+    </contributor>
+  </contributors>
+  
+
+
+</contract>

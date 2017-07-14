@@ -18,8 +18,10 @@ interface ContractGenerator {
 
 	void updateRequirements(OrchaCodeVisitor orchaCodeVisitor)
 	
+	void updateQualityOfServices(OrchaCodeVisitor orchaCodeVisitor)
+	
 	void exportToXML(File xmlFile)
 	
-	public void exportToXML(File xmlFile, Format format)
+	void exportToXML(File xmlFile, Format format)
 	
 }
