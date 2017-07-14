@@ -62,7 +62,7 @@ class SelectBestVendorApplication extends Application{
 //@Queue(capacity=20L, fixedDelay=1000L)
 //@CircuitBreaker(numberOfFailuresBeforeOpening=2, intervalBeforeHalfOpening=2000L)
 //@Retry(maxNumberOfAttempts=3, intervalBetweenTheFirstAndSecondAttempt=5000L, intervalMultiplierBetwennAttemps=2, maximumIntervalBetweenAttempts=20000L)
-@EventSourcing(messageStore=MessageStore.mongoDB, joinPoint=JoinPoint.after, eventName="check order conversion")
+@EventSourcing(messageStore=MessageStore.mongoDB, joinPoint=JoinPoint.after, eventName="log order conversion")
 class OrderConverterApplication extends Application{
 }
 

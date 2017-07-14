@@ -76,7 +76,7 @@
         </xs:annotation>
         <xs:complexType>
           <xs:sequence>
-            <xs:element name="commitment" minOccurs="1" maxOccurs="unbounded" type="Commitment"/>
+            <xs:element name="commitment" minOccurs="0" maxOccurs="unbounded" type="Commitment"/>
           </xs:sequence>
         </xs:complexType>
       </xs:element>
@@ -202,7 +202,7 @@
       <xs:documentation source="description">Information about one of the commitments on this contract.</xs:documentation>
     </xs:annotation>
     <xs:all>
-      <xs:element name="name" type="xs:string">
+      <xs:element minOccurs="0" name="name" type="xs:string">
         <xs:annotation>
           <xs:documentation source="version">0.0.1</xs:documentation>
           <xs:documentation source="description"></xs:documentation>

@@ -66,8 +66,6 @@ class ContractGeneratorImpl implements ContractGenerator{
 		
 		this.updateCommitments(orchaCodeVisitor)
 		
-		this.updateQualityOfServices(orchaCodeVisitor)
-		
 	}
 	
 	@Override
@@ -219,15 +217,24 @@ class ContractGeneratorImpl implements ContractGenerator{
 					Element commitment = commitments.find{ it.getChildText("name", namespace) == computeNode.instruction.springBean.name }
 					Element checkPoint = commitment.getChild("checkpoint", namespace)
 					Element eventName
+					Element joinPoint
 					if(checkPoint == null){	// there is no checkpoint yet
 						checkPoint = new Element("checkpoint", namespace)
-						eventName = new Element("eventName", namespace)
-						checkPoint.addContent(eventName)
+						if(eventSourcingOption.eventName != null){
+							eventName = new Element("eventName", namespace)
+							checkPoint.addContent(eventName)
+						}			
+						joinPoint = new Element("joinpoint", namespace)
+						checkPoint.addContent(joinPoint)
 						commitment.addContent(checkPoint)
 					} else {
 						eventName = checkPoint.getChild("eventName", namespace)
+						joinPoint = checkPoint.getChild("joinpoint", namespace)
 					}
-					eventName.setText(eventSourcingOption.eventName)
+					if(eventSourcingOption.eventName != null){
+						eventName.setText(eventSourcingOption.eventName)
+					}			
+					joinPoint.setText(eventSourcingOption.joinPoint.toString())
 				}				
 			}
 		}
