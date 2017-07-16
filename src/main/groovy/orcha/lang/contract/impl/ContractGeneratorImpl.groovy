@@ -219,6 +219,7 @@ class ContractGeneratorImpl implements ContractGenerator{
 					Element checkPoint = commitment.getChild("checkpoint", namespace)
 					Element eventName
 					Element joinPoint
+					Element messageStore
 					if(checkPoint == null){	// there is no checkpoint yet
 						checkPoint = new Element("checkpoint", namespace)
 						if(eventSourcingOption.eventName != null){
@@ -227,6 +228,8 @@ class ContractGeneratorImpl implements ContractGenerator{
 						}			
 						joinPoint = new Element("joinpoint", namespace)
 						checkPoint.addContent(joinPoint)
+						messageStore = new Element("messageStore", namespace)
+						checkPoint.addContent(messageStore)
 						commitment.addContent(checkPoint)
 					} else {
 						eventName = checkPoint.getChild("eventName", namespace)
@@ -262,6 +265,7 @@ class ContractGeneratorImpl implements ContractGenerator{
 					Element checkPoint = commitment.getChild("checkpoint", namespace)
 					Element eventName
 					Element joinPoint
+					Element messageStore
 					if(checkPoint == null){	// there is no checkpoint yet
 						checkPoint = new Element("checkpoint", namespace)
 						if(eventSourcingOption.eventName != null){
@@ -270,6 +274,8 @@ class ContractGeneratorImpl implements ContractGenerator{
 						}
 						joinPoint = new Element("joinpoint", namespace)
 						checkPoint.addContent(joinPoint)
+						messageStore = new Element("messageStore", namespace)
+						checkPoint.addContent(messageStore)
 						commitment.addContent(checkPoint)
 					} else {
 						eventName = checkPoint.getChild("eventName", namespace)
@@ -305,6 +311,7 @@ class ContractGeneratorImpl implements ContractGenerator{
 					Element checkPoint = commitment.getChild("checkpoint", namespace)
 					Element eventName
 					Element joinPoint
+					Element messageStore
 					if(checkPoint == null){	// there is no checkpoint yet
 						checkPoint = new Element("checkpoint", namespace)
 						if(eventSourcingOption.eventName != null){
@@ -313,6 +320,8 @@ class ContractGeneratorImpl implements ContractGenerator{
 						}
 						joinPoint = new Element("joinpoint", namespace)
 						checkPoint.addContent(joinPoint)
+						messageStore = new Element("messageStore", namespace)
+						checkPoint.addContent(messageStore)
 						commitment.addContent(checkPoint)
 					} else {
 						eventName = checkPoint.getChild("eventName", namespace)
