@@ -17,7 +17,7 @@ import org.springframework.context.annotation.Configuration;
 import service.MyProgram;
 
 @CircuitBreaker(numberOfFailuresBeforeOpening=2, intervalBeforeHalfOpening=3000L, orderInChain=1)
-@Retry(maxNumberOfAttempts=3, intervalBetweenTheFirstAndSecondAttempt=1000L, intervalMultiplierBetwennAttemps=1, maximumIntervalBetweenAttempts=1000L, orderInChain=2)
+@Retry(maxNumberOfAttempts=3, intervalBetweenTheFirstAndSecondAttempt=1000L, intervalMultiplierBetweenAttemps=1, maximumIntervalBetweenAttempts=1000L, orderInChain=2)
 class ProgramConfiguration extends Application{
 }
  

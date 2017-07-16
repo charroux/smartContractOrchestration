@@ -194,7 +194,7 @@ class SpringIntegrationConnectors{
 					
 					if(instructionNode.options.retry.orderInChain < instructionNode.options.circuitBreaker.orderInChain){
 						"int:retry-advice"("max-attempts":instructionNode.options.retry.maxNumberOfAttempts, "recovery-channel":"recoveryChannel"){
-							"int:exponential-back-off"(initial:instructionNode.options.retry.intervalBetweenTheFirstAndSecondAttempt, multiplier: instructionNode.options.retry.intervalMultiplierBetwennAttemps, maximum: instructionNode.options.retry.maximumIntervalBetweenAttempts){ }
+							"int:exponential-back-off"(initial:instructionNode.options.retry.intervalBetweenTheFirstAndSecondAttempt, multiplier: instructionNode.options.retry.intervalMultiplierBetweenAttemps, maximum: instructionNode.options.retry.maximumIntervalBetweenAttempts){ }
 						}
 						"bean"(class:"org.springframework.integration.handler.advice.RequestHandlerCircuitBreakerAdvice"){
 							"property"(name:"threshold", value:instructionNode.options.circuitBreaker.numberOfFailuresBeforeOpening){ }
@@ -206,13 +206,13 @@ class SpringIntegrationConnectors{
 							"property"(name:"halfOpenAfter", value:instructionNode.options.circuitBreaker.intervalBeforeHalfOpening){ }
 						}
 						"int:retry-advice"("max-attempts":instructionNode.options.retry.maxNumberOfAttempts, "recovery-channel":"recoveryChannel"){
-							"int:exponential-back-off"(initial:instructionNode.options.retry.intervalBetweenTheFirstAndSecondAttempt, multiplier: instructionNode.options.retry.intervalMultiplierBetwennAttemps, maximum: instructionNode.options.retry.maximumIntervalBetweenAttempts){ }
+							"int:exponential-back-off"(initial:instructionNode.options.retry.intervalBetweenTheFirstAndSecondAttempt, multiplier: instructionNode.options.retry.intervalMultiplierBetweenAttemps, maximum: instructionNode.options.retry.maximumIntervalBetweenAttempts){ }
 						}
 					}
 					
 				} else if(instructionNode.options.retry!=null){
 					"int:retry-advice"("max-attempts":instructionNode.options.retry.maxNumberOfAttempts, "recovery-channel":"recoveryChannel"){
-						"int:exponential-back-off"(initial:instructionNode.options.retry.intervalBetweenTheFirstAndSecondAttempt, multiplier: instructionNode.options.retry.intervalMultiplierBetwennAttemps, maximum: instructionNode.options.retry.maximumIntervalBetweenAttempts){ }
+						"int:exponential-back-off"(initial:instructionNode.options.retry.intervalBetweenTheFirstAndSecondAttempt, multiplier: instructionNode.options.retry.intervalMultiplierBetweenAttemps, maximum: instructionNode.options.retry.maximumIntervalBetweenAttempts){ }
 					}
 				}
 				
@@ -225,7 +225,7 @@ class SpringIntegrationConnectors{
 						
 						if(instructionNode.options.retry.orderInChain < instructionNode.options.circuitBreaker.orderInChain){
 							"int:retry-advice"("max-attempts":instructionNode.options.retry.maxNumberOfAttempts, "recovery-channel":"recoveryChannel"){
-								"int:exponential-back-off"(initial:instructionNode.options.retry.intervalBetweenTheFirstAndSecondAttempt, multiplier: instructionNode.options.retry.intervalMultiplierBetwennAttemps, maximum: instructionNode.options.retry.maximumIntervalBetweenAttempts){ }
+								"int:exponential-back-off"(initial:instructionNode.options.retry.intervalBetweenTheFirstAndSecondAttempt, multiplier: instructionNode.options.retry.intervalMultiplierBetweenAttemps, maximum: instructionNode.options.retry.maximumIntervalBetweenAttempts){ }
 							}
 							"bean"(class:"org.springframework.integration.handler.advice.RequestHandlerCircuitBreakerAdvice"){
 								"property"(name:"threshold", value:instructionNode.options.circuitBreaker.numberOfFailuresBeforeOpening){ }
@@ -237,7 +237,7 @@ class SpringIntegrationConnectors{
 								"property"(name:"halfOpenAfter", value:instructionNode.options.circuitBreaker.intervalBeforeHalfOpening){ }
 							}
 							"int:retry-advice"("max-attempts":instructionNode.options.retry.maxNumberOfAttempts, "recovery-channel":"recoveryChannel"){
-								"int:exponential-back-off"(initial:instructionNode.options.retry.intervalBetweenTheFirstAndSecondAttempt, multiplier: instructionNode.options.retry.intervalMultiplierBetwennAttemps, maximum: instructionNode.options.retry.maximumIntervalBetweenAttempts){ }
+								"int:exponential-back-off"(initial:instructionNode.options.retry.intervalBetweenTheFirstAndSecondAttempt, multiplier: instructionNode.options.retry.intervalMultiplierBetweenAttemps, maximum: instructionNode.options.retry.maximumIntervalBetweenAttempts){ }
 							}
 						}
 						
@@ -317,7 +317,7 @@ class SpringIntegrationConnectors{
 							
 							if(instructionNode.options.retry.orderInChain < instructionNode.options.circuitBreaker.orderInChain){
 								"int:retry-advice"("max-attempts":instructionNode.options.retry.maxNumberOfAttempts, "recovery-channel":"recoveryChannel"){
-									"int:exponential-back-off"(initial:instructionNode.options.retry.intervalBetweenTheFirstAndSecondAttempt, multiplier: instructionNode.options.retry.intervalMultiplierBetwennAttemps, maximum: instructionNode.options.retry.maximumIntervalBetweenAttempts){ }
+									"int:exponential-back-off"(initial:instructionNode.options.retry.intervalBetweenTheFirstAndSecondAttempt, multiplier: instructionNode.options.retry.intervalMultiplierBetweenAttemps, maximum: instructionNode.options.retry.maximumIntervalBetweenAttempts){ }
 								}
 								"bean"(class:"org.springframework.integration.handler.advice.RequestHandlerCircuitBreakerAdvice"){
 									"property"(name:"threshold", value:instructionNode.options.circuitBreaker.numberOfFailuresBeforeOpening){ }
@@ -329,13 +329,13 @@ class SpringIntegrationConnectors{
 									"property"(name:"halfOpenAfter", value:instructionNode.options.circuitBreaker.intervalBeforeHalfOpening){ }
 								}
 								"int:retry-advice"("max-attempts":instructionNode.options.retry.maxNumberOfAttempts, "recovery-channel":"recoveryChannel"){
-									"int:exponential-back-off"(initial:instructionNode.options.retry.intervalBetweenTheFirstAndSecondAttempt, multiplier: instructionNode.options.retry.intervalMultiplierBetwennAttemps, maximum: instructionNode.options.retry.maximumIntervalBetweenAttempts){ }
+									"int:exponential-back-off"(initial:instructionNode.options.retry.intervalBetweenTheFirstAndSecondAttempt, multiplier: instructionNode.options.retry.intervalMultiplierBetweenAttemps, maximum: instructionNode.options.retry.maximumIntervalBetweenAttempts){ }
 								}
 							}
 							
 						} else if(instructionNode.options.retry!=null){
 							"int:retry-advice"("max-attempts":instructionNode.options.retry.maxNumberOfAttempts, "recovery-channel":"recoveryChannel"){
-								"int:exponential-back-off"(initial:instructionNode.options.retry.intervalBetweenTheFirstAndSecondAttempt, multiplier: instructionNode.options.retry.intervalMultiplierBetwennAttemps, maximum: instructionNode.options.retry.maximumIntervalBetweenAttempts){ }
+								"int:exponential-back-off"(initial:instructionNode.options.retry.intervalBetweenTheFirstAndSecondAttempt, multiplier: instructionNode.options.retry.intervalMultiplierBetweenAttemps, maximum: instructionNode.options.retry.maximumIntervalBetweenAttempts){ }
 							}
 						}
 						
@@ -348,7 +348,7 @@ class SpringIntegrationConnectors{
 								
 								if(instructionNode.options.retry.orderInChain < instructionNode.options.circuitBreaker.orderInChain){
 									"int:retry-advice"("max-attempts":instructionNode.options.retry.maxNumberOfAttempts, "recovery-channel":"recoveryChannel"){
-										"int:exponential-back-off"(initial:instructionNode.options.retry.intervalBetweenTheFirstAndSecondAttempt, multiplier: instructionNode.options.retry.intervalMultiplierBetwennAttemps, maximum: instructionNode.options.retry.maximumIntervalBetweenAttempts){ }
+										"int:exponential-back-off"(initial:instructionNode.options.retry.intervalBetweenTheFirstAndSecondAttempt, multiplier: instructionNode.options.retry.intervalMultiplierBetweenAttemps, maximum: instructionNode.options.retry.maximumIntervalBetweenAttempts){ }
 									}
 									"bean"(class:"org.springframework.integration.handler.advice.RequestHandlerCircuitBreakerAdvice"){
 										"property"(name:"threshold", value:instructionNode.options.circuitBreaker.numberOfFailuresBeforeOpening){ }
@@ -360,7 +360,7 @@ class SpringIntegrationConnectors{
 										"property"(name:"halfOpenAfter", value:instructionNode.options.circuitBreaker.intervalBeforeHalfOpening){ }
 									}
 									"int:retry-advice"("max-attempts":instructionNode.options.retry.maxNumberOfAttempts, "recovery-channel":"recoveryChannel"){
-										"int:exponential-back-off"(initial:instructionNode.options.retry.intervalBetweenTheFirstAndSecondAttempt, multiplier: instructionNode.options.retry.intervalMultiplierBetwennAttemps, maximum: instructionNode.options.retry.maximumIntervalBetweenAttempts){ }
+										"int:exponential-back-off"(initial:instructionNode.options.retry.intervalBetweenTheFirstAndSecondAttempt, multiplier: instructionNode.options.retry.intervalMultiplierBetweenAttemps, maximum: instructionNode.options.retry.maximumIntervalBetweenAttempts){ }
 									}
 								}
 								
@@ -416,7 +416,7 @@ class SpringIntegrationConnectors{
 								
 								if(instructionNode.options.retry.orderInChain < instructionNode.options.circuitBreaker.orderInChain){
 									"int:retry-advice"("max-attempts":instructionNode.options.retry.maxNumberOfAttempts, "recovery-channel":"recoveryChannel"){
-										"int:exponential-back-off"(initial:instructionNode.options.retry.intervalBetweenTheFirstAndSecondAttempt, multiplier: instructionNode.options.retry.intervalMultiplierBetwennAttemps, maximum: instructionNode.options.retry.maximumIntervalBetweenAttempts){ }
+										"int:exponential-back-off"(initial:instructionNode.options.retry.intervalBetweenTheFirstAndSecondAttempt, multiplier: instructionNode.options.retry.intervalMultiplierBetweenAttemps, maximum: instructionNode.options.retry.maximumIntervalBetweenAttempts){ }
 									}
 									"bean"(class:"org.springframework.integration.handler.advice.RequestHandlerCircuitBreakerAdvice"){
 										"property"(name:"threshold", value:instructionNode.options.circuitBreaker.numberOfFailuresBeforeOpening){ }
@@ -428,13 +428,13 @@ class SpringIntegrationConnectors{
 										"property"(name:"halfOpenAfter", value:instructionNode.options.circuitBreaker.intervalBeforeHalfOpening){ }
 									}
 									"int:retry-advice"("max-attempts":instructionNode.options.retry.maxNumberOfAttempts, "recovery-channel":"recoveryChannel"){
-										"int:exponential-back-off"(initial:instructionNode.options.retry.intervalBetweenTheFirstAndSecondAttempt, multiplier: instructionNode.options.retry.intervalMultiplierBetwennAttemps, maximum: instructionNode.options.retry.maximumIntervalBetweenAttempts){ }
+										"int:exponential-back-off"(initial:instructionNode.options.retry.intervalBetweenTheFirstAndSecondAttempt, multiplier: instructionNode.options.retry.intervalMultiplierBetweenAttemps, maximum: instructionNode.options.retry.maximumIntervalBetweenAttempts){ }
 									}
 								}
 								
 							} else if(instructionNode.options.retry!=null){
 								"int:retry-advice"("max-attempts":instructionNode.options.retry.maxNumberOfAttempts, "recovery-channel":"recoveryChannel"){
-									"int:exponential-back-off"(initial:instructionNode.options.retry.intervalBetweenTheFirstAndSecondAttempt, multiplier: instructionNode.options.retry.intervalMultiplierBetwennAttemps, maximum: instructionNode.options.retry.maximumIntervalBetweenAttempts){ }
+									"int:exponential-back-off"(initial:instructionNode.options.retry.intervalBetweenTheFirstAndSecondAttempt, multiplier: instructionNode.options.retry.intervalMultiplierBetweenAttemps, maximum: instructionNode.options.retry.maximumIntervalBetweenAttempts){ }
 								}
 							}
 							
@@ -447,7 +447,7 @@ class SpringIntegrationConnectors{
 									
 									if(instructionNode.options.retry.orderInChain < instructionNode.options.circuitBreaker.orderInChain){
 										"int:retry-advice"("max-attempts":instructionNode.options.retry.maxNumberOfAttempts, "recovery-channel":"recoveryChannel"){
-											"int:exponential-back-off"(initial:instructionNode.options.retry.intervalBetweenTheFirstAndSecondAttempt, multiplier: instructionNode.options.retry.intervalMultiplierBetwennAttemps, maximum: instructionNode.options.retry.maximumIntervalBetweenAttempts){ }
+											"int:exponential-back-off"(initial:instructionNode.options.retry.intervalBetweenTheFirstAndSecondAttempt, multiplier: instructionNode.options.retry.intervalMultiplierBetweenAttemps, maximum: instructionNode.options.retry.maximumIntervalBetweenAttempts){ }
 										}
 										"bean"(class:"org.springframework.integration.handler.advice.RequestHandlerCircuitBreakerAdvice"){
 											"property"(name:"threshold", value:instructionNode.options.circuitBreaker.numberOfFailuresBeforeOpening){ }
@@ -459,7 +459,7 @@ class SpringIntegrationConnectors{
 											"property"(name:"halfOpenAfter", value:instructionNode.options.circuitBreaker.intervalBeforeHalfOpening){ }
 										}
 										"int:retry-advice"("max-attempts":instructionNode.options.retry.maxNumberOfAttempts, "recovery-channel":"recoveryChannel"){
-											"int:exponential-back-off"(initial:instructionNode.options.retry.intervalBetweenTheFirstAndSecondAttempt, multiplier: instructionNode.options.retry.intervalMultiplierBetwennAttemps, maximum: instructionNode.options.retry.maximumIntervalBetweenAttempts){ }
+											"int:exponential-back-off"(initial:instructionNode.options.retry.intervalBetweenTheFirstAndSecondAttempt, multiplier: instructionNode.options.retry.intervalMultiplierBetweenAttemps, maximum: instructionNode.options.retry.maximumIntervalBetweenAttempts){ }
 										}
 									}
 									
@@ -560,7 +560,7 @@ class SpringIntegrationConnectors{
 															
 															if(instructionNode.options.retry.orderInChain < instructionNode.options.circuitBreaker.orderInChain){
 																"int:retry-advice"("max-attempts":instructionNode.options.retry.maxNumberOfAttempts, "recovery-channel":"recoveryChannel"){
-																	"int:exponential-back-off"(initial:instructionNode.options.retry.intervalBetweenTheFirstAndSecondAttempt, multiplier: instructionNode.options.retry.intervalMultiplierBetwennAttemps, maximum: instructionNode.options.retry.maximumIntervalBetweenAttempts){ }
+																	"int:exponential-back-off"(initial:instructionNode.options.retry.intervalBetweenTheFirstAndSecondAttempt, multiplier: instructionNode.options.retry.intervalMultiplierBetweenAttemps, maximum: instructionNode.options.retry.maximumIntervalBetweenAttempts){ }
 																}
 																"bean"(class:"org.springframework.integration.handler.advice.RequestHandlerCircuitBreakerAdvice"){
 																	"property"(name:"threshold", value:instructionNode.options.circuitBreaker.numberOfFailuresBeforeOpening){ }
@@ -572,13 +572,13 @@ class SpringIntegrationConnectors{
 																	"property"(name:"halfOpenAfter", value:instructionNode.options.circuitBreaker.intervalBeforeHalfOpening){ }
 																}
 																"int:retry-advice"("max-attempts":instructionNode.options.retry.maxNumberOfAttempts, "recovery-channel":"recoveryChannel"){
-																	"int:exponential-back-off"(initial:instructionNode.options.retry.intervalBetweenTheFirstAndSecondAttempt, multiplier: instructionNode.options.retry.intervalMultiplierBetwennAttemps, maximum: instructionNode.options.retry.maximumIntervalBetweenAttempts){ }
+																	"int:exponential-back-off"(initial:instructionNode.options.retry.intervalBetweenTheFirstAndSecondAttempt, multiplier: instructionNode.options.retry.intervalMultiplierBetweenAttemps, maximum: instructionNode.options.retry.maximumIntervalBetweenAttempts){ }
 																}
 															}
 															
 														} else if(instructionNode.options.retry!=null){
 															"int:retry-advice"("max-attempts":instructionNode.options.retry.maxNumberOfAttempts, "recovery-channel":"recoveryChannel"){
-																"int:exponential-back-off"(initial:instructionNode.options.retry.intervalBetweenTheFirstAndSecondAttempt, multiplier: instructionNode.options.retry.intervalMultiplierBetwennAttemps, maximum: instructionNode.options.retry.maximumIntervalBetweenAttempts){ }
+																"int:exponential-back-off"(initial:instructionNode.options.retry.intervalBetweenTheFirstAndSecondAttempt, multiplier: instructionNode.options.retry.intervalMultiplierBetweenAttemps, maximum: instructionNode.options.retry.maximumIntervalBetweenAttempts){ }
 															}
 														}
 														
@@ -591,7 +591,7 @@ class SpringIntegrationConnectors{
 																
 																if(instructionNode.options.retry.orderInChain < instructionNode.options.circuitBreaker.orderInChain){
 																	"int:retry-advice"("max-attempts":instructionNode.options.retry.maxNumberOfAttempts, "recovery-channel":"recoveryChannel"){
-																		"int:exponential-back-off"(initial:instructionNode.options.retry.intervalBetweenTheFirstAndSecondAttempt, multiplier: instructionNode.options.retry.intervalMultiplierBetwennAttemps, maximum: instructionNode.options.retry.maximumIntervalBetweenAttempts){ }
+																		"int:exponential-back-off"(initial:instructionNode.options.retry.intervalBetweenTheFirstAndSecondAttempt, multiplier: instructionNode.options.retry.intervalMultiplierBetweenAttemps, maximum: instructionNode.options.retry.maximumIntervalBetweenAttempts){ }
 																	}
 																	"bean"(class:"org.springframework.integration.handler.advice.RequestHandlerCircuitBreakerAdvice"){
 																		"property"(name:"threshold", value:instructionNode.options.circuitBreaker.numberOfFailuresBeforeOpening){ }
@@ -603,7 +603,7 @@ class SpringIntegrationConnectors{
 																		"property"(name:"halfOpenAfter", value:instructionNode.options.circuitBreaker.intervalBeforeHalfOpening){ }
 																	}
 																	"int:retry-advice"("max-attempts":instructionNode.options.retry.maxNumberOfAttempts, "recovery-channel":"recoveryChannel"){
-																		"int:exponential-back-off"(initial:instructionNode.options.retry.intervalBetweenTheFirstAndSecondAttempt, multiplier: instructionNode.options.retry.intervalMultiplierBetwennAttemps, maximum: instructionNode.options.retry.maximumIntervalBetweenAttempts){ }
+																		"int:exponential-back-off"(initial:instructionNode.options.retry.intervalBetweenTheFirstAndSecondAttempt, multiplier: instructionNode.options.retry.intervalMultiplierBetweenAttemps, maximum: instructionNode.options.retry.maximumIntervalBetweenAttempts){ }
 																	}
 																}
 																

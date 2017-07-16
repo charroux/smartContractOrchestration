@@ -24,7 +24,17 @@
   <int:channel id="customer-OutputChannelRoute2"/>
   <int:channel id="customer-OutputChannelRoute3"/>
 <int:chain id="service-activator-chain-orderConverterChannel-id" input-channel="customer-OutputChannelRoute1" output-channel="orderConverterServiceAcivatorOutput">
-    <int:service-activator id="service-activator-orderConverterChannel-id" expression="@vendorOrderConverter.convert(payload)"/>
+    <int:service-activator id="service-activator-orderConverterChannel-id" expression="@vendorOrderConverter.convert(payload)">
+      <int:request-handler-advice-chain>
+        <bean class="org.springframework.integration.handler.advice.RequestHandlerCircuitBreakerAdvice">
+          <property name="threshold" value="2"/>
+          <property name="halfOpenAfter" value="2000"/>
+        </bean>
+        <int:retry-advice max-attempts="3" recovery-channel="recoveryChannel">
+          <int:exponential-back-off initial="5000" multiplier="2" maximum="20000"/>
+        </int:retry-advice>
+      </int:request-handler-advice-chain>
+    </int:service-activator>
   </int:chain>
   <int:transformer id="transformer-orderConverterServiceAcivatorOutput-id" input-channel="orderConverterServiceAcivatorOutput" output-channel="orderConverterAggregatorInput" ref="orderConverterTransformerBean" method="transform">
     <int:request-handler-advice-chain>

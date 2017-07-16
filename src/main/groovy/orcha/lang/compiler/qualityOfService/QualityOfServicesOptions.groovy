@@ -18,9 +18,9 @@ class QualityOfServicesOptions {
 
 @ToString
 class QueueOption{
-	long capacity = -1
-	long fixedDelay = -1
-	long fixedRate = -1
+	int capacity = -1
+	long fixedDelay = -1L
+	long fixedRate = -1L
 	String cron = ""
 }
 
@@ -28,7 +28,7 @@ class QueueOption{
 class RetryOption{
 	int maxNumberOfAttempts = -1
 	long intervalBetweenTheFirstAndSecondAttempt = -1L		
-	int intervalMultiplierBetwennAttemps = -1
+	int intervalMultiplierBetweenAttemps = -1
 	long maximumIntervalBetweenAttempts = -1L
 	int orderInChain
 }

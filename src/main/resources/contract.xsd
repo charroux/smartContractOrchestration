@@ -72,11 +72,23 @@
       <xs:element name="commitments">
         <xs:annotation>
           <xs:documentation source="version">0.0.1</xs:documentation>
-          <xs:documentation source="description">This element defines witch domain this contract belongs.</xs:documentation>
+          <xs:documentation source="description">This element defines witch commitments this contract must observe.</xs:documentation>
         </xs:annotation>
         <xs:complexType>
           <xs:sequence>
             <xs:element name="commitment" minOccurs="0" maxOccurs="unbounded" type="Commitment"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      
+      <xs:element name="serviceLevelAgreements">
+      	<xs:annotation>
+          <xs:documentation source="version">0.0.1</xs:documentation>
+          <xs:documentation source="description">This element defines the agreements for the serice used in the collaborative process.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="serviceLevelAgreement" minOccurs="0" maxOccurs="unbounded" type="ServiceLevelAgreement"/>
           </xs:sequence>
         </xs:complexType>
       </xs:element>
@@ -557,4 +569,79 @@
       </xs:element>
     </xs:all>
   </xs:complexType>
+
+    <xs:complexType name="ServiceLevelAgreement">
+    	<xs:annotation>
+	      <xs:documentation source="version">0.0.1</xs:documentation>
+	      <xs:documentation source="description">ServiceLevelAgreement for the services used in the collaborative process.</xs:documentation>
+	    </xs:annotation>
+	    <xs:sequence>
+	    	<xs:element minOccurs="0" name="performanceLevel" type="PerformanceLevel">
+	    		<xs:annotation>
+		        	<xs:documentation source="version">0.0.1</xs:documentation>
+		          	<xs:documentation source="description">Reliability and responsiveness of the service.</xs:documentation>
+		        </xs:annotation>
+		    </xs:element>
+	    </xs:sequence>
+	    <xs:attribute name="serviceName" type="xs:string"></xs:attribute>
+    </xs:complexType>
+
+    <xs:complexType name="PerformanceLevel">
+    	<xs:annotation>
+	      <xs:documentation source="version">0.0.1</xs:documentation>
+	      <xs:documentation source="description">Reliability and responsiveness of the service.</xs:documentation>
+	    </xs:annotation>
+	    <xs:all>
+	    	<xs:element minOccurs="0" name="retryPattern" type="RetryPattern">
+	    		<xs:annotation>
+		        	<xs:documentation source="version">0.0.1</xs:documentation>
+		          	<xs:documentation source="description">Attempt to redeliver a message when delivery of a message fails.</xs:documentation>
+		        </xs:annotation>
+		    </xs:element>
+		    <xs:element minOccurs="0" name="circuitBreakerPattern" type="CircuitBreakerPattern">
+	    		<xs:annotation>
+		        	<xs:documentation source="version">0.0.1</xs:documentation>
+		          	<xs:documentation source="description">Detect failures and encapsulates logic of preventing a failure to reoccur constantly (during maintenance, temporary external system failure or unexpected system difficulties).</xs:documentation>
+		        </xs:annotation>
+		    </xs:element>
+			<xs:element minOccurs="0" name="messageQueue" type="MessageQueue">
+	    		<xs:annotation>
+		        	<xs:documentation source="version">0.0.1</xs:documentation>
+		          	<xs:documentation source="description"></xs:documentation>
+		        </xs:annotation>
+		    </xs:element>	    
+		</xs:all>
+    </xs:complexType>
+
+    <xs:complexType name="RetryPattern">
+    	<xs:annotation>
+	      <xs:documentation source="version">0.0.1</xs:documentation>
+	      <xs:documentation source="description">Attempt to redeliver a message when delivery of a message fails.</xs:documentation>
+	    </xs:annotation>
+    	<xs:attribute name="maxNumberOfAttempts" type="xs:int" />
+    	<xs:attribute name="intervalBetweenTheFirstAndSecondAttempt" type="xs:long" />
+    	<xs:attribute name="intervalMultiplierBetweenAttemps" type="xs:int" />
+    	<xs:attribute name="maximumIntervalBetweenAttempts" type="xs:long" />
+    </xs:complexType>
+
+    <xs:complexType name="CircuitBreakerPattern">
+    	<xs:annotation>
+	      <xs:documentation source="version">0.0.1</xs:documentation>
+	      <xs:documentation source="description">Detect failures and encapsulates logic of preventing a failure to reoccur constantly (during maintenance, temporary external system failure or unexpected system difficulties).</xs:documentation>
+	    </xs:annotation>
+    	<xs:attribute name="numberOfFailuresBeforeOpening" type="xs:int" />
+    	<xs:attribute name="intervalBeforeHalfOpening" type="xs:long" />
+    </xs:complexType>
+
+    <xs:complexType name="MessageQueue">
+    	<xs:annotation>
+	      <xs:documentation source="version">0.0.1</xs:documentation>
+	      <xs:documentation source="description"></xs:documentation>
+	    </xs:annotation>
+    	<xs:attribute name="capacity" type="xs:int" />
+    	<xs:attribute name="fixedDelay" type="xs:long" />
+    	<xs:attribute name="fixedRate" type="xs:long" />
+    	<xs:attribute name="cron" type="xs:string" />
+    </xs:complexType>
+        
 </xs:schema>

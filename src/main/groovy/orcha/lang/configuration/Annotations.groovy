@@ -34,7 +34,7 @@ import java.lang.annotation.Target;
 public @interface Retry {
    int maxNumberOfAttempts()						default -1;
    long intervalBetweenTheFirstAndSecondAttempt() 	default -1L;		// in milliseconds
-   int intervalMultiplierBetwennAttemps()			default -1;
+   int intervalMultiplierBetweenAttemps()			default -1;
    long maximumIntervalBetweenAttempts()			default -1L; 	// in milliseconds
    int orderInChain()								default 1;
 }

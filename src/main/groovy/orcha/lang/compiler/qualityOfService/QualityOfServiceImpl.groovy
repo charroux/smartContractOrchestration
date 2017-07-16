@@ -253,7 +253,7 @@ class QualityOfServiceImpl implements QualityOfService{
 				throw new OrchaConfigurationException("Queue option intervalBetweenTheFirstAndSecondAttempt should be set at integration configuration of " + beanClass.name)
 			}
 			
-			int intervalMultiplierBetwennAttemps = beanClass.getAnnotation(Retry.class).intervalMultiplierBetwennAttemps()
+			int intervalMultiplierBetwennAttemps = beanClass.getAnnotation(Retry.class).intervalMultiplierBetweenAttemps()
 			if(intervalMultiplierBetwennAttemps <= 0){
 				throw new OrchaConfigurationException("Queue option intervalMultiplierBetwennAttemps should be >= 0 at integration configuration of " + beanClass.name)
 			}
@@ -274,7 +274,7 @@ class QualityOfServiceImpl implements QualityOfService{
 				throw new OrchaConfigurationException("Queue option orderInChain should be >= 0 at integration configuration of " + beanClass.name)
 			}
 			
-			return new RetryOption(maxNumberOfAttempts: maxNumberOfAttempts, intervalBetweenTheFirstAndSecondAttempt: intervalBetweenTheFirstAndSecondAttempt, intervalMultiplierBetwennAttemps: intervalMultiplierBetwennAttemps, maximumIntervalBetweenAttempts: maximumIntervalBetweenAttempts, orderInChain: orderInChain )
+			return new RetryOption(maxNumberOfAttempts: maxNumberOfAttempts, intervalBetweenTheFirstAndSecondAttempt: intervalBetweenTheFirstAndSecondAttempt, intervalMultiplierBetweenAttemps: intervalMultiplierBetwennAttemps, maximumIntervalBetweenAttempts: maximumIntervalBetweenAttempts, orderInChain: orderInChain )
 		} else {
 			return null
 		}

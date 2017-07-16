@@ -9,9 +9,12 @@ import javax.xml.validation.SchemaFactory
 import orcha.lang.compiler.Instruction
 import orcha.lang.compiler.InstructionNode
 import orcha.lang.compiler.OrchaMetadata
+import orcha.lang.compiler.qualityOfService.CircuitBreakerOption
 import orcha.lang.compiler.qualityOfService.EventSourcingOption
 import orcha.lang.compiler.qualityOfService.QualityOfService
 import orcha.lang.compiler.qualityOfService.QualityOfServicesOptions
+import orcha.lang.compiler.qualityOfService.QueueOption
+import orcha.lang.compiler.qualityOfService.RetryOption
 import orcha.lang.compiler.visitor.OrchaCodeVisitor
 import orcha.lang.configuration.Application
 import orcha.lang.configuration.EventHandler
@@ -66,6 +69,8 @@ class ContractGeneratorImpl implements ContractGenerator{
 		this.updateRequirements(orchaCodeVisitor)
 		
 		this.updateCommitments(orchaCodeVisitor)
+		
+		this.updateServiceLevelAgreements(orchaCodeVisitor)
 		
 	}
 	
@@ -334,8 +339,125 @@ class ContractGeneratorImpl implements ContractGenerator{
 				}
 			}
 		}
-
+		
 		log.info "Quality of Services updated in XML document"
 	}
+	
+	@Override
+	public void updateServiceLevelAgreements(OrchaCodeVisitor orchaCodeVisitor){
+
+		qualityOfService.setQualityOfServiceToInstructions(orchaCodeVisitor)
+		
+		XPathFactory xFactory = XPathFactory.instance()
+		XPathExpression<Element> expr = xFactory.compile("//*[local-name() = 'serviceLevelAgreements']/*[local-name() = 'serviceLevelAgreement']", Filters.element())
+		List<Element> serviceLevelAgreements = expr.evaluate(document)
+
+		List<InstructionNode> computeNodes = orchaCodeVisitor.findAllComputeNodes()
+		
+		computeNodes.each { computeNode ->
+			
+			if(computeNode.options != null){
+			
+				QualityOfServicesOptions qoSOption = computeNode.options
+				
+				RetryOption retryOption = qoSOption.retry
+				CircuitBreakerOption circuitBreakerOption = qoSOption.circuitBreaker
+				QueueOption queueOption = qoSOption.queue
+				
+				if(retryOption!=null || circuitBreakerOption!=null || queueOption!=null){
+					Element performanceLevel
+					Element retryPattern
+					Element circuitBreakerPattern
+					Element messageQueue
+					Element agreement = serviceLevelAgreements.find{ it.getAttribute("serviceName", namespace) == computeNode.instruction.springBean.name }
+					if(agreement == null){
+						agreement = new Element("serviceLevelAgreement", namespace)
+						agreement.setAttribute("serviceName", computeNode.instruction.springBean.name)
+						xFactory.compile("//*[local-name() = 'serviceLevelAgreements']", Filters.element()).evaluate(document).getAt(0).addContent(agreement)												
+						performanceLevel = new Element("performanceLevel", namespace)
+						agreement.addContent(performanceLevel)
+						if(retryOption != null){
+							retryPattern = new Element("retryPattern", namespace)
+							performanceLevel.addContent(retryPattern)
+						}
+						if(circuitBreakerOption != null){
+							circuitBreakerPattern = new Element("circuitBreakerPattern", namespace)
+							performanceLevel.addContent(circuitBreakerPattern)
+						}	
+						if(queueOption != null){
+							messageQueue = new Element("messageQueue", namespace)
+							performanceLevel.addContent(messageQueue)
+						}
+					} else {
+						performanceLevel = agreement.getChild("performanceLevel", namespace)
+						if(performanceLevel == null){
+							performanceLevel = new Element("performanceLevel", namespace)
+							agreement.addContent(performanceLevel)
+						} 
+						if(retryOption != null){
+							retryPattern = performanceLevel.getChild("retryPattern", namespace)
+							if(retryPattern == null){
+								retryPattern = new Element("retryPattern", namespace)
+								performanceLevel.addContent(retryPattern)
+							}
+						}
+						if(circuitBreakerOption != null){
+							circuitBreakerPattern = performanceLevel.getChild("circuitBreakerPattern", namespace)
+							if(circuitBreakerPattern == null){
+								circuitBreakerPattern = new Element("circuitBreakerPattern", namespace)
+								performanceLevel.addContent(circuitBreakerPattern)
+							}
+						}
+						if(queueOption != null){
+							messageQueue = performanceLevel.getChild("messageQueue", namespace)
+							if(messageQueue == null){
+								messageQueue = new Element("messageQueue", namespace)
+								performanceLevel.addContent(messageQueue)
+							}							
+						}
+
+					}
+					
+					if(retryOption != null){
+						retryPattern.setAttribute("maxNumberOfAttempts", retryOption.getMaxNumberOfAttempts().toString())
+						retryPattern.setAttribute("intervalBetweenTheFirstAndSecondAttempt", retryOption.getIntervalBetweenTheFirstAndSecondAttempt().toString())
+						retryPattern.setAttribute("intervalMultiplierBetweenAttemps", retryOption.getIntervalMultiplierBetweenAttemps().toString())
+						retryPattern.setAttribute("maximumIntervalBetweenAttempts", retryOption.getMaximumIntervalBetweenAttempts().toString())	
+					}
+
+					if(circuitBreakerOption != null){
+						circuitBreakerPattern.setAttribute("numberOfFailuresBeforeOpening", circuitBreakerOption.getNumberOfFailuresBeforeOpening().toString())
+						circuitBreakerPattern.setAttribute("intervalBeforeHalfOpening", circuitBreakerOption.getIntervalBeforeHalfOpening().toString())
+					}
+					
+					if(queueOption != null){
+						
+						messageQueue.setAttribute("capacity", queueOption.getCapacity().toString())
+						
+						long fixedDelay = queueOption.getFixedDelay()
+						if(fixedDelay != -1L){
+							messageQueue.setAttribute("fixedDelay", fixedDelay.toString())
+						}
+						
+						long fixedRate = queueOption.getFixedRate()
+						if(fixedRate != -1L){
+							messageQueue.setAttribute("fixedRate", fixedRate.toString())
+						}
+						
+						String cron = queueOption.getCron()
+						if(cron != ""){
+							messageQueue.setAttribute("cron", cron)
+						}
+					}
+
+				}
+			}
+		}
+
+		qualityOfService.setQualityOfServiceToInstructions(orchaCodeVisitor)
+		
+		log.info "Service-level Agreements updated in XML document"
+	}
+
 
 }
