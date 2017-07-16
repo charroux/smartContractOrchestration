@@ -26,7 +26,11 @@
 <int:chain id="service-activator-chain-orderConverterChannel-id" input-channel="customer-OutputChannelRoute1" output-channel="orderConverterServiceAcivatorOutput">
     <int:service-activator id="service-activator-orderConverterChannel-id" expression="@vendorOrderConverter.convert(payload)"/>
   </int:chain>
-  <int:transformer id="transformer-orderConverterServiceAcivatorOutput-id" input-channel="orderConverterServiceAcivatorOutput" output-channel="orderConverterAggregatorInput" ref="orderConverterTransformerBean" method="transform"/>
+  <int:transformer id="transformer-orderConverterServiceAcivatorOutput-id" input-channel="orderConverterServiceAcivatorOutput" output-channel="orderConverterAggregatorInput" ref="orderConverterTransformerBean" method="transform">
+    <int:request-handler-advice-chain>
+      <ref bean="eventSourcingAdvice"/>
+    </int:request-handler-advice-chain>
+  </int:transformer>
   <bean id="orderConverterTransformerBean" class="orcha.lang.compiler.referenceimpl.xmlgenerator.impl.ObjectToApplicationTransformer">
     <property name="application" ref="orderConverter"/>
   </bean>
@@ -48,7 +52,11 @@
       <int-script:script lang="js" location="file:src/main/orcha/service/order/vendor2.js"/>
     </int:service-activator>
   </int:chain>
-  <int:transformer id="transformer-vendor2ServiceAcivatorOutput-id" input-channel="vendor2ServiceAcivatorOutput" output-channel="vendor1vendor2vendor3AggregatorInput" ref="vendor2TransformerBean" method="transform"/>
+  <int:transformer id="transformer-vendor2ServiceAcivatorOutput-id" input-channel="vendor2ServiceAcivatorOutput" output-channel="vendor1vendor2vendor3AggregatorInput" ref="vendor2TransformerBean" method="transform">
+    <int:request-handler-advice-chain>
+      <ref bean="eventSourcingAdvice"/>
+    </int:request-handler-advice-chain>
+  </int:transformer>
   <bean id="vendor2TransformerBean" class="orcha.lang.compiler.referenceimpl.xmlgenerator.impl.ObjectToApplicationTransformer">
     <property name="application" ref="vendor2"/>
   </bean>
@@ -57,7 +65,11 @@
       <int-script:script lang="js" location="file:src/main/orcha/service/order/vendor3.js"/>
     </int:service-activator>
   </int:chain>
-  <int:transformer id="transformer-vendor3ServiceAcivatorOutput-id" input-channel="vendor3ServiceAcivatorOutput" output-channel="vendor1vendor2vendor3AggregatorInput" ref="vendor3TransformerBean" method="transform"/>
+  <int:transformer id="transformer-vendor3ServiceAcivatorOutput-id" input-channel="vendor3ServiceAcivatorOutput" output-channel="vendor1vendor2vendor3AggregatorInput" ref="vendor3TransformerBean" method="transform">
+    <int:request-handler-advice-chain>
+      <ref bean="eventSourcingAdvice"/>
+    </int:request-handler-advice-chain>
+  </int:transformer>
   <bean id="vendor3TransformerBean" class="orcha.lang.compiler.referenceimpl.xmlgenerator.impl.ObjectToApplicationTransformer">
     <property name="application" ref="vendor3"/>
   </bean>

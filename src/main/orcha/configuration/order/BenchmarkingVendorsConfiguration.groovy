@@ -40,13 +40,7 @@ import service.order.SpecificOrder
 import service.order.VendorComparison
 import service.order.VendorOrderConverter
 
-/*@Queue(capacity=20L, fixedRate=100L)
-//@EventSourcing(messageStore=MessageStore.mongoDB, joinPoint=JoinPoint.after, eventName="")
-class CustomerEventHandler extends EventHandler{
-}
-
-
-
+/*
 
 //@EventSourcing(messageStore=MessageStore.mongoDB, eventName="")
 //@Queue(capacity=30L, fixedRate=1000L)
@@ -58,6 +52,12 @@ class Vendor1Application extends Application{
 @BranchPoint(configurationFile="dataConfig", position=BranchingPosition.after)
 class SelectBestVendorApplication extends Application{
 }*/
+
+//@Queue(capacity=20L, fixedRate=100L)
+@EventSourcing(messageStore=MessageStore.mongoDB, joinPoint=JoinPoint.after, eventName="")
+class CustomerEventHandler extends EventHandler{
+}
+
 
 //@Queue(capacity=20L, fixedDelay=1000L)
 //@CircuitBreaker(numberOfFailuresBeforeOpening=2, intervalBeforeHalfOpening=2000L)
@@ -144,7 +144,7 @@ class BenchmarkingVendorsConfiguration {
 	
 	@Bean
 	EventHandler customer(){
-		EventHandler eventHandler = new EventHandler(name: "customer")
+		EventHandler eventHandler = new CustomerEventHandler(name: "customer")
 		def fileAdapter = new InputFileAdapter(directory: 'C:/Users/Charroux_std/Documents/projet/ExecAndShare/orcha/Orcha/input', filenamePattern: "orderTV.json")
 		eventHandler.input = new Input(mimeType: "application/json", type: "service.order.Order", adapter: fileAdapter)
 		//eventHandler.input = new Input(mimeType: "application/json", type: "service.order.Order")

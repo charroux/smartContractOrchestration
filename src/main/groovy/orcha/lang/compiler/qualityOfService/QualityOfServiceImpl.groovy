@@ -36,6 +36,14 @@ class QualityOfServiceImpl implements QualityOfService{
 					}
 					it.options.queue = optionQueue
 				}
+				
+				EventSourcingOption eventSourcingOption = this.getEventSourcingOption(it)
+				if(eventSourcingOption !=  null){
+					if(it.options == null){
+						it.options = new QualityOfServicesOptions()
+					}
+					it.options.eventSourcing = eventSourcingOption
+				}
 
 				if(it.next.instruction.instruction == "receive"){
 						
@@ -81,6 +89,20 @@ class QualityOfServiceImpl implements QualityOfService{
 													nextToReceive.options = new QualityOfServicesOptions()			// typically a compute (service activator)
 												}													// parametrized with a poller: fixedRate...
 												nextToReceive.options.queue = optionQueue
+											}
+											
+											eventSourcingOption = this.getEventSourcingOption(it)
+											if(eventSourcingOption !=  null){
+												
+												if(it.options == null){
+													it.options = new QualityOfServicesOptions()
+												}
+												it.options.eventSourcing = eventSourcingOption
+												
+												if(nextToReceive.options == null){							// the next node from receive
+													nextToReceive.options = new QualityOfServicesOptions()	// typically a compute (service activator)
+												}													
+												nextToReceive.options.eventSourcing = eventSourcingOption
 											}
 											set = true
 										}
