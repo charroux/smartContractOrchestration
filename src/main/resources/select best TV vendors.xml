@@ -102,6 +102,11 @@
   <int:transformer id="transformer-selectBestVendorAggregatorInputRoute2AggregatorOutput-id" input-channel="selectBestVendorAggregatorInputRoute2AggregatorOutput" output-channel="selectBestVendorAggregatorOutputTransformerRoute2" ref="selectBestVendorAggregatorOutputTransformerRoute2ApplicationToObjectTransformerBean" method="transform"/>
   <bean id="selectBestVendorAggregatorOutputTransformerRoute2ApplicationToObjectTransformerBean" class="orcha.lang.compiler.referenceimpl.xmlgenerator.impl.ApplicationToObjectTransformer"/>
 <int:chain input-channel="selectBestVendorAggregatorOutputTransformerRoute2" output-channel="selectBestVendorOutputFileChannelAdapteroutputFile2">
+    <int:transformer expression="payload">
+      <int:request-handler-advice-chain>
+        <ref bean="eventSourcingAdvice"/>
+      </int:request-handler-advice-chain>
+    </int:transformer>
     <int:object-to-json-transformer/>
   </int:chain>
   <int:channel id="selectBestVendorOutputFileChannelAdapteroutputFile2"/>

@@ -58,12 +58,15 @@ class SelectBestVendorApplication extends Application{
 class CustomerEventHandler extends EventHandler{
 }
 
-
 //@Queue(capacity=20L, fixedDelay=1000L)
 //@CircuitBreaker(numberOfFailuresBeforeOpening=2, intervalBeforeHalfOpening=2000L)
 //@Retry(maxNumberOfAttempts=3, intervalBetweenTheFirstAndSecondAttempt=5000L, intervalMultiplierBetwennAttemps=2, maximumIntervalBetweenAttempts=20000L)
 @EventSourcing(messageStore=MessageStore.mongoDB, joinPoint=JoinPoint.after, eventName="log order conversion")
 class OrderConverterApplication extends Application{
+}
+
+@EventSourcing(messageStore=MessageStore.mongoDB, joinPoint=JoinPoint.before, eventName="")
+class OutputFile2EventHandler extends EventHandler{
 }
 
 @Configuration
@@ -219,7 +222,7 @@ class BenchmarkingVendorsConfiguration {
 	
 	@Bean
 	EventHandler outputFile2(){
-		def eventHandler = new EventHandler(name: "outputFile2")
+		def eventHandler = new OutputFile2EventHandler(name: "outputFile2")
 		def fileAdapter = new OutputFileAdapter(directory: 'C:/Users/Charroux_std/Documents/projet/ExecAndShare/orcha/Orcha/output', createDirectory: true, filename:'output2.txt', appendNewLine: true, writingMode: WritingMode.REPLACE)
 		eventHandler.output = new Output(mimeType: "application/json", type: "service.order.Bill", adapter: fileAdapter)
 		return eventHandler

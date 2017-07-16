@@ -244,18 +244,56 @@ class ContractGeneratorImpl implements ContractGenerator{
 		
 		receiveNodes.each { receiveNode ->
 			
-			println receiveNode
-			
 			if(receiveNode.options != null){
 				QualityOfServicesOptions qoSOption = receiveNode.options
 				EventSourcingOption eventSourcingOption = qoSOption.eventSourcing
 				
-				println qoSOption
-				println eventSourcingOption
-				
 				if(eventSourcingOption != null){
 					// look for the xml commitment that matches the compute node
 					EventHandler eventHandler = receiveNode.instruction.springBean
+					commitments = expr.evaluate(document)			// to avoid dealing with the same event
+					Element commitment = commitments.find{ it.getChildText("name", namespace) == eventHandler.name }
+					if(commitment == null){
+						commitment = new Element("commitment", namespace)
+						commitment.addContent(new Element("name", namespace).addContent(eventHandler.name))
+						Element commitmentsElement = xFactory.compile("//*[local-name() = 'commitments']", Filters.element()).evaluate(document).get(0)	// commitments
+						commitmentsElement.addContent(commitment)
+					}
+					Element checkPoint = commitment.getChild("checkpoint", namespace)
+					Element eventName
+					Element joinPoint
+					if(checkPoint == null){	// there is no checkpoint yet
+						checkPoint = new Element("checkpoint", namespace)
+						if(eventSourcingOption.eventName != null){
+							eventName = new Element("eventName", namespace)
+							checkPoint.addContent(eventName)
+						}
+						joinPoint = new Element("joinpoint", namespace)
+						checkPoint.addContent(joinPoint)
+						commitment.addContent(checkPoint)
+					} else {
+						eventName = checkPoint.getChild("eventName", namespace)
+						joinPoint = checkPoint.getChild("joinpoint", namespace)
+					}
+					if(eventSourcingOption.eventName != null){
+						eventName.setText(eventSourcingOption.eventName)
+					}
+					joinPoint.setText(eventSourcingOption.joinPoint.toString())
+				}
+			}
+		}
+
+		List<InstructionNode> sendNodes = orchaCodeVisitor.findAllSendNodes()
+		
+		sendNodes.each { sendNode ->
+			
+			if(sendNode.options != null){
+				QualityOfServicesOptions qoSOption = sendNode.options
+				EventSourcingOption eventSourcingOption = qoSOption.eventSourcing
+				
+				if(eventSourcingOption != null){
+					// look for the xml commitment that matches the compute node
+					EventHandler eventHandler = sendNode.instruction.springBean
 					commitments = expr.evaluate(document)			// to avoid dealing with the same event
 					Element commitment = commitments.find{ it.getChildText("name", namespace) == eventHandler.name }
 					if(commitment == null){
