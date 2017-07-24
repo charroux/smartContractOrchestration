@@ -4,26 +4,26 @@
   <bean id="errorUnwrapper" class="orcha.lang.compiler.referenceimpl.xmlgenerator.impl.ErrorUnwrapper"/>
   <int:channel id="recoveryChannel"/>
   <int:transformer input-channel="recoveryChannel" output-channel="loggingChannel" expression="'Failure after many attemps for the message :' + payload.failedMessage.payload"/>
-<int-file:inbound-channel-adapter id="file-customer-InputChannel-id" directory="data/input" channel="customer-InputChannel" prevent-duplicates="true" filename-pattern="orderTV.json">
-    <int:poller id="poller-customer-InputChannel-id" fixed-delay="1000"/>
+<int-file:inbound-channel-adapter id="file-aCustomer-InputChannel-id" directory="data/input" channel="aCustomer-InputChannel" prevent-duplicates="true" filename-pattern="orderTV.json">
+    <int:poller id="poller-aCustomer-InputChannel-id" fixed-delay="1000"/>
   </int-file:inbound-channel-adapter>
-  <int-file:file-to-string-transformer input-channel="customer-InputChannel" output-channel="customer-InputChannelTransformer" delete-files="false"/>
-  <int:chain input-channel="customer-InputChannelTransformer" output-channel="customer-OutputChannel">
+  <int-file:file-to-string-transformer input-channel="aCustomer-InputChannel" output-channel="aCustomer-InputChannelTransformer" delete-files="false"/>
+  <int:chain input-channel="aCustomer-InputChannelTransformer" output-channel="aCustomer-OutputChannel">
     <int:json-to-object-transformer type="service.order.Order"/>
-    <int:header-enricher id="header-enricher-customer-InputChannel-id">
+    <int:header-enricher id="header-enricher-aCustomer-InputChannel-id">
       <int:header name="messageID" expression="headers['id'].toString()"/>
     </int:header-enricher>
   </int:chain>
-<int:recipient-list-router id="router-customer-OutputChannel-id" input-channel="customer-OutputChannel">
-    <int:recipient channel="customer-OutputChannelRoute1" selector-expression="payload.product.specification == 'TV'"/>
-    <int:recipient channel="customer-OutputChannelRoute2" selector-expression="payload.product.specification == 'TV'"/>
-    <int:recipient channel="customer-OutputChannelRoute3" selector-expression="payload.product.specification == 'TV'"/>
+<int:recipient-list-router id="router-aCustomer-OutputChannel-id" input-channel="aCustomer-OutputChannel">
+    <int:recipient channel="aCustomer-OutputChannelRoute1" selector-expression="payload.product.specification == 'TV'"/>
+    <int:recipient channel="aCustomer-OutputChannelRoute2" selector-expression="payload.product.specification == 'TV'"/>
+    <int:recipient channel="aCustomer-OutputChannelRoute3" selector-expression="payload.product.specification == 'TV'"/>
     <int:recipient channel="loggingChannel"/>
   </int:recipient-list-router>
-  <int:channel id="customer-OutputChannelRoute1"/>
-  <int:channel id="customer-OutputChannelRoute2"/>
-  <int:channel id="customer-OutputChannelRoute3"/>
-<int:chain id="service-activator-chain-orderConverterChannel-id" input-channel="customer-OutputChannelRoute1" output-channel="orderConverterServiceAcivatorOutput">
+  <int:channel id="aCustomer-OutputChannelRoute1"/>
+  <int:channel id="aCustomer-OutputChannelRoute2"/>
+  <int:channel id="aCustomer-OutputChannelRoute3"/>
+<int:chain id="service-activator-chain-orderConverterChannel-id" input-channel="aCustomer-OutputChannelRoute1" output-channel="orderConverterServiceAcivatorOutput">
     <int:service-activator id="service-activator-orderConverterChannel-id" expression="@vendorOrderConverter.convert(payload)">
       <int:request-handler-advice-chain>
         <bean class="org.springframework.integration.handler.advice.RequestHandlerCircuitBreakerAdvice">
@@ -53,7 +53,7 @@
   <bean id="vendor1TransformerBean" class="orcha.lang.compiler.referenceimpl.xmlgenerator.impl.ObjectToApplicationTransformer">
     <property name="application" ref="vendor1"/>
   </bean>
-<int:chain id="service-activator-chain-vendor2Channel-id" input-channel="customer-OutputChannelRoute2" output-channel="vendor2ServiceAcivatorOutput">
+<int:chain id="service-activator-chain-vendor2Channel-id" input-channel="aCustomer-OutputChannelRoute2" output-channel="vendor2ServiceAcivatorOutput">
     <int:service-activator id="service-activator-vendor2Channel-id">
       <int-script:script lang="js" location="file:src/main/orcha/service/order/vendor2.js"/>
     </int:service-activator>
@@ -62,7 +62,7 @@
   <bean id="vendor2TransformerBean" class="orcha.lang.compiler.referenceimpl.xmlgenerator.impl.ObjectToApplicationTransformer">
     <property name="application" ref="vendor2"/>
   </bean>
-<int:chain id="service-activator-chain-vendor3Channel-id" input-channel="customer-OutputChannelRoute3" output-channel="vendor3ServiceAcivatorOutput">
+<int:chain id="service-activator-chain-vendor3Channel-id" input-channel="aCustomer-OutputChannelRoute3" output-channel="vendor3ServiceAcivatorOutput">
     <int:service-activator id="service-activator-vendor3Channel-id">
       <int-script:script lang="js" location="file:src/main/orcha/service/order/vendor3.js"/>
     </int:service-activator>

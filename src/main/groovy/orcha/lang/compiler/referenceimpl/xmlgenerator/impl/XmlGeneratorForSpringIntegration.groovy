@@ -735,13 +735,7 @@ class XmlGeneratorForSpringIntegration implements XmlGenerator{
 					
 					InstructionNode nextTowhenNode = orchaCodeVisitor.findNextRawNode(whenNode)
 					nextTowhenNode.inputName = whenNode.outputName
-					
-					println node.hashCode() + '-----------' + node
-					println node.instruction.hashCode() + '-----------' + node.instruction
-					println whenNode.hashCode() + '-----------' + whenNode
-					println nextTowhenNode.hashCode() + '-------------' + nextTowhenNode
-					println '-----------------'
-					
+							
 					index++
 
 				} else {
@@ -846,24 +840,16 @@ class XmlGeneratorForSpringIntegration implements XmlGenerator{
 				}
 								
 			} else {
-				
-				println 'instructionNode = ' + instructionNode
-			
+								
 				String orchaExpression = instruction.variable
 			
-				List<InstructionNode> precedingNodes = orchaCodeParser.findAllPrecedingNodes(instructionNode)
-				
-				precedingNodes.each { nn ->
-					println "preceding: " + nn
-				}
+				List<InstructionNode> precedingNodes = orchaCodeParser.findAllPrecedingNodes(instructionNode)			
 				
 				if(precedingNodes.size()>0 && expressionParser.isComputeFailsInExpression(precedingNodes.getAt(0), orchaExpression)==false){
 
 					String releaseExpression = expressionParser.releaseExpression(orchaExpression, graphOfInstructions)
 					String transformerExpression = expressionParser.aggregatorTransformerExpression(orchaExpression, instructionNode, graphOfInstructions)
 					boolean isMultipleArgumentsInExpression = expressionParser.isMultipleArgumentsInExpression(orchaExpression, instructionNode, graphOfInstructions)
-					
-					println 'releaseExpression1: ' + releaseExpression
 					
 					def xmlEvent = generateAggregator(instructionNode, releaseExpression, transformerExpression, isMultipleArgumentsInExpression)
 					

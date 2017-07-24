@@ -15,7 +15,7 @@ package source.order
 // any other product will be ignored.
 // The when instruction waits for program orderConverter to be terminated.
 // So the comp
-receive order from customer condition "order.product.specification == 'TV'"
+receive order from aCustomer condition "order.product.specification == 'TV'"
 convertOrder with order.value
 
 when "convertOrder terminates"		
@@ -23,10 +23,10 @@ evaluateVendor1 with convertOrder.result
 
 // The following instruction can be repeated any number of time (3 times in this program).
 // So the same event order will be dispatched to any instructions following the receive instruction.
-receive order from customer condition "order.product.specification == 'TV'"
+receive order from aCustomer condition "order.product.specification == 'TV'"
 evaluateVendor2 with order.value
 
-receive order from customer condition "order.product.specification == 'TV'"
+receive order from aCustomer condition "order.product.specification == 'TV'"
 evaluateVendor3 with order.value
 
 when "(evaluateVendor1 terminates) and (evaluateVendor2 terminates) and (evaluateVendor3 terminates)"

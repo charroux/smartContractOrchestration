@@ -21,7 +21,7 @@ title "select best TV vendors"
 author "Ben C."
 version "1.0"
 
-receive order from customer condition "order.product.specification == 'TV'"
+receive order from aCustomer condition "order.product.specification == 'TV'"
 compute orderConverter with order.value
 
 when "orderConverter terminates"		
@@ -29,10 +29,10 @@ compute vendor1 with orderConverter.result
 
 // The following instruction can be repeated any number of times (3 times in this program).
 // So the same event order will be dispatched to any instructions following the receive instruction.
-receive order from customer condition "order.product.specification == 'TV'"
+receive order from aCustomer condition "order.product.specification == 'TV'"
 compute vendor2 with order.value
 
-receive order from customer condition "order.product.specification == 'TV'"
+receive order from aCustomer condition "order.product.specification == 'TV'"
 compute vendor3 with order.value
 
 when "(vendor1 terminates) and (vendor2 terminates) and (vendor3 terminates)"

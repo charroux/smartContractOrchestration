@@ -146,8 +146,8 @@ class BenchmarkingVendorsConfiguration {
 	}*/
 	
 	@Bean
-	EventHandler customer(){
-		EventHandler eventHandler = new CustomerEventHandler(name: "customer")
+	EventHandler aCustomer(){
+		EventHandler eventHandler = new CustomerEventHandler(name: "aCustomer")
 		def fileAdapter = new InputFileAdapter(directory: 'data/input', filenamePattern: "orderTV.json")
 		eventHandler.input = new Input(mimeType: "application/json", type: "service.order.Order", adapter: fileAdapter)
 		//eventHandler.input = new Input(mimeType: "application/json", type: "service.order.Order")
