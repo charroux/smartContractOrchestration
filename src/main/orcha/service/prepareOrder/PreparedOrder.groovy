@@ -4,10 +4,7 @@ import groovy.transform.EqualsAndHashCode
 import groovy.transform.ToString
 
 @ToString
-@EqualsAndHashCode
-class PreparedOrder {
+public class PreparedOrder {
 	
-	String address		// address for delivery
-	Order order
-
+	String address	// address for delivery	Order order
 }
