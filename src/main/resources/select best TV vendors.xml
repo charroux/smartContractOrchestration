@@ -4,7 +4,7 @@
   <bean id="errorUnwrapper" class="orcha.lang.compiler.referenceimpl.xmlgenerator.impl.ErrorUnwrapper"/>
   <int:channel id="recoveryChannel"/>
   <int:transformer input-channel="recoveryChannel" output-channel="loggingChannel" expression="'Failure after many attemps for the message :' + payload.failedMessage.payload"/>
-<int-file:inbound-channel-adapter id="file-customer-InputChannel-id" directory="C:/Users/Charroux_std/Documents/projet/ExecAndShare/orcha/Orcha/input" channel="customer-InputChannel" prevent-duplicates="true" filename-pattern="orderTV.json">
+<int-file:inbound-channel-adapter id="file-customer-InputChannel-id" directory="data/input" channel="customer-InputChannel" prevent-duplicates="true" filename-pattern="orderTV.json">
     <int:poller id="poller-customer-InputChannel-id" fixed-delay="1000"/>
   </int-file:inbound-channel-adapter>
   <int-file:file-to-string-transformer input-channel="customer-InputChannel" output-channel="customer-InputChannelTransformer" delete-files="false"/>
@@ -36,11 +36,7 @@
       </int:request-handler-advice-chain>
     </int:service-activator>
   </int:chain>
-  <int:transformer id="transformer-orderConverterServiceAcivatorOutput-id" input-channel="orderConverterServiceAcivatorOutput" output-channel="orderConverterAggregatorInput" ref="orderConverterTransformerBean" method="transform">
-    <int:request-handler-advice-chain>
-      <ref bean="eventSourcingAdvice"/>
-    </int:request-handler-advice-chain>
-  </int:transformer>
+  <int:transformer id="transformer-orderConverterServiceAcivatorOutput-id" input-channel="orderConverterServiceAcivatorOutput" output-channel="orderConverterAggregatorInput" ref="orderConverterTransformerBean" method="transform"/>
   <bean id="orderConverterTransformerBean" class="orcha.lang.compiler.referenceimpl.xmlgenerator.impl.ObjectToApplicationTransformer">
     <property name="application" ref="orderConverter"/>
   </bean>
@@ -62,11 +58,7 @@
       <int-script:script lang="js" location="file:src/main/orcha/service/order/vendor2.js"/>
     </int:service-activator>
   </int:chain>
-  <int:transformer id="transformer-vendor2ServiceAcivatorOutput-id" input-channel="vendor2ServiceAcivatorOutput" output-channel="vendor1vendor2vendor3AggregatorInput" ref="vendor2TransformerBean" method="transform">
-    <int:request-handler-advice-chain>
-      <ref bean="eventSourcingAdvice"/>
-    </int:request-handler-advice-chain>
-  </int:transformer>
+  <int:transformer id="transformer-vendor2ServiceAcivatorOutput-id" input-channel="vendor2ServiceAcivatorOutput" output-channel="vendor1vendor2vendor3AggregatorInput" ref="vendor2TransformerBean" method="transform"/>
   <bean id="vendor2TransformerBean" class="orcha.lang.compiler.referenceimpl.xmlgenerator.impl.ObjectToApplicationTransformer">
     <property name="application" ref="vendor2"/>
   </bean>
@@ -75,11 +67,7 @@
       <int-script:script lang="js" location="file:src/main/orcha/service/order/vendor3.js"/>
     </int:service-activator>
   </int:chain>
-  <int:transformer id="transformer-vendor3ServiceAcivatorOutput-id" input-channel="vendor3ServiceAcivatorOutput" output-channel="vendor1vendor2vendor3AggregatorInput" ref="vendor3TransformerBean" method="transform">
-    <int:request-handler-advice-chain>
-      <ref bean="eventSourcingAdvice"/>
-    </int:request-handler-advice-chain>
-  </int:transformer>
+  <int:transformer id="transformer-vendor3ServiceAcivatorOutput-id" input-channel="vendor3ServiceAcivatorOutput" output-channel="vendor1vendor2vendor3AggregatorInput" ref="vendor3TransformerBean" method="transform"/>
   <bean id="vendor3TransformerBean" class="orcha.lang.compiler.referenceimpl.xmlgenerator.impl.ObjectToApplicationTransformer">
     <property name="application" ref="vendor3"/>
   </bean>
@@ -112,11 +100,6 @@
   <int:transformer id="transformer-selectBestVendorAggregatorInputRoute2AggregatorOutput-id" input-channel="selectBestVendorAggregatorInputRoute2AggregatorOutput" output-channel="selectBestVendorAggregatorOutputTransformerRoute2" ref="selectBestVendorAggregatorOutputTransformerRoute2ApplicationToObjectTransformerBean" method="transform"/>
   <bean id="selectBestVendorAggregatorOutputTransformerRoute2ApplicationToObjectTransformerBean" class="orcha.lang.compiler.referenceimpl.xmlgenerator.impl.ApplicationToObjectTransformer"/>
 <int:chain input-channel="selectBestVendorAggregatorOutputTransformerRoute2" output-channel="selectBestVendorOutputFileChannelAdapteroutputFile2">
-    <int:transformer expression="payload">
-      <int:request-handler-advice-chain>
-        <ref bean="eventSourcingAdvice"/>
-      </int:request-handler-advice-chain>
-    </int:transformer>
     <int:object-to-json-transformer/>
   </int:chain>
   <int:channel id="selectBestVendorOutputFileChannelAdapteroutputFile2"/>

@@ -54,18 +54,18 @@ class SelectBestVendorApplication extends Application{
 }*/
 
 //@Queue(capacity=20L, fixedRate=100L)
-@EventSourcing(messageStore=MessageStore.mongoDB, joinPoint=JoinPoint.after, eventName="")
+//@EventSourcing(messageStore=MessageStore.mongoDB, joinPoint=JoinPoint.after, eventName="")
 class CustomerEventHandler extends EventHandler{
 }
 
 //@Queue(capacity=20L, fixedDelay=1000L)
 @CircuitBreaker(numberOfFailuresBeforeOpening=2, intervalBeforeHalfOpening=2000L)
 @Retry(maxNumberOfAttempts=3, intervalBetweenTheFirstAndSecondAttempt=5000L, intervalMultiplierBetweenAttemps=2, maximumIntervalBetweenAttempts=20000L)
-@EventSourcing(messageStore=MessageStore.mongoDB, joinPoint=JoinPoint.after, eventName="log order conversion")
+//@EventSourcing(messageStore=MessageStore.mongoDB, joinPoint=JoinPoint.after, eventName="log order conversion")
 class OrderConverterApplication extends Application{
 }
 
-@EventSourcing(messageStore=MessageStore.mongoDB, joinPoint=JoinPoint.before, eventName="")
+//@EventSourcing(messageStore=MessageStore.mongoDB, joinPoint=JoinPoint.before, eventName="")
 class OutputFile2EventHandler extends EventHandler{
 }
 
@@ -148,7 +148,7 @@ class BenchmarkingVendorsConfiguration {
 	@Bean
 	EventHandler customer(){
 		EventHandler eventHandler = new CustomerEventHandler(name: "customer")
-		def fileAdapter = new InputFileAdapter(directory: 'C:/Users/Charroux_std/Documents/projet/ExecAndShare/orcha/Orcha/input', filenamePattern: "orderTV.json")
+		def fileAdapter = new InputFileAdapter(directory: 'data/input', filenamePattern: "orderTV.json")
 		eventHandler.input = new Input(mimeType: "application/json", type: "service.order.Order", adapter: fileAdapter)
 		//eventHandler.input = new Input(mimeType: "application/json", type: "service.order.Order")
 		return eventHandler
@@ -214,7 +214,7 @@ class BenchmarkingVendorsConfiguration {
 	@Bean
 	EventHandler outputFile1(){
 		def eventHandler = new EventHandler(name: "outputFile1")
-		def fileAdapter = new OutputFileAdapter(directory: 'C:/Users/Charroux_std/Documents/projet/ExecAndShare/orcha/Orcha/output', createDirectory: true, filename:'output1.txt', appendNewLine: true, writingMode: WritingMode.REPLACE)
+		def fileAdapter = new OutputFileAdapter(directory: 'data/output', createDirectory: true, filename:'output1.txt', appendNewLine: true, writingMode: WritingMode.REPLACE)
 		eventHandler.output = new Output(mimeType: "application/json", type: "service.order.Bill", adapter: fileAdapter)
 		//eventHandler.output = new Output(mimeType: "application/json", type: "service.order.Bill")
 		return eventHandler
@@ -223,7 +223,7 @@ class BenchmarkingVendorsConfiguration {
 	@Bean
 	EventHandler outputFile2(){
 		def eventHandler = new OutputFile2EventHandler(name: "outputFile2")
-		def fileAdapter = new OutputFileAdapter(directory: 'C:/Users/Charroux_std/Documents/projet/ExecAndShare/orcha/Orcha/output', createDirectory: true, filename:'output2.txt', appendNewLine: true, writingMode: WritingMode.REPLACE)
+		def fileAdapter = new OutputFileAdapter(directory: 'data/output', createDirectory: true, filename:'output2.txt', appendNewLine: true, writingMode: WritingMode.REPLACE)
 		eventHandler.output = new Output(mimeType: "application/json", type: "service.order.Bill", adapter: fileAdapter)
 		return eventHandler
 	}
