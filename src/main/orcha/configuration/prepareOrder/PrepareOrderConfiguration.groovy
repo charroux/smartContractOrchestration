@@ -27,7 +27,7 @@ class PrepareOrderConfiguration {
 	
 	@Bean
 	Application prepareOrder(){
-		def program = new Application(name: "prepareOrder", specifications: "Prepare an order for a customer. Argument: service.order.Order. Return: service.order.SpecificOrder", description: "Convert a specific vendor order into a generic one.", language: "js")
+		def program = new Application(name: "prepareOrder", specifications: "Prepare an order for a customer. Argument: service.prepareOrder.Order. Return: service.prepareOrder.PreparedOrder", description: "Add an address for the delivery to an order.", language: "js")
 		def javaAdapter = new JavaServiceAdapter(javaClass: 'service.prepareOrder.OrderPreparation', method:'prepare')
 		program.input = new Input(type: "service.prepareOrder.Order", adapter: javaAdapter)
 		program.output = new Output(type: "service.prepareOrder.PreparedOrder", adapter: javaAdapter)
