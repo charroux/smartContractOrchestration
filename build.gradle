@@ -139,7 +139,7 @@ sourceSets {
 	}
 }
 
-task compile(type: JavaExec) {
+task compileOrcha(type: JavaExec) {
 	classpath = sourceSets.main.runtimeClasspath
 	main = 'orcha.lang.Compiler'
 	if(project.hasProperty("orchaFile")){
@@ -147,3 +147,7 @@ task compile(type: JavaExec) {
 	}	
 }
 
+task launchOrcha(type: JavaExec) {
+	classpath = sourceSets.main.runtimeClasspath
+	main = 'orcha.lang.OrchaSpringIntegrationLauncher'
+}
