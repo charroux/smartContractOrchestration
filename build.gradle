@@ -151,3 +151,11 @@ task launchOrcha(type: JavaExec) {
 	classpath = sourceSets.main.runtimeClasspath
 	main = 'orcha.lang.OrchaSpringIntegrationLauncher'
 }
+
+task generateContract(type: JavaExec) {
+	classpath = sourceSets.main.runtimeClasspath
+	main = 'orcha.lang.ContractGeneration'
+	if(project.hasProperty("orchaFile")){
+		args Eval.me(orchaFile)
+	}
+}
