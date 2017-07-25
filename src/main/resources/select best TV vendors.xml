@@ -24,7 +24,7 @@
   <int:channel id="aCustomer-OutputChannelRoute2"/>
   <int:channel id="aCustomer-OutputChannelRoute3"/>
 <int:chain id="service-activator-chain-orderConverterChannel-id" input-channel="aCustomer-OutputChannelRoute1" output-channel="orderConverterServiceAcivatorOutput">
-    <int:service-activator id="service-activator-orderConverterChannel-id" expression="@vendorOrderConverter.convert(payload)">
+    <int:service-activator id="service-activator-orderConverterChannel-id" expression="@orderConverterService.service(payload)">
       <int:request-handler-advice-chain>
         <bean class="org.springframework.integration.handler.advice.RequestHandlerCircuitBreakerAdvice">
           <property name="threshold" value="2"/>

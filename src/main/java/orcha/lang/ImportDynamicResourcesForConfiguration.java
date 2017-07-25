@@ -9,8 +9,8 @@ import org.springframework.context.annotation.ImportResource;
  * 
  */
 @ImportResource({
-    "prepare order.xml",
-    "prepare orderQoS.xml"
+    "select best TV vendors.xml",
+    "select best TV vendorsQoS.xml"
 })
 public class ImportDynamicResourcesForConfiguration {
 

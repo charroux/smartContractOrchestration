@@ -150,25 +150,24 @@ class BenchmarkingVendorsConfiguration {
 		EventHandler eventHandler = new CustomerEventHandler(name: "aCustomer")
 		def fileAdapter = new InputFileAdapter(directory: 'data/input', filenamePattern: "orderTV.json")
 		eventHandler.input = new Input(mimeType: "application/json", type: "service.order.Order", adapter: fileAdapter)
-		//eventHandler.input = new Input(mimeType: "application/json", type: "service.order.Order")
 		return eventHandler
 	}
 	
 	@Bean
 	Application orderConverter(){
 		def program = new OrderConverterApplication(name: "orderConverter", specifications: "Convert an order format into another one. Argument: service.order.Order. Return: service.order.SpecificOrder", description: "Convert a specific vendor order into a generic one.")
-		def javaAdapter = new JavaServiceAdapter(javaClass: 'service.order.VendorOrderConverter', method:'convert')
+		program.input = new Input(type: "service.order.Order")
+		program.output = new Output(type: "service.order.SpecificOrder")
+/*		def javaAdapter = new JavaServiceAdapter(javaClass: 'service.order.VendorOrderConverter', method:'convert')
 		program.input = new Input(type: "service.order.Order", adapter: javaAdapter)
-		program.output = new Output(type: "service.order.SpecificOrder", adapter: javaAdapter)
-		//program.input = new Input(type: "service.order.Order")
-		//program.output = new Output(type: "service.order.SpecificOrder")
+		program.output = new Output(type: "service.order.SpecificOrder", adapter: javaAdapter)*/
 		return program
 	}
 	
-	@Bean
+/*	@Bean
 	VendorOrderConverter vendorOrderConverter(){
 		return new VendorOrderConverter()
-	}
+	}*/
 	
 	@Bean
 	Application vendor1(){
