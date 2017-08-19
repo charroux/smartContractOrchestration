@@ -492,7 +492,7 @@ class ConfigurationMockGenerator {
 									
 					JBlock body = method.body();
 									
-					JInvocation assertEqualsInvoke = codeModel.ref(org.mockito.Mockito.class).staticInvoke("mock").arg(JExpr.direct(serviceClassNameInterface + ".class"));
+/*					JInvocation assertEqualsInvoke = codeModel.ref(org.mockito.Mockito.class).staticInvoke("mock").arg(JExpr.direct(serviceClassNameInterface + ".class"));
 									
 					JVar serviceMockVariable = body.decl(argumentClass, methodName + "Mock", assertEqualsInvoke);
 					
@@ -505,8 +505,11 @@ class ConfigurationMockGenerator {
 					JVar testArgumentReturn = body.decl(codeModel.ref(returnClass), "mockOutput", JExpr._new(codeModel.ref(returnClass)));
 									
 					JInvocation testInvoke = codeModel.ref(org.mockito.Mockito.class).staticInvoke("when").arg( serviceMockVariable.invoke("service").arg(testArgumentVariable)).invoke("thenReturn").arg(testArgumentReturn);
-					body.add(testInvoke);
-									
+					body.add(testInvoke);*/
+
+					Class returnClass = Class.forName(instruction.springBean.output.type)
+					JVar serviceMockVariable = body.decl(codeModel.ref(Class.forName("java.lang.Integer")), "test")
+
 					body._return(serviceMockVariable)
 					
 					
