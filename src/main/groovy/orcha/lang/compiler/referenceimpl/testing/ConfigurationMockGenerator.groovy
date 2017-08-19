@@ -12,7 +12,6 @@ import com.sun.codemodel.JMod
 import com.sun.codemodel.JType
 import com.sun.codemodel.JVar
 import com.sun.codemodel.writer.FileCodeWriter
-import com.sun.org.apache.xpath.internal.functions.FuncSubstring
 import com.sun.codemodel.ClassType
 import com.sun.codemodel.JBlock
 import com.sun.codemodel.JClass

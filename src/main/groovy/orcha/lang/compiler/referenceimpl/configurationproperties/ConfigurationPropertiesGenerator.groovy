@@ -15,7 +15,6 @@ import com.sun.codemodel.JBlock
 import com.sun.codemodel.JClass
 import com.sun.codemodel.JExpr
 import com.sun.codemodel.writer.FileCodeWriter
-import com.sun.org.apache.xpath.internal.functions.FuncSubstring
 import groovy.json.JsonOutput
 import groovy.util.logging.Slf4j
 
