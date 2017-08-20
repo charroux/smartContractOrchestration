@@ -96,10 +96,10 @@ class OrchaCompilerConfiguration {
 		return new CompileServiceWithSpringIntegration()
 	}
 	
-	@Bean
+/*	@Bean
 	XmlGenerator xmlGenerator(){
 		return new XmlGeneratorForSpringIntegration()
-	}
+	}*/
 	
 	@Bean
 	SpringIntegrationConnectors connectors(){

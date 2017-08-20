@@ -74,10 +74,5 @@ class CompileConfiguration {
 	ServiceOfferSelectionGenerator serviceOfferSelectionGenerator(){
 		return new ServiceOfferSelectionGenerator()
 	}
-	
-/*	@Bean
-	XmlGenerator xmlGenerator(){
-		return new XmlGeneratorForSpringIntegration()
-	}*/
 
 }
