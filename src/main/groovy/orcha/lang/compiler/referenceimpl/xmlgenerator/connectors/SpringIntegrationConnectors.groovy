@@ -15,6 +15,11 @@ import orcha.lang.configuration.EventSourcing.JoinPoint
 import orcha.lang.configuration.EventSourcing.MessageStore
 import org.springframework.http.MediaType
 
+/**
+ * Deprecated: 
+ * @author Ben C.
+ *
+ */
 class SpringIntegrationConnectors{
 	
 	def inputFileAdapter(InstructionNode instructionNode){

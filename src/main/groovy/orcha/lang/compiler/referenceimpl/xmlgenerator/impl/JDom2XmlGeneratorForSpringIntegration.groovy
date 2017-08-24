@@ -1,6 +1,9 @@
 package orcha.lang.compiler.referenceimpl.xmlgenerator.impl
 
+import java.io.BufferedWriter
 import java.io.File
+import java.util.List
+
 import org.jdom2.Document
 import org.jdom2.Element
 import org.jdom2.Namespace
@@ -10,12 +13,24 @@ import org.jdom2.output.support.XMLOutputProcessor
 import org.springframework.beans.factory.annotation.Autowired
 
 import groovy.util.logging.Slf4j
+import orcha.lang.compiler.Instruction
 import orcha.lang.compiler.InstructionNode
+import orcha.lang.compiler.OrchaCompilationException
 import orcha.lang.compiler.qualityOfService.QualityOfService
 import orcha.lang.compiler.qualityOfService.QualityOfServicesOptions
 import orcha.lang.compiler.referenceimpl.ExpressionParser
 import orcha.lang.compiler.referenceimpl.xmlgenerator.XmlGenerator
 import orcha.lang.compiler.visitor.OrchaCodeVisitor
+import orcha.lang.configuration.ComposeEventAdapter
+import orcha.lang.configuration.DatabaseAdapter
+import orcha.lang.configuration.EventHandler
+import orcha.lang.configuration.HttpAdapter
+import orcha.lang.configuration.InputFileAdapter
+import orcha.lang.configuration.JavaServiceAdapter
+import orcha.lang.configuration.MailReceiverAdapter
+import orcha.lang.configuration.MailSenderAdapter
+import orcha.lang.configuration.OutputFileAdapter
+import orcha.lang.configuration.ScriptServiceAdapter
 import orcha.lang.contract.ContractGenerator.Format
 
 @Slf4j
@@ -45,12 +60,30 @@ class JDom2XmlGeneratorForSpringIntegration implements XmlGenerator{
 		bufferedWriterSpringContext.flush()
 		bufferedWriterSpringContext.close()
 		
-		SAXBuilder builder = new SAXBuilder();
-		Document xmlSpringContext = builder.build(xmlSpringContextFile);
- 
-		generateGeneralContext(xmlSpringContext)
+		SAXBuilder builder = new SAXBuilder()
 		
-		this.exportToXML(xmlSpringContext, xmlSpringContextFile)
+		Document xmlSpringIntegration = builder.build(xmlSpringContextFile)
+ 
+		generateGeneralContext(xmlSpringIntegration)
+		
+		def alreadyDoneInstructions = []
+		 
+		 def eventsSourcing = []
+		 
+		 List<InstructionNode> nodes = orchaCodeParser.findAllNodes()
+		 
+		 nodes.each {
+			 
+			 generateXMLForInstruction(it, orchaCodeParser, alreadyDoneInstructions, xmlSpringIntegration)
+			 
+			 if(it.options!=null && it.options.eventSourcing!=null){
+				 eventsSourcing.add(it)
+			 }
+		 }		
+		
+		this.exportToXML(xmlSpringIntegration, xmlSpringContextFile)
+
+		log.info 'Transpilatation complete successfully. Orcha orchestrator generated into ' + xmlSpringContextFile.getAbsolutePath()
 		
 		//def xmlEvent = generateGeneralContext()
 		//bufferedWriterSpringContext.writeLine(xmlEvent.toString())
@@ -61,26 +94,16 @@ class JDom2XmlGeneratorForSpringIntegration implements XmlGenerator{
 		bufferedWriterQoSSpringContext.flush()
 		bufferedWriterQoSSpringContext.close()
 		
-/*		def alreadyDoneInstructions = []
-		
-		def eventsSourcing = []
-		
-		List<InstructionNode> nodes = orchaCodeParser.findAllNodes()
-		
-		nodes.each {
-			
-			generateXMLForInstruction(it, orchaCodeParser, alreadyDoneInstructions, bufferedWriterSpringContext)
-			
-			if(it.options!=null && it.options.eventSourcing!=null){
-				eventsSourcing.add(it)
-			}
-		}
+		Document xmlQoSSpringIntegration = builder.build(xmlQoSSpringContextFile)
 		
 		if(eventsSourcing.size() > 0){
-			generateEventSourcingXML(eventsSourcing, bufferedWriterQoSSpringContext)
-		}
-*/		
+			
+			EventSourcing eventSourcing = new EventSourcing(xmlQoSSpringIntegration)
+			eventSourcing.eventSourcing(eventsSourcing)
+			
+		}	
 		
+		this.exportToXML(xmlQoSSpringIntegration, xmlQoSSpringContextFile)
 		
 		// usefull to write line by line
 		/*String xmlContext = xmlSpringContextFile.text
@@ -90,7 +113,6 @@ class JDom2XmlGeneratorForSpringIntegration implements XmlGenerator{
 			writer.close()
 		}*/
 		
-		log.info 'Transpilatation complete successfully. Orcha orchestrator generated into ' + xmlSpringContextFile.getAbsolutePath()
 		
 		
 		// usefull to write line by line
@@ -365,27 +387,45 @@ class JDom2XmlGeneratorForSpringIntegration implements XmlGenerator{
 		
 	}
 	
-	private void generateGeneralContext(Document xmlSpringContext){
+	private void generateGeneralContext(Document xmlSpringIntegration){
 		
-		Element rootElement = xmlSpringContext.getRootElement();
-		
-		Namespace namespace = rootElement.getNamespace()
+		Element rootElement = xmlSpringIntegration.getRootElement()
+
+		Namespace namespace = Namespace.getNamespace("int", "http://www.springframework.org/schema/integration")
 		
 		Element element = new Element("logging-channel-adapter", namespace)
+		element.setAttribute("id", "loggingChannel")
+		element.setAttribute("level", "INFO")
 		rootElement.addContent(element)
 		
-		/*def xml = new StreamingMarkupBuilder()
-		xml.useDoubleQuotes = true
-		return xml.bind{
-			"int:logging-channel-adapter"(id:"loggingChannel", level:"INFO"){
-			}
-			"stream:stderr-channel-adapter"(channel:"errorChannel", "append-newline":"true"){
-			}
-			"bean"(id:"errorUnwrapper", class:"orcha.lang.compiler.referenceimpl.xmlgenerator.impl.ErrorUnwrapper"){
-			}
-			"int:channel"(id:"recoveryChannel"){ }
-			"int:transformer"("input-channel":"recoveryChannel", "output-channel":"loggingChannel", "expression":"'Failure after many attemps for the message :' + payload.failedMessage.payload"){ }
-		}*/
+		namespace = Namespace.getNamespace("stream", "http://www.springframework.org/schema/integration/stream")
+		
+		element = new Element("stderr-channel-adapter", namespace)
+		element.setAttribute("channel", "errorChannel")
+		element.setAttribute("append-newline", "true")
+		rootElement.addContent(element)
+		
+		namespace = rootElement.getNamespace()
+		
+		element = new Element("bean", namespace)
+		element.setAttribute("id", "errorUnwrapper")
+		element.setAttribute("class", "orcha.lang.compiler.referenceimpl.xmlgenerator.impl.ErrorUnwrapper")
+		rootElement.addContent(element)
+		
+		namespace = Namespace.getNamespace("int", "http://www.springframework.org/schema/integration")
+		
+		element = new Element("channel", namespace)
+		element.setAttribute("id", "recoveryChannel")
+		rootElement.addContent(element)
+		
+		namespace = Namespace.getNamespace("int", "http://www.springframework.org/schema/integration")
+		
+		element = new Element("transformer", namespace)
+		element.setAttribute("input-channel", "recoveryChannel")
+		element.setAttribute("output-channel", "loggingChannel")
+		element.setAttribute("expression", "'Failure after many attemps for the message :' + payload.failedMessage.payload")
+		rootElement.addContent(element)
+
 	}
 
 	private void exportToXML(Document document, File xmlFile){
@@ -413,4 +453,202 @@ class JDom2XmlGeneratorForSpringIntegration implements XmlGenerator{
 		xmlProcessor.process(fw, jdomFormat, document)
 		
 	}
+	
+	private void generateXMLForInstruction(InstructionNode instructionNode, OrchaCodeVisitor orchaCodeParser, List<Instruction>alreadyDoneInstructions, Document xmlSpringIntegration){
+		
+		List<Instruction> graphOfInstructions = orchaCodeParser.findAllNodes()
+		
+		Instruction instruction = instructionNode.instruction
+			
+		if(instruction.instruction == "receive"){
+			
+			if( alreadyDoneInstructions.contains(instruction) == false){
+
+				generateReceiveEventHandler(instructionNode, xmlSpringIntegration)
+				
+/*				if(instructionNode.next.instruction.instruction == "receive"){
+					
+					xmlEvent = generateRouterForEventHandlers(instructionNode)
+					bufferedWriter.writeLine(xmlEvent.toString())
+					
+					InstructionNode node = instructionNode.next
+					
+					while(node != null){
+						alreadyDoneInstructions.add(node.instruction)
+						node = node.next
+					}
+				}*/
+
+			}
+			
+		}else if(instruction.instruction == "compute"){
+		
+			String failChannel = expressionParser.failChannel(instructionNode, orchaCodeParser)
+			
+			// when nodes
+			List<InstructionNode> nodes = orchaCodeParser.findNextNode(instructionNode)
+			
+			// is a when node with a fails :
+			// compute appli1
+			// when "appli1 fails"
+			boolean computeFails = (null != nodes.find { expressionParser.isComputeFailsInExpression(instructionNode, it.instruction.variable) })
+					
+			generateApplication(instructionNode, computeFails, failChannel, xmlSpringIntegration)
+			
+		} else if(instruction.instruction == "when"){
+		
+			if(instructionNode.next.instruction.instruction == "when"){
+				
+				if(expressionParser.isSeveralWhenWithSameApplicationsInExpression(instructionNode.next)){
+					
+					RouterForAggregator routerForAggregator = new RouterForAggregator(xmlSpringIntegration)
+					routerForAggregator.routerForAggregator(instructionNode)
+					
+				}
+								
+			} else {
+								
+				String orchaExpression = instruction.variable
+			
+				List<InstructionNode> precedingNodes = orchaCodeParser.findAllPrecedingNodes(instructionNode)
+				
+				if(precedingNodes.size()>0 && expressionParser.isComputeFailsInExpression(precedingNodes.getAt(0), orchaExpression)==false){
+
+					String releaseExpression = expressionParser.releaseExpression(orchaExpression, graphOfInstructions)
+					String transformerExpression = expressionParser.aggregatorTransformerExpression(orchaExpression, instructionNode, graphOfInstructions)
+					boolean isMultipleArgumentsInExpression = expressionParser.isMultipleArgumentsInExpression(orchaExpression, instructionNode, graphOfInstructions)
+					
+					Aggregator aggregator = new Aggregator(xmlSpringIntegration)
+					aggregator.aggregate(instructionNode, releaseExpression, transformerExpression, isMultipleArgumentsInExpression)
+	
+				} else {
+				
+					
+					List<InstructionNode> previousNodes = orchaCodeParser.findAllRawPrecedingNodes(instructionNode)
+					
+					previousNodes.each { previousNode ->
+						
+						boolean computeFails = expressionParser.isComputeFailsInExpression(previousNode, instruction.variable)
+						if(computeFails == true){
+							List<InstructionNode> nextNodes = orchaCodeParser.findNextNode(instructionNode)
+							if(nextNodes.size() > 0){
+								InstructionNode nextNode = nextNodes.getAt(0)
+								def errorExpression = 'payload.error'
+								if(nextNode.instruction.withs.size() > 0){
+									String withProperty = nextNode.instruction.withs[0].withProperty
+									if(withProperty != "result"){
+										errorExpression = errorExpression + '.' + withProperty
+									}
+								}
+												
+								String failedServiceName = expressionParser.failedServiceName(instructionNode, graphOfInstructions)
+								String failChannel = expressionParser.failChannel(instructionNode, graphOfInstructions)
+								
+								Fail fail = new Fail(xmlSpringIntegration)
+								fail.fail(instructionNode, failedServiceName, failChannel, errorExpression)
+								
+							}
+						}
+					}
+				}
+			}
+		
+		} else if(instruction.instruction == "send"){
+		
+			generateSendEventHandler(instructionNode, xmlSpringIntegration)
+		
+		}
+
+	}
+	
+	private void generateReceiveEventHandler(InstructionNode instructionNode, Document xmlSpringIntegration){
+		
+		def EventHandler eventHandler = instructionNode.instruction.springBean
+		InboundChannelAdapter inboundChannelAdapter = new InboundChannelAdapter(xmlSpringIntegration)
+		
+		if(eventHandler.input!=null && eventHandler.input.adapter instanceof HttpAdapter){
+				
+			throw new OrchaCompilationException(eventHandler.toString() + " not supported yet.")
+			
+		} else if(eventHandler.input!=null && eventHandler.input.adapter instanceof InputFileAdapter){
+		
+			inboundChannelAdapter.file(instructionNode)
+		
+		} else if(eventHandler.input!=null && eventHandler.input.adapter instanceof MailReceiverAdapter){
+		
+			throw new OrchaCompilationException(eventHandler.toString() + " not supported yet.")
+			
+		} else if(eventHandler.input!=null && eventHandler.input.adapter instanceof MailSenderAdapter){
+		
+			throw new OrchaCompilationException(eventHandler.toString() + " not supported yet.")
+			
+		} else if(eventHandler.input!=null && eventHandler.input.adapter instanceof ComposeEventAdapter){
+		
+			throw new OrchaCompilationException(eventHandler.toString() + " not supported yet.")
+			
+		} else {
+			throw new OrchaCompilationException(eventHandler.toString() + " not supported yet.")
+		}
+	}
+	
+	private void generateApplication(InstructionNode instructionNode, boolean computeFails, String failChannel, Document xmlSpringIntegration){
+		
+		ServiceActivator serviceActivator = new ServiceActivator(xmlSpringIntegration)
+		
+		if(instructionNode.instruction.springBean.input.adapter instanceof JavaServiceAdapter){
+			
+			boolean isScript = false
+			serviceActivator.service(instructionNode, computeFails, failChannel, isScript)
+			
+		} else if(instructionNode.instruction.springBean.input.adapter instanceof ScriptServiceAdapter){
+		
+			boolean isScript = true
+			serviceActivator.service(instructionNode, computeFails, failChannel, isScript)
+			
+		}
+		
+/*		if(instructionNode.instruction.springBean.input.adapter instanceof MailSenderAdapter){
+			
+			def xml = new StreamingMarkupBuilder()
+			xml.useDoubleQuotes = true
+			def xmlEvent = xml.bind(connectors.mailSenderAdapter(instructionNode))
+			bufferedWriter.writeLine(xmlEvent.toString())
+			
+		}
+		
+		if(instructionNode.instruction.springBean.output.adapter instanceof MailReceiverAdapter){
+			
+			def xml = new StreamingMarkupBuilder()
+			xml.useDoubleQuotes = true
+			def xmlEvent = xml.bind(connectors.mailReceiverAdapter(instructionNode))
+			bufferedWriter.writeLine(xmlEvent.toString())
+			
+		}*/
+		
+
+	}
+	
+	private void generateSendEventHandler(InstructionNode instructionNode, Document xmlSpringIntegration){
+		
+		OutboundChannelAdapter outboundChannelAdapter = new OutboundChannelAdapter(xmlSpringIntegration)
+		
+		def EventHandler eventHandler = instructionNode.instruction.springBean
+		
+		if(eventHandler.output.adapter instanceof DatabaseAdapter){
+			
+			throw new OrchaCompilationException(eventHandler.toString() + " not supported yet.")
+			
+		} else if(eventHandler.output.adapter instanceof OutputFileAdapter){
+				
+			outboundChannelAdapter.file(instructionNode)
+			
+		} else if(eventHandler.output.adapter instanceof MailSenderAdapter){
+				
+			throw new OrchaCompilationException(eventHandler.toString() + " not supported yet.")
+			
+		} else {
+			throw new OrchaCompilationException(eventHandler.toString() + " not supported yet.")
+		}
+	}
+	
 }

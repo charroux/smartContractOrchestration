@@ -56,6 +56,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.http.MediaType
 import org.springframework.integration.file.FileHeaders
 
+/** 
+ * Deprecated: use {@link orcha.lang.compiler.referenceimpl.xmlgenerator.impl.JDom2XmlGeneratorForSpringIntegration JDom2XmlGeneratorForSpringIntegration} instead.
+ *
+ * @author Ben C.
+ *
+ */
 @Slf4j
 class XmlGeneratorForSpringIntegration implements XmlGenerator{
 	

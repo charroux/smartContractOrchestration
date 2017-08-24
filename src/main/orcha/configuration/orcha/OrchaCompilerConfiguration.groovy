@@ -13,6 +13,7 @@ import orcha.lang.compiler.referenceimpl.OrchaLauncherGenerator
 import orcha.lang.compiler.referenceimpl.testing.ConfigurationMockGenerator
 import orcha.lang.compiler.referenceimpl.xmlgenerator.XmlGenerator
 import orcha.lang.compiler.referenceimpl.xmlgenerator.connectors.SpringIntegrationConnectors
+import orcha.lang.compiler.referenceimpl.xmlgenerator.impl.JDom2XmlGeneratorForSpringIntegration
 import orcha.lang.compiler.referenceimpl.xmlgenerator.impl.XmlGeneratorForSpringIntegration
 import orcha.lang.compiler.serviceOffer.ServiceOfferSelectionGenerator
 import orcha.lang.compiler.visitor.OrchaCodeParser
@@ -96,10 +97,11 @@ class OrchaCompilerConfiguration {
 		return new CompileServiceWithSpringIntegration()
 	}
 	
-/*	@Bean
+	@Bean
 	XmlGenerator xmlGenerator(){
-		return new XmlGeneratorForSpringIntegration()
-	}*/
+		//return new XmlGeneratorForSpringIntegration()
+		return new JDom2XmlGeneratorForSpringIntegration()
+	}
 	
 	@Bean
 	SpringIntegrationConnectors connectors(){
