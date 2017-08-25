@@ -1,5 +1,7 @@
 package orcha.lang.compiler
 
+import java.io.File
+
 import orcha.lang.compiler.visitor.OrchaCodeVisitor
 
 interface Compile{
@@ -20,5 +22,7 @@ interface Compile{
 	 * @throws OrchaConfigurationException
 	 */
 	void compileForTesting(OrchaCodeVisitor orchaCodeParser)  throws OrchaCompilationException, OrchaConfigurationException
+	
+	void compile(OrchaCodeVisitor orchaCodeParser, File destinationDirectory) throws OrchaCompilationException, OrchaConfigurationException
 	
 }

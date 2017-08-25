@@ -446,12 +446,13 @@ class JDom2XmlGeneratorForSpringIntegration implements XmlGenerator{
 			jdomFormat = org.jdom2.output.Format.getPrettyFormat()
 		}
 		
-		XMLOutputter xml = new XMLOutputter();
-		xml.setFormat(jdomFormat);
+		XMLOutputter xml = new XMLOutputter()
+		xml.setFormat(jdomFormat)
 		XMLOutputProcessor xmlProcessor = xml.getXMLOutputProcessor()
-		FileWriter fw = new FileWriter(xmlFile);
+		FileWriter fw = new FileWriter(xmlFile)
 		xmlProcessor.process(fw, jdomFormat, document)
-		
+		fw.close()
+
 	}
 	
 	private void generateXMLForInstruction(InstructionNode instructionNode, OrchaCodeVisitor orchaCodeParser, List<Instruction>alreadyDoneInstructions, Document xmlSpringIntegration){

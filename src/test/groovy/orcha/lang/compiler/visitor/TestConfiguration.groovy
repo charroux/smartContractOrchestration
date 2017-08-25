@@ -29,7 +29,7 @@ import service.order.VendorComparison
 import service.order.VendorOrderConverter
 
 @SpringBootConfiguration
-class OrchaCodeVisitorTestConfiguration {
+class TestConfiguration {
 
 	@Bean
 	OrchaCodeParser orchaCodeParser(){

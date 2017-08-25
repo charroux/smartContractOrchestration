@@ -75,7 +75,8 @@ class CompileServiceWithSpringIntegration implements Compile{
 	 * @throws OrchaCompilationException
 	 * @throws OrchaConfigurationException
 	 */
-	private void compile(OrchaCodeVisitor orchaCodeParser, File destinationDirectory) throws OrchaCompilationException, OrchaConfigurationException {
+	@Override
+	public void compile(OrchaCodeVisitor orchaCodeParser, File destinationDirectory) throws OrchaCompilationException, OrchaConfigurationException {
 		
 		log.info 'Transpilatation of the Orcha program begins'
 		
@@ -87,11 +88,11 @@ class CompileServiceWithSpringIntegration implements Compile{
 				
 		xmlGenerator.generate(orchaCodeParser, new File(xmlSpringContent), new File(xmlQoSSpringContent))
 				
-		String xmlContext = new File(xmlSpringContent).text
+/*		String xmlContext = new File(xmlSpringContent).text
 		String springContexteAsText = XmlUtil.serialize(xmlContext)
 		new File(xmlSpringContent).withWriter('utf-8') { writer ->
 			writer.writeLine springContexteAsText
-		}
+		}*/
 		
 		File oldFile = new File(xmlSpringContent)
 		
@@ -105,11 +106,11 @@ class CompileServiceWithSpringIntegration implements Compile{
 		
 		log.info 'Transpilatation complete successfully. Orcha orchestrator generated into ' + xmlSpringContentInSrc
 		
-		xmlContext = new File(xmlQoSSpringContent).text
+/*		xmlContext = new File(xmlQoSSpringContent).text
 		springContexteAsText = XmlUtil.serialize(xmlContext)
 		new File(xmlQoSSpringContent).withWriter('utf-8') { writer ->
 			writer.writeLine springContexteAsText
-		}
+		}*/
 		
 		oldFile = new File(xmlQoSSpringContent)
 		
