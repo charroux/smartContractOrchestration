@@ -2,6 +2,10 @@ Terms of use : Orcha and related software belong to B. Charroux and L. Sliman. T
 
 Installation : complete the <a href="http://orchalang.com/howto/orchaHowTo.html#Install">installation procedure</a>.
 
+Compilation of an Orcha program: complete the <a href="http://orchalang.com/howto/orchaHowTo.html#Transpilation">transpilation procedure</a>.
+
+Launching of an Ocha program: complete the <a href="http://orchalang.com/howto/orchaHowTo.html#Launching">launching procedure</a>.
+
 Using  <a href="https://docs.gitlab.com/ce/workflow/gitlab_flow.html#merge-pull-requests-with-gitlab-flow"> merge request</a>.
 
 Using  <a href="https://docs.gitlab.com/ce/workflow/gitlab_flow.html#merge-pull-requests-with-gitlab-flow"> merge request</a>.
