@@ -6,6 +6,8 @@ Compilation of an Orcha program: complete the <a href="http://orchalang.com/howt
 
 Launching of an Ocha program: complete the <a href="http://orchalang.com/howto/orchaHowTo.html#Launching">launching procedure</a>.
 
+<h1>Best practise</h1>
+
 Using  <a href="https://docs.gitlab.com/ce/workflow/gitlab_flow.html#merge-pull-requests-with-gitlab-flow"> merge request</a>.
 
 Using  <a href="https://docs.gitlab.com/ce/workflow/gitlab_flow.html#merge-pull-requests-with-gitlab-flow"> merge request</a>.
