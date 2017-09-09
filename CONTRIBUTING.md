@@ -10,8 +10,6 @@ Launching of an Ocha program: complete the <a href="http://orchalang.com/howto/o
 
 Using  <a href="https://docs.gitlab.com/ce/workflow/gitlab_flow.html#merge-pull-requests-with-gitlab-flow"> merge request</a>.
 
-Using  <a href="https://docs.gitlab.com/ce/workflow/gitlab_flow.html#merge-pull-requests-with-gitlab-flow"> merge request</a>.
-
 Using <a href="https://docs.gitlab.com/ce/workflow/gitlab_flow.html#issue-tracking-with-gitlab-flow"> issue tracing</a>.
 
 <a  href="https://docs.gitlab.com/ce/workflow/gitlab_flow.html#award-emojis-on-issues-and-merge-requests">Award emojis on issues and merge requests</a>.
