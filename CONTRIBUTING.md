@@ -1,6 +1,10 @@
-Terms of use : Orcha and related software belong to B. Charroux and L. Sliman. They are confidentiels and they can not be used without authorization. Especially, they can not be publish on public repositories.
+<h1>Terms of use</h1>
 
-Installation : complete the <a href="http://orchalang.com/howto/orchaHowTo.html#Install">installation procedure</a>.
+Orcha and related software belong to B. Charroux and L. Sliman. They are confidentiels and they can not be used without authorization. Especially, they can not be publish on public repositories.
+
+<h1>Installation</h1>
+
+Complete the <a href="http://orchalang.com/howto/orchaHowTo.html#Install">installation procedure</a>.
 
 Compilation of an Orcha program: complete the <a href="http://orchalang.com/howto/orchaHowTo.html#Transpilation">transpilation procedure</a>.
 
