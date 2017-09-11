@@ -6,21 +6,29 @@
 </head>
 <body>
 
-<h1>Installation procedure</h1>
+<h1 id="Install">Installation procedure</h1>
 
 <h2>Requirements</h2>
 
-Tested on Windows.<br>
+Tested on Windows but should work on other systems.<br>
 Java JDK 1.8 (not JRE) is needed.<br>
 
-<h2>Installation</h2>
+<h3>Only for coding:</h3>
+
+<a href="https://spring.io/tools">Eclipse Spring tools suite</a> is needed.<br>
+A <a href="https://git-scm.com/book/en/v2/Getting-Started-Installing-Git">git client</a> is needed.<br><br>
+
+<a href="https://docs.gitlab.com/ce/gitlab-basics/README.html">Documentation about gitlab</a>
+
+
+<h2>Installation (from the ZIP file)</h2>
 
 <ul>
 	<li>Download the <a href="http://orchalang.com/howto/OrchaBeforeLibrary.zip">OrchaBeforeLibrary ZIP file</a> and unzip it</li>
 	<li>Open a command line window into the project folder (OrchaBeforeLibrary)</li>
 </ul>
 
-<p>Type the following commands (take care if you copy/paste):</p>
+<p>Type the following commands (take care if you copy/paste from this page):</p>
 
 <ul>
 	<li>gradlew clean</li>
@@ -31,7 +39,31 @@ Java JDK 1.8 (not JRE) is needed.<br>
 
 
 
-<h2>Transpilation of an Orcha program (a business process) into Spring integration</h2>
+<h2>Installation (from gitlab)</h2>
+
+The project home page is: <a href="https://gitlab.com/BenOrcha/orcha">https://gitlab.com/BenOrcha/orcha</a><br>
+
+Clone the project on your local machine using: <a href="https://git-scm.com/docs/git-clone">git clone https://gitlab.com/BenOrcha/orcha</a><br>
+
+Enter the project folder.<br>
+
+<p>Type the following commands (take care if you copy/paste form this page):</p>
+
+<ul>
+	<li>gradlew clean</li>
+	<li>gradlew build</li>
+	<li>gradle eclipse (only for coding)</li>
+</ul>
+
+<p>These commands may take a long time to complete at the first start since it downloads the building tool (Gradle) and all the required libraries (mainly Spring Integration and Spring Boot).</p>
+
+For coding:
+<ul>
+	<li>import the project under Eclipse (menu: file -> import -> existing project into workspace)</li>
+</ul>
+
+
+<h1 id="Transpilation">Transpilation of an Orcha program (a business process) into Spring integration</h1>
 
 <p>The process (file PrepareOrder.groovy) to transpile is into OrchaBeforeLibrary\src\main\orcha\source\prepareOrder:</p>
 <code>
@@ -50,7 +82,9 @@ send prepareOrder.result to delivery<br>
 
 <p>The transpiled code (prepare order.xml) appears into OrchaBeforeLibrary\src\main\resources</p>
 
-<h2>Launch the Orcha process (Orchestration of services)</h2>
+
+
+<h1 id="Launching">Launch the Orcha process (Orchestration of services)</h1>
 
 <code>
 </code>
@@ -67,7 +101,7 @@ send prepareOrder.result to delivery<br>
 
 
 
-<h2>Testing</h2>
+<h1>Testing</h1>
 
 <p>The test program (written in Orcha - Behavior Driven Development) PrepareOrderTest.groovy is into OrchaBeforeLibrary\src\test\orcha\source\prepareOrder:</p>
 <code>
@@ -86,7 +120,7 @@ send prepareOrder.result to delivery<br>
 
 
 
-<h2>Generation of a contract</h2>
+<h1>Generation of a contract</h1>
 
 <p>Type the following commands:</p>
 
@@ -98,7 +132,7 @@ send prepareOrder.result to delivery<br>
 
 
 
-<h2>Selection of a service by comparison</h2>
+<h1>Selection of a service by comparison</h1>
 
 <p>The process to transpile (BenchmarkingVendors.groovy) is into OrchaBeforeLibrary\src\main\orcha\source\order:</p>
 
