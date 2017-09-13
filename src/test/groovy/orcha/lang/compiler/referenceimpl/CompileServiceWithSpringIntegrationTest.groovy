@@ -225,5 +225,11 @@ class CompileServiceWithSpringIntegrationTest {
 		
 	}
 	
+	@Test
+	void benchmarkingExample(){
+		// to be completed...
+		// begin by add the orcha program from src/main/orcha/source/BenchmarkingExample
+	}
+	
 
 }
