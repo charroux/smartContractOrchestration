@@ -27,7 +27,7 @@ class PrepareOrderApplication extends Application{
 }
 
 @SpringBootConfiguration
-class CompileTestConfiguration {
+class PrepareOrderTestConfiguration {
 	
 	@Bean
 	EventHandler customer(){

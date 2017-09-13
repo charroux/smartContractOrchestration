@@ -45,7 +45,7 @@ class CompileServiceWithSpringIntegrationTest {
 	EventHandler delivery
 	
 	@Test
-	void test(){
+	void prepareOrder(){
 		
 		String orchaProgram = 	"package source.prepareOrder\n" +
 		"domain productSales\n" +
