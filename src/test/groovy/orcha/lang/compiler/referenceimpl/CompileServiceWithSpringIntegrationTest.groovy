@@ -44,6 +44,7 @@ class CompileServiceWithSpringIntegrationTest {
 	@Autowired
 	EventHandler delivery
 	
+	
 	@Test
 	void prepareOrder(){
 		
