@@ -26,8 +26,7 @@ import orcha.lang.configuration.OutputFileAdapter.WritingMode
 class PrepareOrderApplication extends Application{
 }
 
-@SpringBootConfiguration
-class PrepareOrderTestConfiguration implements BenchmarkingExampleTestConfiguration{
+trait PrepareOrderTestConfiguration{
 	
 	@Bean
 	EventHandler customer(){
