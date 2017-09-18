@@ -41,7 +41,7 @@ class ComposeFileConfiguration {
 	@Bean
 	EventHandler inputFile(){
 		def eventHandler = new EventHandler(name: "inputFile")
-		def fileAdapter = new InputFileAdapter(directory: 'C:/Users/Charroux_std/Documents/projet/ExecAndShare/orcha/Orcha/input', filenamePattern: "*.txt")
+		def fileAdapter = new InputFileAdapter(directory: 'data/input', filenamePattern: "*.txt")
 		eventHandler.input = new Input(mimeType: "application/json", type: "java.lang.Integer", adapter: fileAdapter)
 		return eventHandler
 	}
@@ -49,7 +49,7 @@ class ComposeFileConfiguration {
 	@Bean
 	EventHandler outputFile(){
 		def eventHandler = new EventHandler(name: "outputFile")
-		def fileAdapter = new OutputFileAdapter(directory: 'C:/Users/Charroux_std/Documents/projet/ExecAndShare/orcha/Orcha/output', createDirectory: true, filename:'output.txt', appendNewLine: true, writingMode: WritingMode.REPLACE)
+		def fileAdapter = new OutputFileAdapter(directory: 'data/output', createDirectory: true, filename:'output.txt', appendNewLine: true, writingMode: WritingMode.REPLACE)
 		eventHandler.output = new Output(mimeType: "text/plain", type: "java.lang.String", adapter: fileAdapter)
 		return eventHandler
 	}

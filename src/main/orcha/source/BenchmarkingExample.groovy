@@ -1,8 +1,8 @@
-				
+title "benchmarking services"
 
-receive event from inputFile	 
-compute code1 with event.value
-receive event from inputFile
-compute code2 with event.value
-when "code1 terminates and code2 terminates"
-send code1.result to outputFile
+receive event from benchmarkingInputFile	 
+compute codeToBenchmark1 with event.value
+receive event from benchmarkingInputFile
+compute codeToBenchmark2 with event.value
+when "codeToBenchmark1 terminates and codeToBenchmark2 terminates"
+send codeToBenchmark1.result to benchmarkingOutputFile

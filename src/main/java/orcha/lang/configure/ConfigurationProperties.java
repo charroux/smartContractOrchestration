@@ -10,17 +10,17 @@ package orcha.lang.configure;
 @org.springframework.boot.context.properties.ConfigurationProperties(prefix = "driving")
 public class ConfigurationProperties {
 
-    public ConfigurationProperties.Delivery delivery = new Delivery();
+    public ConfigurationProperties.OutputFile outputFile = new OutputFile();
 
-    public ConfigurationProperties.Delivery getDelivery() {
-        return delivery;
+    public ConfigurationProperties.OutputFile getOutputFile() {
+        return outputFile;
     }
 
-    public void setDelivery(ConfigurationProperties.Delivery delivery) {
-        this.delivery = delivery;
+    public void setOutputFile(ConfigurationProperties.OutputFile outputFile) {
+        this.outputFile = outputFile;
     }
 
-    public class Delivery {
+    public class OutputFile {
 
         public String directory;
         public String filename;
