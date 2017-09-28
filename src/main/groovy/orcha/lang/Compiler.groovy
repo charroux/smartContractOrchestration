@@ -89,15 +89,51 @@ class Compiler implements CommandLineRunner{
 			
 			configurationPropertiesGenerator.generate(orchaCodeVisitor)
 			
-			String testFolder = orchaSourceFile.getParent().replace("main", "test")
-			File orchaTestSourceDirectory = new File(testFolder)
-			File[] testFiles = orchaTestSourceDirectory.listFiles()
-			if(testFiles!=null && testFiles.length > 0){
-				OrchaCodeVisitor orchaTestCodeVisitor = orchaTestCodeParser.parse(testFiles[0])
+			File orchaSourceTestFile = this.orchaTestFile(orchaSourceFile)
+			
+			if(orchaSourceTestFile != null){
+				OrchaCodeVisitor orchaTestCodeVisitor = orchaTestCodeParser.parse(orchaSourceTestFile)
 				compile.compileForTesting(orchaTestCodeVisitor)
 			}
 			
+			
+/*			if(testFiles!=null && testFiles.length > 0){
+				OrchaCodeVisitor orchaTestCodeVisitor = orchaTestCodeParser.parse(testFiles[0])
+				compile.compileForTesting(orchaTestCodeVisitor)
+			}
+*/			
 		}
+		
+	}
+	
+	private File orchaTestFile(File orchaSourceFile){
+		
+		String testFolder = orchaSourceFile.getParent().replace("main", "test")
+		
+		File orchaTestSourceDirectory = new File(testFolder)
+		File[] testFiles = orchaTestSourceDirectory.listFiles()
+		
+		int numberOfFiles = 0
+		
+		testFiles.each {
+			if(it.isFile()){
+				numberOfFiles++
+			}
+		}
+		
+		if(numberOfFiles == 0){
+			log.info "Unable to find an Orcha test program in: " + testFolder
+			return null
+		}
+		
+		if(numberOfFiles > 1){
+			log.info "Unable to choose an Orcha test program: more than one file in: " + testFolder
+			return null
+		}
+		
+		log.info "Orcha test program found: " + testFiles[0]
+		
+		return testFiles[0]
 		
 	}
 	
