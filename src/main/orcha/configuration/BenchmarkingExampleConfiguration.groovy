@@ -20,7 +20,7 @@ class BenchmarkingExampleConfiguration {
 	
 	@Bean
 	EventHandler benchmarkingInputFile(){
-		def eventHandler = new EventHandler(name: "inputFile")
+		def eventHandler = new EventHandler(name: "benchmarkingInputFile")
 		def fileAdapter = new InputFileAdapter(directory: 'data/input', filenamePattern: "benchmarkingData.txt")
 		eventHandler.input = new Input(mimeType: "application/json", type: "java.lang.Integer", adapter: fileAdapter)
 		return eventHandler
@@ -33,7 +33,7 @@ class BenchmarkingExampleConfiguration {
 	
 	@Bean
 	Application codeToBenchmark1(){
-		def code1Application = new Application(name: "codeToBenchmark1", language: "Groovy")
+		def code1Application = new Application(name: "codeToBenchmark1", language: "Groovy", description:"Receives and integer and returns the opposite value")
 		def groovyCode1Adapter = new JavaServiceAdapter(javaClass: 'service.GroovyCodeToBenchmark1', method:'method')
 		def code1Input = new Input(type: "java.lang.Integer", adapter: groovyCode1Adapter)
 		code1Application.input = code1Input
@@ -49,7 +49,7 @@ class BenchmarkingExampleConfiguration {
 	
 	@Bean
 	Application codeToBenchmark2(){
-		def code1Application = new Application(name: "codeToBenchmark2", language: "Groovy")
+		def code1Application = new Application(name: "codeToBenchmark2", language: "Groovy", description: "Return the received integer")
 		def groovyCode1Adapter = new JavaServiceAdapter(javaClass: 'service.GroovyCodeToBenchmark2', method:'method')
 		def code1Input = new Input(type: "java.lang.Integer", adapter: groovyCode1Adapter)
 		code1Application.input = code1Input
@@ -60,8 +60,8 @@ class BenchmarkingExampleConfiguration {
 	
 	@Bean
 	EventHandler benchmarkingOutputFile(){
-		def eventHandler = new EventHandler(name: "outputFile")
-		def fileAdapter = new OutputFileAdapter(directory: 'data/output', createDirectory: true, filename:'output.txt', appendNewLine: true, writingMode: WritingMode.REPLACE)
+		def eventHandler = new EventHandler(name: "benchmarkingOutputFile")
+		def fileAdapter = new OutputFileAdapter(directory: 'data/output', createDirectory: true, filename:'benchmarkingOutputFile.txt', appendNewLine: true, writingMode: WritingMode.REPLACE)
 		eventHandler.output = new Output(mimeType: "text/plain", type: "java.lang.String", adapter: fileAdapter)
 		return eventHandler
 	}

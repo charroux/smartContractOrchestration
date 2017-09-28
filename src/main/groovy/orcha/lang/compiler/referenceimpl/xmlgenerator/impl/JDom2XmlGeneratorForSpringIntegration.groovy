@@ -467,6 +467,17 @@ class JDom2XmlGeneratorForSpringIntegration implements XmlGenerator{
 
 				generateReceiveEventHandler(instructionNode, xmlSpringIntegration)
 				
+				if(instructionNode.next.instruction.instruction == "receive"){
+					generateRouterForEventHandlers(instructionNode, xmlSpringIntegration)
+					
+					InstructionNode node = instructionNode.next
+					
+					while(node != null){
+						alreadyDoneInstructions.add(node.instruction)
+						node = node.next
+					}
+				}
+				
 /*				if(instructionNode.next.instruction.instruction == "receive"){
 					
 					xmlEvent = generateRouterForEventHandlers(instructionNode)
@@ -627,6 +638,13 @@ class JDom2XmlGeneratorForSpringIntegration implements XmlGenerator{
 		}*/
 		
 
+	}
+	
+	private void generateRouterForEventHandlers(InstructionNode instructionNode, Document xmlSpringIntegration){
+		
+		RouterForEventHandler routerForEventHandler = new RouterForEventHandler(xmlSpringIntegration)
+		routerForEventHandler.routerForEventHandler(instructionNode)
+	
 	}
 	
 	private void generateSendEventHandler(InstructionNode instructionNode, Document xmlSpringIntegration){
