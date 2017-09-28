@@ -12,7 +12,7 @@ Compilation of an Orcha program: complete the <a href="http://orchalang.com/howt
 
 Launching of an Ocha program: complete the <a href="http://orchalang.com/howto/orchaHowTo.html#Launching">launching procedure</a>.
 
-<h1>What to do ?</h1>
+<h1>What to do next ?</h1>
 
 Discover what are the <a href="https://gitlab.com/BenOrcha/orcha/boards?milestone_title=Minimal%20viable%20prototype&=">issues</a> I can solve.
 
