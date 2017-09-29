@@ -47,7 +47,9 @@ class CompileServiceWithSpringIntegrationTest {
 	
 	@Test
 	void prepareOrder(){
-		
+	
+		// the Orcha source program
+			
 		String orchaProgram = 	"package source.prepareOrder\n" +
 		"domain productSales\n" +
 		"description 'Prepare an order.'\n" +
@@ -59,14 +61,20 @@ class CompileServiceWithSpringIntegrationTest {
 		"when 'prepareOrder terminates'\n" + 
 		"send prepareOrder.result to delivery"
 		
+		// construct the graph of instructions for the Orcha programm
+		
 		OrchaCodeVisitor orchaCodeVisitor = orchaCodeParser.parse(orchaProgram)
 		
+		// generate an XML file (Spring integration configuration): this is the file to be tested
+		 
 		String path = "." + File.separator + "src" + File.separator + "test" + File.separator + "resources" + File.separator		
 		File destinationDirectory = new File(path)
 		compile.compile(orchaCodeVisitor, destinationDirectory)
 		
 		String xmlSpringContextFileName = orchaCodeVisitor.getOrchaMetadata().getTitle() + ".xml"
 		String pathToXmlFile = destinationDirectory.getAbsolutePath() + File.separator + xmlSpringContextFileName
+		
+		// parse the XML file checking is correctness
 		
 		SAXBuilder builder = new SAXBuilder()
 		
