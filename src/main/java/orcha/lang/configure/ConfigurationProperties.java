@@ -10,17 +10,17 @@ package orcha.lang.configure;
 @org.springframework.boot.context.properties.ConfigurationProperties(prefix = "driving")
 public class ConfigurationProperties {
 
-    public ConfigurationProperties.EventFilteringOutputFile eventFilteringOutputFile = new EventFilteringOutputFile();
+    public ConfigurationProperties.ComputesInSeriesOutputFile computesInSeriesOutputFile = new ComputesInSeriesOutputFile();
 
-    public ConfigurationProperties.EventFilteringOutputFile getEventFilteringOutputFile() {
-        return eventFilteringOutputFile;
+    public ConfigurationProperties.ComputesInSeriesOutputFile getComputesInSeriesOutputFile() {
+        return computesInSeriesOutputFile;
     }
 
-    public void setEventFilteringOutputFile(ConfigurationProperties.EventFilteringOutputFile eventFilteringOutputFile) {
-        this.eventFilteringOutputFile = eventFilteringOutputFile;
+    public void setComputesInSeriesOutputFile(ConfigurationProperties.ComputesInSeriesOutputFile computesInSeriesOutputFile) {
+        this.computesInSeriesOutputFile = computesInSeriesOutputFile;
     }
 
-    public class EventFilteringOutputFile {
+    public class ComputesInSeriesOutputFile {
 
         public String directory;
         public String filename;

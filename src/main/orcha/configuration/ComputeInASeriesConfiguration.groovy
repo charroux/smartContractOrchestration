@@ -11,35 +11,43 @@ import orcha.lang.configuration.OutputFileAdapter
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import service.MyProgram1;
-import service.MyProgram2
+import service.Program1;
+import service.Program2
 
 @Configuration
 class ComputeInASeriesConfiguration {
+	
+	@Bean
+	EventHandler computesInSeriesInputFile(){
+		def eventHandler = new EventHandler(name: "computesInSeriesInputFile")
+		def fileAdapter = new InputFileAdapter(directory: 'data/input', filenamePattern: "computesInSeriesInputFile.txt")
+		eventHandler.input = new Input(mimeType: "application/json", type: "java.lang.Integer", adapter: fileAdapter)
+		return eventHandler
+	}
 		
 	@Bean
-	MyProgram1 myProgram1(){
-		return new MyProgram1()
+	Program1 program1(){
+		return new Program1()
 	}
 	
 	@Bean
-	Application program1(){
-		def program1 = new Application(name: "program1", language: "Java")
-		def javaAdapter = new JavaServiceAdapter(javaClass: 'service.MyProgram1', method:'myMethod')
+	Application firstProgram(){
+		def program1 = new Application(name: "firstProgram", language: "Java")
+		def javaAdapter = new JavaServiceAdapter(javaClass: 'service.Program1', method:'myMethod')
 		program1.input = new Input(type: "java.lang.Integer", adapter: javaAdapter)
 		program1.output = new Output(type: "java.lang.Integer", adapter: javaAdapter)
 		return program1
 	}
 	
 	@Bean
-	MyProgram2 myProgram2(){
-		return new MyProgram2()
+	Program2 program2(){
+		return new Program2()
 	}
 	
 	@Bean
-	Application program2(){
-		def program2 = new Application(name: "program2", language: "Java")
-		def javaAdapter = new JavaServiceAdapter(javaClass: 'service.MyProgram2', method:'myMethod')
+	Application secondProgram(){
+		def program2 = new Application(name: "secondProgram", language: "Java")
+		def javaAdapter = new JavaServiceAdapter(javaClass: 'service.Program2', method:'myMethod')
 		program2.input = new Input(type: "java.lang.Integer", adapter: javaAdapter)
 		program2.output = new Output(type: "java.lang.Integer", adapter: javaAdapter)
 		return program2
@@ -60,4 +68,13 @@ class ComputeInASeriesConfiguration {
 		eventHandler.output = new Output(mimeType: "text/plain", type: "java.lang.String", adapter: fileAdapter)
 		return eventHandler
 	}
+	
+	@Bean
+	EventHandler computesInSeriesOutputFile(){
+		def eventHandler = new EventHandler(name: "computesInSeriesOutputFile")
+		def fileAdapter = new OutputFileAdapter(directory: 'data/output', createDirectory: true, filename:'computesInSeriesOutputFile.txt', appendNewLine: true, writingMode: WritingMode.REPLACE)
+		eventHandler.output = new Output(mimeType: "text/plain", type: "java.lang.String", adapter: fileAdapter)
+		return eventHandler
+	}
+	
 }
