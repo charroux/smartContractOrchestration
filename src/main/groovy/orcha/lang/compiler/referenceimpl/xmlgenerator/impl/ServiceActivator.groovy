@@ -73,7 +73,7 @@ class ServiceActivator implements Chain, Poller, QoS, orcha.lang.compiler.refere
 			def location = scriptingServiceAdapter.file
 			def language = instructionNode.instruction.springBean.language
 
-			serviceActivatorElement = new Element("int:service-activator", namespace)
+			serviceActivatorElement = new Element("service-activator", namespace)
 			serviceActivatorElement.setAttribute("id", "service-activator-"+id+"-id")
 										
 			Element scriptElement = new Element("script", Namespace.getNamespace("int-script", "http://www.springframework.org/schema/integration/scripting"))

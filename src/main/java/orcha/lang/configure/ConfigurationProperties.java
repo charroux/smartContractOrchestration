@@ -10,17 +10,17 @@ package orcha.lang.configure;
 @org.springframework.boot.context.properties.ConfigurationProperties(prefix = "driving")
 public class ConfigurationProperties {
 
-    public ConfigurationProperties.ComputesInSeriesOutputFile computesInSeriesOutputFile = new ComputesInSeriesOutputFile();
+    public ConfigurationProperties.JavascriptServiceOutputFile javascriptServiceOutputFile = new JavascriptServiceOutputFile();
 
-    public ConfigurationProperties.ComputesInSeriesOutputFile getComputesInSeriesOutputFile() {
-        return computesInSeriesOutputFile;
+    public ConfigurationProperties.JavascriptServiceOutputFile getJavascriptServiceOutputFile() {
+        return javascriptServiceOutputFile;
     }
 
-    public void setComputesInSeriesOutputFile(ConfigurationProperties.ComputesInSeriesOutputFile computesInSeriesOutputFile) {
-        this.computesInSeriesOutputFile = computesInSeriesOutputFile;
+    public void setJavascriptServiceOutputFile(ConfigurationProperties.JavascriptServiceOutputFile javascriptServiceOutputFile) {
+        this.javascriptServiceOutputFile = javascriptServiceOutputFile;
     }
 
-    public class ComputesInSeriesOutputFile {
+    public class JavascriptServiceOutputFile {
 
         public String directory;
         public String filename;
