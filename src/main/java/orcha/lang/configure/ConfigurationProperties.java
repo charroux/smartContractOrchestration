@@ -10,17 +10,17 @@ package orcha.lang.configure;
 @org.springframework.boot.context.properties.ConfigurationProperties(prefix = "driving")
 public class ConfigurationProperties {
 
-    public ConfigurationProperties.JavascriptServiceOutputFile javascriptServiceOutputFile = new JavascriptServiceOutputFile();
+    public ConfigurationProperties.QosOutputFile qosOutputFile = new QosOutputFile();
 
-    public ConfigurationProperties.JavascriptServiceOutputFile getJavascriptServiceOutputFile() {
-        return javascriptServiceOutputFile;
+    public ConfigurationProperties.QosOutputFile getQosOutputFile() {
+        return qosOutputFile;
     }
 
-    public void setJavascriptServiceOutputFile(ConfigurationProperties.JavascriptServiceOutputFile javascriptServiceOutputFile) {
-        this.javascriptServiceOutputFile = javascriptServiceOutputFile;
+    public void setQosOutputFile(ConfigurationProperties.QosOutputFile qosOutputFile) {
+        this.qosOutputFile = qosOutputFile;
     }
 
-    public class JavascriptServiceOutputFile {
+    public class QosOutputFile {
 
         public String directory;
         public String filename;

@@ -22,7 +22,7 @@ class BenchmarkingExampleConfiguration {
 	EventHandler benchmarkingInputFile(){
 		def eventHandler = new EventHandler(name: "benchmarkingInputFile")
 		def fileAdapter = new InputFileAdapter(directory: 'data/input', filenamePattern: "benchmarkingData.txt")
-		eventHandler.input = new Input(mimeType: "application/json", type: "java.lang.Integer", adapter: fileAdapter)
+		eventHandler.input = new Input(mimeType: "text/plain", type: "java.lang.Integer", adapter: fileAdapter)
 		return eventHandler
 	}
 	

@@ -9,8 +9,8 @@ import org.springframework.context.annotation.ImportResource;
  * 
  */
 @ImportResource({
-    "javascript service.xml",
-    "javascript serviceQoS.xml"
+    "retry.xml",
+    "retryQoS.xml"
 })
 public class ImportDynamicResourcesForConfiguration {
 
