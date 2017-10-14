@@ -13,8 +13,8 @@ import orcha.lang.configuration.Output
 
 /**
  * 
- * The circuit is oppened after two failure.
- * If another service call is done before 5000 ms (delay to return the state half-opening state) then the service is not called.
+ * The circuit is opened after two failure.
+ * If another service call is done before 5000 ms (delay to return to the state half-opening state) then the service is not called anymore (state opened).
  * 
  * @author Ben C.
  *

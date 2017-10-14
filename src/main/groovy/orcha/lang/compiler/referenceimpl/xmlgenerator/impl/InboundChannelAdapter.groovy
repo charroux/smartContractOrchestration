@@ -40,7 +40,7 @@ class InboundChannelAdapter implements Poller, Chain, HeaderEnricher, Filter, Tr
 		Element pollerElement
 		
 		if(instructionNode.options!=null && instructionNode.options.queue!=null){
-			element.setAttribute("queue-size", instructionNode.options.queue.capacity)
+			element.setAttribute("queue-size", instructionNode.options.queue.capacity.toString())
 			pollerElement = poller(instructionNode.options.queue)
 		} else {
 			QueueOption queueOption = new QueueOption(fixedDelay: 1000)

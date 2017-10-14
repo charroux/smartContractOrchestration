@@ -14,11 +14,6 @@ import java.lang.annotation.ElementType
    String cron()		default ""
 }
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
 /**
  * Unlike the CircuitBreaker pattern the same message is processed again an again until the maxNumberOfAttempts is reached after which:
  * - the maxNumberOfAttempts is reinitialized to zero
