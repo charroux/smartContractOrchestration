@@ -1,4 +1,5 @@
 title "computes in series"
+description "Read the content of a text file. Pass its content to a service. Launch another service in a serie. Then write the result of the lastest service to a file."
 
 receive event from computesInSeriesInputFile			
 compute firstProgram with event.value

@@ -15,13 +15,13 @@ import service.Program1;
 import service.Program2
 
 @Configuration
-class ComputeInASeriesConfiguration {
+class ComputesInSeriesConfiguration {
 	
 	@Bean
 	EventHandler computesInSeriesInputFile(){
 		def eventHandler = new EventHandler(name: "computesInSeriesInputFile")
 		def fileAdapter = new InputFileAdapter(directory: 'data/input', filenamePattern: "computesInSeriesInputFile.txt")
-		eventHandler.input = new Input(mimeType: "application/json", type: "java.lang.Integer", adapter: fileAdapter)
+		eventHandler.input = new Input(mimeType: "text/plain", type: "java.lang.Integer", adapter: fileAdapter)
 		return eventHandler
 	}
 		
@@ -53,7 +53,7 @@ class ComputeInASeriesConfiguration {
 		return program2
 	}
 
-	@Bean
+/*	@Bean
 	EventHandler inputFile(){
 		def eventHandler = new EventHandler(name: "inputFile")
 		def fileAdapter = new InputFileAdapter(directory: 'C:/Users/Charroux_std/Documents/projet/ExecAndShare/orcha/Orcha/input', filenamePattern: "*.txt")
@@ -67,7 +67,7 @@ class ComputeInASeriesConfiguration {
 		def fileAdapter = new OutputFileAdapter(directory: 'C:/Users/Charroux_std/Documents/projet/ExecAndShare/orcha/Orcha/output', createDirectory: true, filename:'output.txt', appendNewLine: true, writingMode: WritingMode.REPLACE)
 		eventHandler.output = new Output(mimeType: "text/plain", type: "java.lang.String", adapter: fileAdapter)
 		return eventHandler
-	}
+	}*/
 	
 	@Bean
 	EventHandler computesInSeriesOutputFile(){

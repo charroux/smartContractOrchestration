@@ -10,17 +10,17 @@ package orcha.lang.configure;
 @org.springframework.boot.context.properties.ConfigurationProperties(prefix = "driving")
 public class ConfigurationProperties {
 
-    public ConfigurationProperties.QosOutputFile qosOutputFile = new QosOutputFile();
+    public ConfigurationProperties.ComputesInSeriesOutputFile computesInSeriesOutputFile = new ComputesInSeriesOutputFile();
 
-    public ConfigurationProperties.QosOutputFile getQosOutputFile() {
-        return qosOutputFile;
+    public ConfigurationProperties.ComputesInSeriesOutputFile getComputesInSeriesOutputFile() {
+        return computesInSeriesOutputFile;
     }
 
-    public void setQosOutputFile(ConfigurationProperties.QosOutputFile qosOutputFile) {
-        this.qosOutputFile = qosOutputFile;
+    public void setComputesInSeriesOutputFile(ConfigurationProperties.ComputesInSeriesOutputFile computesInSeriesOutputFile) {
+        this.computesInSeriesOutputFile = computesInSeriesOutputFile;
     }
 
-    public class QosOutputFile {
+    public class ComputesInSeriesOutputFile {
 
         public String directory;
         public String filename;

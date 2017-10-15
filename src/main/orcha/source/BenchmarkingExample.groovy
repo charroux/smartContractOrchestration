@@ -1,4 +1,5 @@
 title "benchmarking services"
+description "Read a tesxt file, dispatch its content to two services, then launch the two services and wait until the two services complete. Write the result to a service into a file."
 
 receive event from benchmarkingInputFile	 
 compute codeToBenchmark1 with event.value
