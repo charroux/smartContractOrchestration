@@ -5,6 +5,7 @@ import org.jdom2.Namespace
 import orcha.lang.compiler.Instruction
 import orcha.lang.compiler.InstructionNode
 import orcha.lang.compiler.qualityOfService.EventSourcingOption
+import orcha.lang.configuration.EventSourcing.JoinPoint
 
 trait Transformer implements Bean, QoS{
 
@@ -56,7 +57,7 @@ trait Transformer implements Bean, QoS{
 				Element adviceChain = new Element("request-handler-advice-chain", namespace)
 				transformer.addContent(adviceChain)
 				Element eventSourcingElement = eventSourcing(instructionNode.options.eventSourcing)
-				adviceChain.addContent(adviceChain)
+				adviceChain.addContent(eventSourcingElement)
 			}
 		}
 		

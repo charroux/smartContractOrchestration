@@ -9,8 +9,8 @@ import org.springframework.context.annotation.ImportResource;
  * 
  */
 @ImportResource({
-    "computes in series.xml",
-    "computes in seriesQoS.xml"
+    "event sourcing.xml",
+    "event sourcingQoS.xml"
 })
 public class ImportDynamicResourcesForConfiguration {
 
