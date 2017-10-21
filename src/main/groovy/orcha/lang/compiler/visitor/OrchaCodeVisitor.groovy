@@ -22,6 +22,8 @@ import org.codehaus.groovy.ast.ClassCodeVisitorSupport
  */
 abstract class OrchaCodeVisitor extends ClassCodeVisitorSupport{
 	
+	abstract String getOrchaSourceProgram()
+	
 	abstract OrchaMetadata getOrchaMetadata()
 	
 	//abstract void parseSourceFile(File orchaFile) throws OrchaCompilationException, OrchaConfigurationException

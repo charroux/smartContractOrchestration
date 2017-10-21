@@ -44,7 +44,7 @@ class Fail implements Bean{
 		
 		def properties = [application: failedServiceName]
 		Element beanElement = beanWithRef("orcha.lang.compiler.referenceimpl.xmlgenerator.impl.ErrorToApplicationTransformer", properties)
-		rootElement.addContent(bean)		
+		rootElement.addContent(beanElement)		
 		
 		transformer = new Element("transformer", namespace)
 		transformer.setAttribute("input-channel", failChannel+"-ErrorToApplication-output")

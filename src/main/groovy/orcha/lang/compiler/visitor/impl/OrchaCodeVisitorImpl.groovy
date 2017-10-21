@@ -47,7 +47,7 @@ import groovy.util.logging.Slf4j
 @Slf4j
 class OrchaCodeVisitorImpl extends OrchaCodeVisitor{
 	
-	//File orchaFile
+	String orchaSourceProgram
 	
 	ApplicationContext context
 	
@@ -59,6 +59,10 @@ class OrchaCodeVisitorImpl extends OrchaCodeVisitor{
 
 	public OrchaMetadata getOrchaMetadata() {
 		return orchaMetadata;
+	}
+	
+	public String getOrchaSourceProgram(){
+		return 	orchaSourceProgram
 	}
 	
 	private List<InstructionNode> graphOfInstructions = []

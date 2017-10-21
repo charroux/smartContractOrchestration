@@ -132,7 +132,7 @@ class ServiceActivator implements Chain, Poller, QoS, orcha.lang.compiler.refere
 								
 		}
 																						
-		if(instructionNode.options.eventSourcing!=null){
+		if(instructionNode.options!=null && instructionNode.options.eventSourcing!=null){
 						
 			if(instructionNode.options.eventSourcing.joinPoint==JoinPoint.before || instructionNode.options.eventSourcing.joinPoint==JoinPoint.beforeAndAfter){
 				Element eventSourcingElement = eventSourcing(instructionNode.options.eventSourcing)

@@ -11,15 +11,23 @@
  <inceptionYear>2017</inceptionYear>
   <description>Chose among TV vendors the best one</description>
   
+  <process></process>
+  
   <domain>
   	<name>Sale</name>
   </domain>
   
+  <requirements>
+  </requirements>
+      
   <commitments>
   </commitments>
   
   <serviceLevelAgreements>
   </serviceLevelAgreements>
+  
+  <deliveries>
+  </deliveries>
   
   <organization>
   	<name>OLabDymanics</name>

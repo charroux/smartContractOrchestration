@@ -34,7 +34,7 @@ class PrepareOrderConfiguration {
 	
 	@Bean
 	Application prepareOrder(){
-		def program = new PrepareOrderApplication(name: "prepareOrder", specifications: "Prepare an order for a customer. Argument: service.prepareOrder.Order. Return: service.prepareOrder.PreparedOrder", description: "Add an address for the delivery to an order.", language: "js")
+		def program = new PrepareOrderApplication(name: "prepareOrder", specifications: "Prepare an order for a customer.", description: "Add an address for the delivery to an order.", language: "js")
 		def javaAdapter = new JavaServiceAdapter(javaClass: 'service.prepareOrder.OrderPreparation', method:'prepare')
 		program.input = new Input(type: "service.prepareOrder.Order", adapter: javaAdapter)
 		program.output = new Output(type: "service.prepareOrder.PreparedOrder", adapter: javaAdapter)

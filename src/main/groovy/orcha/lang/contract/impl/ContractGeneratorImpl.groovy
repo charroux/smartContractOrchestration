@@ -66,11 +66,15 @@ class ContractGeneratorImpl implements ContractGenerator{
 	@Override
 	public void generateAll(OrchaCodeVisitor orchaCodeVisitor) {
 		
+		this.updateProcess(orchaCodeVisitor)
+		
 		this.updateRequirements(orchaCodeVisitor)
 		
 		this.updateCommitments(orchaCodeVisitor)
 		
 		this.updateServiceLevelAgreements(orchaCodeVisitor)
+		
+		this.updateDeliveries(orchaCodeVisitor)
 		
 	}
 	
@@ -101,37 +105,89 @@ class ContractGeneratorImpl implements ContractGenerator{
 		xmlProcessor.process(fw, jdomFormat, document)
 		
 	}
+
+	@Override
+	public void updateRequirements(OrchaCodeVisitor orchaCodeVisitor){
+		
+		XPathFactory xFactory = XPathFactory.instance()
+		XPathExpression<Element> expr = xFactory.compile("//*[local-name() = 'requirements']/*[local-name() = 'requirement']", Filters.element())
+		List<Element> requirements = expr.evaluate(document)
+
+		List<InstructionNode> receiveNodes = orchaCodeVisitor.findAllReceiveNodes()
+		
+		receiveNodes.each { receiveNode ->
+			
+			Element requirement = requirements.find{ it.getAttribute("eventHandlerName", namespace) == receiveNode.instruction.springBean.name }
+			if(requirement == null){
+				requirement = new Element("requirement", namespace)
+				requirement.setAttribute("eventHandlerName", receiveNode.instruction.springBean.name)
+			}
+			xFactory.compile("//*[local-name() = 'requirements']", Filters.element()).evaluate(document).getAt(0).addContent(requirement)
+			
+			this.updateInput(receiveNode, requirement)
+			
+		}
+
+		log.info "Requirements updated in XML document"
+				
+	}
+	
+	@Override
+	public void updateDeliveries(OrchaCodeVisitor orchaCodeVisitor){
+		
+		XPathFactory xFactory = XPathFactory.instance()
+		XPathExpression<Element> expr = xFactory.compile("//*[local-name() = 'deliveries']/*[local-name() = 'delivery']", Filters.element())
+		List<Element> deliveries = expr.evaluate(document)
+
+		List<InstructionNode> sendNodes = orchaCodeVisitor.findAllSendNodes()
+		
+		sendNodes.each { sendNode ->
+			
+			Element delivery = deliveries.find{ it.getAttribute("eventHandlerName", namespace) == sendNode.instruction.springBean.name }
+			if(delivery == null){
+				delivery = new Element("delivery", namespace)
+				delivery.setAttribute("eventHandlerName", sendNode.instruction.springBean.name)
+			}
+			xFactory.compile("//*[local-name() = 'deliveries']", Filters.element()).evaluate(document).getAt(0).addContent(delivery)
+		
+			this.updateOutput(sendNode, delivery)
+		}
+		
+		log.info "Deliveries updated in XML document"
+				
+	}
 	
 	@Override
 	public void updateCommitments(OrchaCodeVisitor orchaCodeVisitor){
 		
 		XPathFactory xFactory = XPathFactory.instance()
-		XPathExpression<Element> expr = xFactory.compile("//*[local-name() = 'commitments']/*[local-name() = 'commitment']/*[local-name() = 'name']", Filters.element())
-		List<Element> elements = expr.evaluate(document)
-		def names = []
-		for(Element element: elements){
-			names.add(element.getValue())
-		}
+		XPathExpression<Element> expr = xFactory.compile("//*[local-name() = 'commitments']/*[local-name() = 'commitment']", Filters.element())
+		List<Element> commitments = expr.evaluate(document)
 
 		List<InstructionNode> computeNodes = orchaCodeVisitor.findAllComputeNodes()
 		
 		computeNodes.each { computeNode ->
-			Application application = (Application)computeNode.instruction.springBean
-			if(names.contains(application.name) == false){
-				elements = xFactory.compile("//*[local-name() = 'commitments']", Filters.element()).evaluate(document)
-				Element commitments = elements.get(0)	// commitments
-				Element element = new Element("commitment", namespace)
-				if(application.name != null){
-					element.addContent(new Element("name", namespace).addContent(application.name))
-				}
-				if(application.description != null){
-					element.addContent(new Element("description", namespace).addContent(application.description))
-				} 
-				if(application.specifications){
-					element.addContent(new Element("specifications", namespace).addContent(application.specifications))
-				}
-				commitments.addContent(element)
+			
+			Application application = computeNode.instruction.springBean
+			
+			Element commitment = commitments.find{ it.getAttribute("serviceName", namespace) == application.name }
+			if(commitment == null){
+				commitment = new Element("commitment", namespace)
+				commitment.setAttribute("serviceName", application.name)
+			}	
+			xFactory.compile("//*[local-name() = 'commitments']", Filters.element()).evaluate(document).getAt(0).addContent(commitment)
+			
+			if(application.description != null){
+				commitment.addContent(new Element("description", namespace).addContent(application.description))
+			} 
+			if(application.specifications){
+				commitment.addContent(new Element("specifications", namespace).addContent(application.specifications))
 			}
+			
+			this.updateInput(computeNode, commitment)
+		
+			this.updateOutput(computeNode, commitment)
+			
 		}
 		
 		this.updateQualityOfServices(orchaCodeVisitor)
@@ -141,7 +197,7 @@ class ContractGeneratorImpl implements ContractGenerator{
 	}
 
 	@Override
-	public void updateRequirements(OrchaCodeVisitor orchaCodeVisitor){
+	public void updateProcess(OrchaCodeVisitor orchaCodeVisitor){
 		
 		OrchaMetadata orchaMetadata = orchaCodeVisitor.getOrchaMetadata()
 		
@@ -183,6 +239,20 @@ class ContractGeneratorImpl implements ContractGenerator{
 			element.setText(metadata)
 		}
 		
+		
+		
+		
+		expr = xFactory.compile("//*[local-name() = 'process']", Filters.element())
+		elements = expr.evaluate(document)
+		element = elements.getAt(0)
+		 
+		String orchaSourceProgram = orchaCodeVisitor.getOrchaSourceProgram()
+		element.setText(orchaSourceProgram)
+		
+		 
+		 
+		 
+		
 		expr = xFactory.compile("//*[local-name() = 'authors']/*[local-name() = 'author']/*[local-name() = 'name']", Filters.element())
 		elements = expr.evaluate(document)
 		def names = []
@@ -204,6 +274,97 @@ class ContractGeneratorImpl implements ContractGenerator{
 				
 	}
 
+	private void updateInput(InstructionNode instructionNode, Element element) {
+		
+		Object springBean = instructionNode.instruction.springBean	// Application or EventHandler
+			 
+		if(springBean.input != null){
+			Element input = element.getChild("input", namespace)
+			Element mimeType
+			Element type
+			if(input == null){	// there is no input yet
+				input = new Element("input", namespace)
+				if(springBean.input.mimeType != null){
+					mimeType = new Element("mimeType", namespace)
+					mimeType.setText(springBean.input.mimeType)
+					input.addContent(mimeType)
+				}
+				if(springBean.input.type != null){
+					type = new Element("type", namespace)
+					type.setText(springBean.input.type)
+					input.addContent(type)
+				}
+				element.addContent(input)
+			} else {	// there is an input
+				if(springBean.input.mimeType != null){
+					mimeType = input.getChild("mimeType", namespace)
+					if(mimeType == null){
+						mimeType = new Element("mimeType", namespace)
+						input.addContent(mimeType)
+					} 						
+					mimeType.setText(springBean.input.mimeType)
+				}
+				if(springBean.input.type != null){
+					type = input.getChild("type", namespace)
+					if(type == null){
+						type = new Element("type", namespace)
+						input.addContent(type)
+					} 
+					type.setText(springBean.input.type)
+				}
+			}
+
+		}
+
+		log.info "Inputs updated in XML document"
+	}
+	
+	private void updateOutput(InstructionNode instructionNode, Element element) {
+		
+		Object springBean = instructionNode.instruction.springBean	// Application or EventHandler
+			 
+		if(springBean.output != null){
+		
+			Element output = element.getChild("output", namespace)
+			Element mimeType
+			Element type
+			if(output == null){	// there is no output yet
+				output = new Element("output", namespace)
+				if(springBean.output.mimeType != null){
+					mimeType = new Element("mimeType", namespace)
+					mimeType.setText(springBean.output.mimeType)
+					output.addContent(mimeType)
+				}
+				if(springBean.output.type != null){
+					type = new Element("type", namespace)
+					type.setText(springBean.output.type)
+					output.addContent(type)
+				}
+				element.addContent(output)
+			} else {	// there is an input
+				if(springBean.output.mimeType != null){
+					mimeType = output.getChild("mimeType", namespace)
+					if(mimeType == null){
+						mimeType = new Element("mimeType", namespace)
+						output.addContent(mimeType)
+					}
+					mimeType.setText(springBean.output.mimeType)
+				}
+				if(springBean.output.type != null){
+					type = output.getChild("type", namespace)
+					if(type == null){
+						type = new Element("type", namespace)
+						output.addContent(type)
+					}
+					type.setText(springBean.output.type)
+				}
+			}
+		}
+		
+		log.info "Outputs updated in XML document"
+
+	}
+	
 	private void updateQualityOfServices(OrchaCodeVisitor orchaCodeVisitor) {
 		
 		qualityOfService.setQualityOfServiceToInstructions(orchaCodeVisitor)
