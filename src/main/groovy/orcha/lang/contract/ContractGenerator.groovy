@@ -14,7 +14,7 @@ interface ContractGenerator {
 	
 	void generateAll(OrchaCodeVisitor orchaCodeVisitor)
 	
-	void updateRequirements(OrchaCodeVisitor orchaCodeVisitor)
+	void updatePrerequisites(OrchaCodeVisitor orchaCodeVisitor)
 	
 	void updateCommitments(OrchaCodeVisitor orchaCodeVisitor)
 

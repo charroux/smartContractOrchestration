@@ -92,7 +92,7 @@ class EventSourcingConfiguration {
 	
 	@Bean
 	Application serviceWithEventSourcingBeforeService(){
-		def jsApp = new ApplicationWithEventSourcingAfterService(name: "serviceWithEventSourcingBeforeService", language: "js", specifications: "", description: "")
+		def jsApp = new ApplicationWithEventSourcingBeforeService(name: "serviceWithEventSourcingBeforeService", language: "js", specifications: "", description: "")
 		def scriptAdapter = new ScriptServiceAdapter(file: 'file:src/main/orcha/service/eventSourcing/serviceWithEventSourcingBeforeService.js')
 		jsApp.input = new Input(type: "service.eventSourcing.Intermediate", adapter: scriptAdapter)
 		jsApp.output = new Output(type: "service.eventSourcing.Output", adapter: scriptAdapter)

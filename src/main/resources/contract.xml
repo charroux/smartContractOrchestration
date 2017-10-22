@@ -17,8 +17,8 @@
   	<name>Sale</name>
   </domain>
   
-  <requirements>
-  </requirements>
+  <prerequisites>
+  </prerequisites>
       
   <commitments>
   </commitments>
@@ -28,15 +28,14 @@
   
   <deliveries>
   </deliveries>
-  
+
+  <checkpoints>
+  </checkpoints>
+    
   <organization>
   	<name>OLabDymanics</name>
   	<url>http://olab-dynamics.org</url>
   </organization>
-  
-  <prerequisites>
-    <orcha>3.0</orcha>
-  </prerequisites>
   
   <licenses>
   	<license>

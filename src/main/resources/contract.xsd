@@ -113,17 +113,17 @@
     		</xs:annotation>
     	</xs:element>
 
-		<xs:element name="requirements">
+		<xs:element name="prerequisites">
     		<xs:annotation>
     			<xs:documentation source="version">
     				0.0.1
     			</xs:documentation>
-    			<xs:documentation source="description">Requirements to active the active contract</xs:documentation>
+    			<xs:documentation source="description">Prerequisites to active the active contract</xs:documentation>
     		</xs:annotation>
     		<xs:complexType>
     			<xs:sequence>
-    				<xs:element name="requirement" minOccurs="0"
-    					maxOccurs="unbounded" type="Requirement" />
+    				<xs:element name="prerequisite" minOccurs="0"
+    					maxOccurs="unbounded" type="Prerequisite" />
     			</xs:sequence>
     		</xs:complexType>		
 		</xs:element>
@@ -165,6 +165,24 @@
     		</xs:complexType>
     	</xs:element>
 
+    	<xs:element name="checkpoints">
+    		<xs:annotation>
+    			<xs:documentation source="version">
+    				0.0.1
+    			</xs:documentation>
+    			<xs:documentation source="description">
+    				Where event are catch to verify the correctness of the active contract.
+    			</xs:documentation>
+    		</xs:annotation>
+    		<xs:complexType>
+    			<xs:sequence>
+    				<xs:element name="checkpoint"
+    					minOccurs="0" maxOccurs="unbounded"
+    					type="Checkpoint" />
+    			</xs:sequence>
+    		</xs:complexType>
+    	</xs:element>
+    	
 		<xs:element name="deliveries">
     		<xs:annotation>
     			<xs:documentation source="version">
@@ -248,17 +266,6 @@
     					maxOccurs="unbounded" type="MailingList" />
     			</xs:sequence>
     		</xs:complexType>
-    	</xs:element>
-    	<xs:element minOccurs="0" name="prerequisites"
-    		type="Prerequisites">
-    		<xs:annotation>
-    			<xs:documentation source="version">
-    				0.0.1
-    			</xs:documentation>
-    			<xs:documentation source="description">
-    				Describes the prerequisites for this contract.
-    			</xs:documentation>
-    		</xs:annotation>
     	</xs:element>
     	<xs:element minOccurs="0" name="properties">
     		<xs:annotation>
@@ -346,17 +353,6 @@
     			<xs:documentation source="description"></xs:documentation>
     		</xs:annotation>
     	</xs:element>
-    	<xs:element minOccurs="0" name="checkpoint" type="Checkpoint">
-    		<xs:annotation>
-    			<xs:documentation source="version">
-    				0.0.1
-    			</xs:documentation>
-    			<xs:documentation source="description">
-    				A checkpoint is a point (join point) in a process
-    				where messages are logged.
-    			</xs:documentation>
-    		</xs:annotation>
-    	</xs:element>
     	<xs:element minOccurs="0" name="input" type="Input">
     		<xs:annotation>
     			<xs:documentation source="version">
@@ -378,55 +374,7 @@
     		</xs:annotation>
     	</xs:element>
     </xs:all>
-    <xs:attribute name="serviceName" type="xs:string"></xs:attribute>
-  </xs:complexType>
-  
-  <xs:complexType name="Prerequisites">
-    <xs:annotation>
-      <xs:documentation source="version">0.0.1</xs:documentation>
-      <xs:documentation source="description">Describes the prerequisites a contract can have.</xs:documentation>
-    </xs:annotation>
-    <xs:all>
-      <xs:element minOccurs="0" name="orcha" type="xs:string" default="1.0">
-        <xs:annotation>
-          <xs:documentation source="version">0.0.1</xs:documentation>
-          <xs:documentation source="description">
-
-          </xs:documentation>
-        </xs:annotation>
-      </xs:element>
-    </xs:all>
-  </xs:complexType>
-
-  <xs:complexType name="Checkpoint">
-    <xs:annotation>
-      <xs:documentation source="version">0.0.1</xs:documentation>
-      <xs:documentation source="description">A checkpoint is a point (joint point) in a process where messages are logged.</xs:documentation>
-    </xs:annotation>
-    <xs:all>
-    	<xs:element minOccurs="0" name="eventName" type="xs:string">
-    	</xs:element>
-    	<xs:element name="joinpoint">
-    		<xs:annotation>
-    			<xs:documentation source="version">
-    				0.0.1
-    			</xs:documentation>
-    			<xs:documentation source="description">
-    				The joint point define the point where messages
-    				extracted. It can be before, after or both a service
-    				call.
-    			</xs:documentation>
-    		</xs:annotation>
-    		<xs:simpleType>
-    			<xs:restriction base="xs:string">
-    				<xs:enumeration value="before" />
-    				<xs:enumeration value="after" />
-    				<xs:enumeration value="beforeAndAfter" />
-    			</xs:restriction>
-    		</xs:simpleType>
-    	</xs:element>
-    	<xs:element minOccurs="0" name="messageStore" type="xs:string" default="MongoDB"></xs:element>
-    </xs:all>
+    <xs:attribute name="serviceName" type="xs:string" use="required"></xs:attribute>
   </xs:complexType>
 
   <xs:complexType name="Contributor">
@@ -723,7 +671,7 @@
 		        </xs:annotation>
 		    </xs:element>
 	    </xs:sequence>
-	    <xs:attribute name="serviceName" type="xs:string"></xs:attribute>
+	    <xs:attribute name="serviceName" type="xs:string" use="required"></xs:attribute>
     </xs:complexType>
 
     <xs:complexType name="PerformanceLevel">
@@ -758,10 +706,10 @@
 	      <xs:documentation source="version">0.0.1</xs:documentation>
 	      <xs:documentation source="description">Attempt to redeliver a message when delivery of a message fails.</xs:documentation>
 	    </xs:annotation>
-    	<xs:attribute name="maxNumberOfAttempts" type="xs:int" />
-    	<xs:attribute name="intervalBetweenTheFirstAndSecondAttempt" type="xs:long" />
-    	<xs:attribute name="intervalMultiplierBetweenAttemps" type="xs:int" />
-    	<xs:attribute name="maximumIntervalBetweenAttempts" type="xs:long" />
+    	<xs:attribute name="maxNumberOfAttempts" type="xs:int" use="required"/>
+    	<xs:attribute name="intervalBetweenTheFirstAndSecondAttempt" type="xs:long" use="required"/>
+    	<xs:attribute name="intervalMultiplierBetweenAttemps" type="xs:int" use="required"/>
+    	<xs:attribute name="maximumIntervalBetweenAttempts" type="xs:long" use="required"/>
     </xs:complexType>
 
     <xs:complexType name="CircuitBreakerPattern">
@@ -769,8 +717,8 @@
 	      <xs:documentation source="version">0.0.1</xs:documentation>
 	      <xs:documentation source="description">Detect failures and encapsulates logic of preventing a failure to reoccur constantly (during maintenance, temporary external system failure or unexpected system difficulties).</xs:documentation>
 	    </xs:annotation>
-    	<xs:attribute name="numberOfFailuresBeforeOpening" type="xs:int" />
-    	<xs:attribute name="intervalBeforeHalfOpening" type="xs:long" />
+    	<xs:attribute name="numberOfFailuresBeforeOpening" type="xs:int" use="required"/>
+    	<xs:attribute name="intervalBeforeHalfOpening" type="xs:long" use="required"/>
     </xs:complexType>
 
     <xs:complexType name="MessageQueue">
@@ -807,32 +755,32 @@
     	</xs:all>
     </xs:complexType>
     
-    <xs:complexType name="Requirements">
+<!--     <xs:complexType name="Prerequisites">
     	<xs:annotation>
     		<xs:documentation source="version">0.0.1</xs:documentation>
     		<xs:documentation source="description">
-    			Requirements to active the contract.
+    			Prerequisites to active the contract.
     		</xs:documentation>
     	</xs:annotation>
     	<xs:sequence>
-    		<xs:element minOccurs="1" name="requirements" type="Requirement"></xs:element>
+    		<xs:element minOccurs="1" name="prerequisites" type="Prerequisite"></xs:element>
     	</xs:sequence>
-    </xs:complexType>
+    </xs:complexType> -->
 
-    <xs:complexType name="Requirement">
+    <xs:complexType name="Prerequisite">
     	<xs:annotation>
     		<xs:documentation source="version">0.0.1</xs:documentation>
     		<xs:documentation source="description">
-    			A requirement to active a commitment.
+    			A prerequisite to active a commitment.
     		</xs:documentation>
     	</xs:annotation>
     	<xs:all>
-    		<xs:element name="input" type="Input"></xs:element>
+    		<xs:element name="inputEventHandler" type="InputEventHandler"></xs:element>
     	</xs:all>
-    	<xs:attribute name="eventHandlerName" type="xs:string"></xs:attribute>
+    	<xs:attribute name="name" type="xs:string" use="required"></xs:attribute>
     </xs:complexType>
 
-   <xs:complexType name="Deliveries">
+<!--    <xs:complexType name="Deliveries">
     	<xs:annotation>
     		<xs:documentation source="version">0.0.1</xs:documentation>
     		<xs:documentation source="description">
@@ -842,7 +790,7 @@
     	<xs:sequence>
     		<xs:element minOccurs="1" name="deliveries" type="Delivery"></xs:element>
     	</xs:sequence>
-    </xs:complexType>
+    </xs:complexType> -->
 
     <xs:complexType name="Delivery">
     	<xs:annotation>
@@ -852,9 +800,75 @@
     		</xs:documentation>
     	</xs:annotation>
     	<xs:all>
-    		<xs:element name="output" type="Output"></xs:element>
+    		<xs:element name="outputEventHandler" type="OutputEventHandler"></xs:element>
     	</xs:all>    	
-    	<xs:attribute name="eventHandlerName" type="xs:string"></xs:attribute>
     </xs:complexType>
 
+    <xs:complexType name="InputEventHandler">
+    	<xs:annotation>
+    		<xs:documentation source="version">0.0.1</xs:documentation>
+    		<xs:documentation source="description">
+    			An eventHandler of a prerequisite.
+    		</xs:documentation>
+    	</xs:annotation>
+    	<xs:all>
+    		<xs:element name="input" type="Input"></xs:element>
+    	</xs:all>
+    	<xs:attribute name="name" type="xs:string" use="required"></xs:attribute>
+    </xs:complexType>
+
+    <xs:complexType name="OutputEventHandler">
+    	<xs:annotation>
+    		<xs:documentation source="version">0.0.1</xs:documentation>
+    		<xs:documentation source="description">
+    			An eventHandler of a delivery.
+    		</xs:documentation>
+    	</xs:annotation>
+    	<xs:all>
+    		<xs:element name="output" type="Output"></xs:element>
+    	</xs:all>
+    	<xs:attribute name="name" type="xs:string" use="required"></xs:attribute>
+    </xs:complexType>
+
+<!--     <xs:complexType name="Checkpoints">
+    	<xs:annotation>
+    		<xs:documentation source="version">0.0.1</xs:documentation>
+    		<xs:documentation source="description">
+    			Where to catch events in order to check the correctness of the active contract.
+    		</xs:documentation>
+    	</xs:annotation>
+    	<xs:sequence>
+    		<xs:element minOccurs="1" name="checkpoints" type="Checkpoint"></xs:element>
+    	</xs:sequence>
+    </xs:complexType> -->
+    
+	<xs:complexType name="Checkpoint">
+	    <xs:annotation>
+	      <xs:documentation source="version">0.0.1</xs:documentation>
+	      <xs:documentation source="description">A checkpoint is a point (joint point) in a process where messages are logged.</xs:documentation>
+	    </xs:annotation>
+	    <xs:attribute name="name" type="xs:string" use="required"></xs:attribute>
+	    <xs:attribute name="messageStore" type="xs:string" default="MongoDB"></xs:attribute>
+	    <xs:attribute name="position" use="required">
+	    	<xs:annotation>
+	    		<xs:documentation source="version">
+	    			0.0.1
+	    		</xs:documentation>
+	    		<xs:documentation source="description">
+	    			position defines the point where messages are
+	    			extracted. It can be before, after or both a commitment,
+	    			a delivery or a prerequisite.
+	    		</xs:documentation>
+	    		</xs:annotation>
+	    	<xs:simpleType>
+	    		<xs:restriction base="xs:string">
+	    			<xs:enumeration value="before" />
+	    			<xs:enumeration value="after" />
+	    			<xs:enumeration value="beforeAndAfter" />
+	    		</xs:restriction>
+	    	</xs:simpleType>
+	    </xs:attribute>
+	    <xs:attribute name="eventName" type="xs:string"></xs:attribute>
+  </xs:complexType>
+        
 </xs:schema>

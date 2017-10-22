@@ -57,7 +57,9 @@ class ContractGeneration  implements CommandLineRunner{
 		
 		contractGenerator.generateAll(orchaCodeVisitor)
 		
-		String outputXMLPath = "." + File.separator + "src" + File.separator + "main" + File.separator + "resources" + File.separator + "contract1.xml"
+		String orchaProgramTitle = orchaCodeVisitor.getOrchaMetadata().getTitle()
+		
+		String outputXMLPath = "." + File.separator + "src" + File.separator + "main" + File.separator + "resources" + File.separator + orchaProgramTitle + " contract.xml"
 		File outputXMLFile = new File(outputXMLPath)
 		contractGenerator.exportToXML(outputXMLFile)
 		

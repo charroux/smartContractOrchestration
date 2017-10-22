@@ -68,13 +68,15 @@ class ContractGeneratorImpl implements ContractGenerator{
 		
 		this.updateProcess(orchaCodeVisitor)
 		
-		this.updateRequirements(orchaCodeVisitor)
+		this.updatePrerequisites(orchaCodeVisitor)
 		
 		this.updateCommitments(orchaCodeVisitor)
 		
 		this.updateServiceLevelAgreements(orchaCodeVisitor)
 		
 		this.updateDeliveries(orchaCodeVisitor)
+		
+		this.updateQualityOfServices(orchaCodeVisitor)		
 		
 	}
 	
@@ -107,28 +109,32 @@ class ContractGeneratorImpl implements ContractGenerator{
 	}
 
 	@Override
-	public void updateRequirements(OrchaCodeVisitor orchaCodeVisitor){
+	public void updatePrerequisites(OrchaCodeVisitor orchaCodeVisitor){
 		
 		XPathFactory xFactory = XPathFactory.instance()
-		XPathExpression<Element> expr = xFactory.compile("//*[local-name() = 'requirements']/*[local-name() = 'requirement']", Filters.element())
-		List<Element> requirements = expr.evaluate(document)
+		XPathExpression<Element> expr = xFactory.compile("//*[local-name() = 'prerequisites']/*[local-name() = 'prerequisite']", Filters.element())
+		List<Element> prerequisites = expr.evaluate(document)
 
 		List<InstructionNode> receiveNodes = orchaCodeVisitor.findAllReceiveNodes()
+		Element inputEventHandler
 		
 		receiveNodes.each { receiveNode ->
 			
-			Element requirement = requirements.find{ it.getAttribute("eventHandlerName", namespace) == receiveNode.instruction.springBean.name }
-			if(requirement == null){
-				requirement = new Element("requirement", namespace)
-				requirement.setAttribute("eventHandlerName", receiveNode.instruction.springBean.name)
+			Element prerequisite = prerequisites.find{ it.getAttribute("eventHandlerName").getValue() == receiveNode.instruction.springBean.name }
+			if(prerequisite == null){
+				prerequisite = new Element("prerequisite", namespace)
+				prerequisite.setAttribute("name", receiveNode.instruction.variable)				
+				inputEventHandler = new Element("inputEventHandler", namespace)
+				inputEventHandler.setAttribute("name", receiveNode.instruction.springBean.name)
+				prerequisite.addContent(inputEventHandler)
+				xFactory.compile("//*[local-name() = 'prerequisites']", Filters.element()).evaluate(document).getAt(0).addContent(prerequisite)
 			}
-			xFactory.compile("//*[local-name() = 'requirements']", Filters.element()).evaluate(document).getAt(0).addContent(requirement)
 			
-			this.updateInput(receiveNode, requirement)
+			this.updateInput(receiveNode, inputEventHandler)
 			
 		}
 
-		log.info "Requirements updated in XML document"
+		log.info "Prerequisites updated in XML document"
 				
 	}
 	
@@ -141,16 +147,20 @@ class ContractGeneratorImpl implements ContractGenerator{
 
 		List<InstructionNode> sendNodes = orchaCodeVisitor.findAllSendNodes()
 		
+		Element outputEventHandler
+		
 		sendNodes.each { sendNode ->
 			
-			Element delivery = deliveries.find{ it.getAttribute("eventHandlerName", namespace) == sendNode.instruction.springBean.name }
+			Element delivery = deliveries.find{ it.getAttribute("eventHandlerName").getValue() == sendNode.instruction.springBean.name }
 			if(delivery == null){
 				delivery = new Element("delivery", namespace)
-				delivery.setAttribute("eventHandlerName", sendNode.instruction.springBean.name)
+				outputEventHandler = new Element("outputEventHandler", namespace)
+				outputEventHandler.setAttribute("name", sendNode.instruction.springBean.name)
+				delivery.addContent(outputEventHandler)
+				xFactory.compile("//*[local-name() = 'deliveries']", Filters.element()).evaluate(document).getAt(0).addContent(delivery)
 			}
-			xFactory.compile("//*[local-name() = 'deliveries']", Filters.element()).evaluate(document).getAt(0).addContent(delivery)
 		
-			this.updateOutput(sendNode, delivery)
+			this.updateOutput(sendNode, outputEventHandler)
 		}
 		
 		log.info "Deliveries updated in XML document"
@@ -170,12 +180,12 @@ class ContractGeneratorImpl implements ContractGenerator{
 			
 			Application application = computeNode.instruction.springBean
 			
-			Element commitment = commitments.find{ it.getAttribute("serviceName", namespace) == application.name }
+			Element commitment = commitments.find{ it.getAttribute("serviceName").getValue() == application.name }
 			if(commitment == null){
 				commitment = new Element("commitment", namespace)
 				commitment.setAttribute("serviceName", application.name)
+				xFactory.compile("//*[local-name() = 'commitments']", Filters.element()).evaluate(document).getAt(0).addContent(commitment)
 			}	
-			xFactory.compile("//*[local-name() = 'commitments']", Filters.element()).evaluate(document).getAt(0).addContent(commitment)
 			
 			if(application.description != null){
 				commitment.addContent(new Element("description", namespace).addContent(application.description))
@@ -189,8 +199,6 @@ class ContractGeneratorImpl implements ContractGenerator{
 			this.updateOutput(computeNode, commitment)
 			
 		}
-		
-		this.updateQualityOfServices(orchaCodeVisitor)
 		
 		log.info "Commitments updated in XML document"
 				
@@ -270,7 +278,7 @@ class ContractGeneratorImpl implements ContractGenerator{
 			}	
 		}
 				 		
-		log.info "Requirements updated in XML document"
+		log.info "Process updated in XML document"
 				
 	}
 
@@ -365,49 +373,57 @@ class ContractGeneratorImpl implements ContractGenerator{
 
 	}
 	
+	private void updateCheckPoint(InstructionNode instructionNode, List<Element> checkpoints){
+		
+		if(instructionNode.options != null){
+			
+			EventSourcingOption eventSourcingOption = instructionNode.options.eventSourcing
+			
+			if(eventSourcingOption != null){
+				
+				// look for the xml checkpoint that matches the compute node
+				Element checkpoint = checkpoints.find{ it.getAttribute("name").getValue() == instructionNode.instruction.springBean.name }
+				if(checkpoint == null){
+					checkpoint = new Element("checkpoint", namespace)
+					checkpoint.setAttribute("name", instructionNode.instruction.springBean.name)
+					XPathFactory xFactory = XPathFactory.instance()
+					xFactory.compile("//*[local-name() = 'checkpoints']", Filters.element()).evaluate(document).getAt(0).addContent(checkpoint)
+				}
+			
+				if(eventSourcingOption.eventName.empty == false){
+					checkpoint.setAttribute("eventName", eventSourcingOption.eventName)
+				}		
+				checkpoint.setAttribute("position", eventSourcingOption.joinPoint.toString())
+			}		
+		}
+	}
+	
 	private void updateQualityOfServices(OrchaCodeVisitor orchaCodeVisitor) {
 		
 		qualityOfService.setQualityOfServiceToInstructions(orchaCodeVisitor)
 		
 		XPathFactory xFactory = XPathFactory.instance()
-		XPathExpression<Element> expr = xFactory.compile("//*[local-name() = 'commitments']/*[local-name() = 'commitment']", Filters.element())
-		List<Element> commitments = expr.evaluate(document)
+		XPathExpression<Element> expr = xFactory.compile("//*[local-name() = 'checkpoints']/*[local-name() = 'checkpoint']", Filters.element())
+		List<Element> checkpoints = expr.evaluate(document)
 
-		List<InstructionNode> computeNodes = orchaCodeVisitor.findAllComputeNodes()
-		
-		computeNodes.each { computeNode ->
-			if(computeNode.options != null){
-				QualityOfServicesOptions qoSOption = computeNode.options
-				EventSourcingOption eventSourcingOption = qoSOption.eventSourcing
-				if(eventSourcingOption != null){
-					// look for the xml commitment that matches the compute node 
-					Element commitment = commitments.find{ it.getChildText("name", namespace) == computeNode.instruction.springBean.name }
-					Element checkPoint = commitment.getChild("checkpoint", namespace)
-					Element eventName
-					Element joinPoint
-					Element messageStore
-					if(checkPoint == null){	// there is no checkpoint yet
-						checkPoint = new Element("checkpoint", namespace)
-						if(eventSourcingOption.eventName != null){
-							eventName = new Element("eventName", namespace)
-							checkPoint.addContent(eventName)
-						}			
-						joinPoint = new Element("joinpoint", namespace)
-						checkPoint.addContent(joinPoint)
-						messageStore = new Element("messageStore", namespace)
-						checkPoint.addContent(messageStore)
-						commitment.addContent(checkPoint)
-					} else {
-						eventName = checkPoint.getChild("eventName", namespace)
-						joinPoint = checkPoint.getChild("joinpoint", namespace)
-					}
-					if(eventSourcingOption.eventName != null){
-						eventName.setText(eventSourcingOption.eventName)
-					}			
-					joinPoint.setText(eventSourcingOption.joinPoint.toString())
-				}				
-			}
+		List<InstructionNode> receiveNodes = orchaCodeVisitor.findAllReceiveNodes()		
+		receiveNodes.each { receiveNode ->
+			this.updateCheckPoint(receiveNode, checkpoints)
 		}
+
+		List<InstructionNode> computeNodes = orchaCodeVisitor.findAllComputeNodes()		
+		computeNodes.each { computeNode ->
+			this.updateCheckPoint(computeNode, checkpoints)
+		}
+		
+		List<InstructionNode> sendNodes = orchaCodeVisitor.findAllSendNodes()
+		sendNodes.each { sendNode ->
+			this.updateCheckPoint(sendNode, checkpoints)
+		}
+		
+		
+		/*expr = xFactory.compile("//*[local-name() = 'prerequisites']/*[local-name() = 'prerequisite']", Filters.element())
+		List<Element> prerequisites = expr.evaluate(document)
 
 		List<InstructionNode> receiveNodes = orchaCodeVisitor.findAllReceiveNodes()
 		
@@ -419,9 +435,8 @@ class ContractGeneratorImpl implements ContractGenerator{
 				
 				if(eventSourcingOption != null){
 					// look for the xml commitment that matches the compute node
-					EventHandler eventHandler = receiveNode.instruction.springBean
-					commitments = expr.evaluate(document)			// to avoid dealing with the same event
-					Element commitment = commitments.find{ it.getChildText("name", namespace) == eventHandler.name }
+					EventHandler eventHandler = receiveNode.instruction.springBean					
+					Element prerequisite = prerequisites.find{ it.getAttribute("name").getValue() == eventHandler.name }
 					if(commitment == null){
 						commitment = new Element("commitment", namespace)
 						commitment.addContent(new Element("name", namespace).addContent(eventHandler.name))
@@ -499,7 +514,7 @@ class ContractGeneratorImpl implements ContractGenerator{
 					joinPoint.setText(eventSourcingOption.joinPoint.toString())
 				}
 			}
-		}
+		}*/
 		
 		log.info "Quality of Services updated in XML document"
 	}
@@ -530,7 +545,7 @@ class ContractGeneratorImpl implements ContractGenerator{
 					Element retryPattern
 					Element circuitBreakerPattern
 					Element messageQueue
-					Element agreement = serviceLevelAgreements.find{ it.getAttribute("serviceName", namespace) == computeNode.instruction.springBean.name }
+					Element agreement = serviceLevelAgreements.find{ it.getAttribute("serviceName").getValue() == computeNode.instruction.springBean.name }
 					if(agreement == null){
 						agreement = new Element("serviceLevelAgreement", namespace)
 						agreement.setAttribute("serviceName", computeNode.instruction.springBean.name)
