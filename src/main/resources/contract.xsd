@@ -739,9 +739,10 @@
     		<xs:documentation source="description">An input data structure.</xs:documentation>
     	</xs:annotation>
     	<xs:all>
-    		<xs:element minOccurs="0" name="mimeType" type="xs:string"></xs:element>
-    		<xs:element minOccurs="0" name="type" type="xs:string"></xs:element>
+    		<xs:element minOccurs="0" name="datastructure" type="xs:string"></xs:element>
     	</xs:all>
+    	<xs:attribute name="typeName" use="required"></xs:attribute>
+    	<xs:attribute name="mimeType" use="optional"></xs:attribute>
     </xs:complexType>
 
     <xs:complexType name="Output">
@@ -750,9 +751,10 @@
     		<xs:documentation source="description">An output data structure.</xs:documentation>
     	</xs:annotation>
     	<xs:all>
-    		<xs:element minOccurs="0" name="mimeType" type="xs:string"></xs:element>
-    		<xs:element minOccurs="0" name="type" type="xs:string"></xs:element>
+    		<xs:element minOccurs="0" name="datastructure" type="xs:string"></xs:element>
     	</xs:all>
+    	<xs:attribute name="typeName" use="required"></xs:attribute>
+    	<xs:attribute name="mimeType" use="optional"></xs:attribute>
     </xs:complexType>
     
 <!--     <xs:complexType name="Prerequisites">

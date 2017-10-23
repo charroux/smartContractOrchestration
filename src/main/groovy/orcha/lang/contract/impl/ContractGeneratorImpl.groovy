@@ -292,36 +292,12 @@ class ContractGeneratorImpl implements ContractGenerator{
 			Element type
 			if(input == null){	// there is no input yet
 				input = new Element("input", namespace)
-				if(springBean.input.mimeType != null){
-					mimeType = new Element("mimeType", namespace)
-					mimeType.setText(springBean.input.mimeType)
-					input.addContent(mimeType)
-				}
-				if(springBean.input.type != null){
-					type = new Element("type", namespace)
-					type.setText(springBean.input.type)
-					input.addContent(type)
-				}
 				element.addContent(input)
-			} else {	// there is an input
-				if(springBean.input.mimeType != null){
-					mimeType = input.getChild("mimeType", namespace)
-					if(mimeType == null){
-						mimeType = new Element("mimeType", namespace)
-						input.addContent(mimeType)
-					} 						
-					mimeType.setText(springBean.input.mimeType)
-				}
-				if(springBean.input.type != null){
-					type = input.getChild("type", namespace)
-					if(type == null){
-						type = new Element("type", namespace)
-						input.addContent(type)
-					} 
-					type.setText(springBean.input.type)
-				}
+			} 
+			input.setAttribute("typeName", springBean.input.type)
+			if(springBean.input.mimeType != null){
+				input.setAttribute("mimeType", springBean.input.mimeType)
 			}
-
 		}
 
 		log.info "Inputs updated in XML document"
@@ -338,34 +314,11 @@ class ContractGeneratorImpl implements ContractGenerator{
 			Element type
 			if(output == null){	// there is no output yet
 				output = new Element("output", namespace)
-				if(springBean.output.mimeType != null){
-					mimeType = new Element("mimeType", namespace)
-					mimeType.setText(springBean.output.mimeType)
-					output.addContent(mimeType)
-				}
-				if(springBean.output.type != null){
-					type = new Element("type", namespace)
-					type.setText(springBean.output.type)
-					output.addContent(type)
-				}
 				element.addContent(output)
-			} else {	// there is an input
-				if(springBean.output.mimeType != null){
-					mimeType = output.getChild("mimeType", namespace)
-					if(mimeType == null){
-						mimeType = new Element("mimeType", namespace)
-						output.addContent(mimeType)
-					}
-					mimeType.setText(springBean.output.mimeType)
-				}
-				if(springBean.output.type != null){
-					type = output.getChild("type", namespace)
-					if(type == null){
-						type = new Element("type", namespace)
-						output.addContent(type)
-					}
-					type.setText(springBean.output.type)
-				}
+			} 
+			output.setAttribute("typeName", springBean.output.type)
+			if(springBean.output.mimeType != null){
+				output.setAttribute("mimeType", springBean.output.mimeType)
 			}
 		}
 		
