@@ -30,6 +30,7 @@ class QualityOfServiceImpl implements QualityOfService{
 			if(it.instruction.instruction == "receive"){
 
 				QueueOption optionQueue = this.getQueueOption(it)
+				
 				if(optionQueue !=  null){
 					if(it.options == null){							// a receive node
 						it.options = new QualityOfServicesOptions()
@@ -121,6 +122,15 @@ class QualityOfServiceImpl implements QualityOfService{
 				}
 				
 			} else if(it.instruction.instruction == "compute"){
+				
+				QueueOption optionQueue = this.getQueueOption(it)
+				
+				if(optionQueue !=  null){
+					if(it.options == null){							// a receive node
+						it.options = new QualityOfServicesOptions()
+					}
+					it.options.queue = optionQueue
+				}
 				
 				RetryOption retryOption = this.getRetryOption(it)
 				if(retryOption !=  null){

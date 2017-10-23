@@ -671,7 +671,7 @@
 		        </xs:annotation>
 		    </xs:element>
 	    </xs:sequence>
-	    <xs:attribute name="serviceName" type="xs:string" use="required"></xs:attribute>
+	    <xs:attribute name="name" type="xs:string" use="required"></xs:attribute>
     </xs:complexType>
 
     <xs:complexType name="PerformanceLevel">

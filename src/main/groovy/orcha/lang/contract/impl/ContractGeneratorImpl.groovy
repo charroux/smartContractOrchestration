@@ -519,6 +519,108 @@ class ContractGeneratorImpl implements ContractGenerator{
 		log.info "Quality of Services updated in XML document"
 	}
 	
+	private void updateSLA(InstructionNode instructionNode, List<Element> serviceLevelAgreements){
+		
+		XPathFactory xFactory = XPathFactory.instance()
+		
+		if(instructionNode.options != null){
+			
+				QualityOfServicesOptions qoSOption = instructionNode.options
+				
+				RetryOption retryOption = qoSOption.retry
+				CircuitBreakerOption circuitBreakerOption = qoSOption.circuitBreaker
+				QueueOption queueOption = qoSOption.queue
+				
+				if(retryOption!=null || circuitBreakerOption!=null || queueOption!=null){
+					Element performanceLevel
+					Element retryPattern
+					Element circuitBreakerPattern
+					Element messageQueue
+					Element agreement = serviceLevelAgreements.find{ it.getAttribute("name").getValue() == instructionNode.instruction.springBean.name }
+					if(agreement == null){
+						agreement = new Element("serviceLevelAgreement", namespace)
+						agreement.setAttribute("name", instructionNode.instruction.springBean.name)
+						xFactory.compile("//*[local-name() = 'serviceLevelAgreements']", Filters.element()).evaluate(document).getAt(0).addContent(agreement)
+						performanceLevel = new Element("performanceLevel", namespace)
+						agreement.addContent(performanceLevel)
+						if(retryOption != null){
+							retryPattern = new Element("retryPattern", namespace)
+							performanceLevel.addContent(retryPattern)
+						}
+						if(circuitBreakerOption != null){
+							circuitBreakerPattern = new Element("circuitBreakerPattern", namespace)
+							performanceLevel.addContent(circuitBreakerPattern)
+						}
+						if(queueOption != null){
+							messageQueue = new Element("messageQueue", namespace)
+							performanceLevel.addContent(messageQueue)
+						}
+					} else {
+						performanceLevel = agreement.getChild("performanceLevel", namespace)
+						if(performanceLevel == null){
+							performanceLevel = new Element("performanceLevel", namespace)
+							agreement.addContent(performanceLevel)
+						}
+						if(retryOption != null){
+							retryPattern = performanceLevel.getChild("retryPattern", namespace)
+							if(retryPattern == null){
+								retryPattern = new Element("retryPattern", namespace)
+								performanceLevel.addContent(retryPattern)
+							}
+						}
+						if(circuitBreakerOption != null){
+							circuitBreakerPattern = performanceLevel.getChild("circuitBreakerPattern", namespace)
+							if(circuitBreakerPattern == null){
+								circuitBreakerPattern = new Element("circuitBreakerPattern", namespace)
+								performanceLevel.addContent(circuitBreakerPattern)
+							}
+						}
+						if(queueOption != null){
+							messageQueue = performanceLevel.getChild("messageQueue", namespace)
+							if(messageQueue == null){
+								messageQueue = new Element("messageQueue", namespace)
+								performanceLevel.addContent(messageQueue)
+							}
+						}
+
+					}
+					
+					if(retryOption != null){
+						retryPattern.setAttribute("maxNumberOfAttempts", retryOption.getMaxNumberOfAttempts().toString())
+						retryPattern.setAttribute("intervalBetweenTheFirstAndSecondAttempt", retryOption.getIntervalBetweenTheFirstAndSecondAttempt().toString())
+						retryPattern.setAttribute("intervalMultiplierBetweenAttemps", retryOption.getIntervalMultiplierBetweenAttemps().toString())
+						retryPattern.setAttribute("maximumIntervalBetweenAttempts", retryOption.getMaximumIntervalBetweenAttempts().toString())
+					}
+
+					if(circuitBreakerOption != null){
+						circuitBreakerPattern.setAttribute("numberOfFailuresBeforeOpening", circuitBreakerOption.getNumberOfFailuresBeforeOpening().toString())
+						circuitBreakerPattern.setAttribute("intervalBeforeHalfOpening", circuitBreakerOption.getIntervalBeforeHalfOpening().toString())
+					}
+					
+					if(queueOption != null){
+						
+						messageQueue.setAttribute("capacity", queueOption.getCapacity().toString())
+						
+						long fixedDelay = queueOption.getFixedDelay()
+						if(fixedDelay != -1L){
+							messageQueue.setAttribute("fixedDelay", fixedDelay.toString())
+						}
+						
+						long fixedRate = queueOption.getFixedRate()
+						if(fixedRate != -1L){
+							messageQueue.setAttribute("fixedRate", fixedRate.toString())
+						}
+						
+						String cron = queueOption.getCron()
+						if(cron != ""){
+							messageQueue.setAttribute("cron", cron)
+						}
+					}
+
+				}
+			}
+	}
+	
 	@Override
 	public void updateServiceLevelAgreements(OrchaCodeVisitor orchaCodeVisitor){
 
@@ -528,11 +630,28 @@ class ContractGeneratorImpl implements ContractGenerator{
 		XPathExpression<Element> expr = xFactory.compile("//*[local-name() = 'serviceLevelAgreements']/*[local-name() = 'serviceLevelAgreement']", Filters.element())
 		List<Element> serviceLevelAgreements = expr.evaluate(document)
 
-		List<InstructionNode> computeNodes = orchaCodeVisitor.findAllComputeNodes()
-		
+		List<InstructionNode> receiveNodes = orchaCodeVisitor.findAllReceiveNodes()
+		receiveNodes.each { receiveNode ->
+			
+			this.updateSLA(receiveNode, serviceLevelAgreements)
+			
+		}
+
+		List<InstructionNode> computeNodes = orchaCodeVisitor.findAllComputeNodes()		
 		computeNodes.each { computeNode ->
 			
-			if(computeNode.options != null){
+			this.updateSLA(computeNode, serviceLevelAgreements)
+			
+		}
+
+		List<InstructionNode> sendNodes = orchaCodeVisitor.findAllSendNodes()
+		sendNodes.each { sendNode ->
+			
+			this.updateSLA(sendNode, serviceLevelAgreements)
+			
+		}
+
+/*			if(computeNode.options != null){
 			
 				QualityOfServicesOptions qoSOption = computeNode.options
 				
@@ -545,10 +664,10 @@ class ContractGeneratorImpl implements ContractGenerator{
 					Element retryPattern
 					Element circuitBreakerPattern
 					Element messageQueue
-					Element agreement = serviceLevelAgreements.find{ it.getAttribute("serviceName").getValue() == computeNode.instruction.springBean.name }
+					Element agreement = serviceLevelAgreements.find{ it.getAttribute("name").getValue() == computeNode.instruction.springBean.name }
 					if(agreement == null){
 						agreement = new Element("serviceLevelAgreement", namespace)
-						agreement.setAttribute("serviceName", computeNode.instruction.springBean.name)
+						agreement.setAttribute("name", computeNode.instruction.springBean.name)
 						xFactory.compile("//*[local-name() = 'serviceLevelAgreements']", Filters.element()).evaluate(document).getAt(0).addContent(agreement)												
 						performanceLevel = new Element("performanceLevel", namespace)
 						agreement.addContent(performanceLevel)
@@ -628,7 +747,7 @@ class ContractGeneratorImpl implements ContractGenerator{
 
 				}
 			}
-		}
+		}*/
 
 		qualityOfService.setQualityOfServiceToInstructions(orchaCodeVisitor)
 		
