@@ -44,6 +44,21 @@ class CompileServiceWithSpringIntegrationTest {
 	@Autowired
 	EventHandler delivery
 	
+	//the following concerns BenchmarkingExample tests
+	@Autowired
+	EventHandler benchmarkingInputFile
+	
+	@Autowired
+	Application codeToBenchmark1
+	
+	@Autowired
+	Application codeToBenchmark2
+	
+	@Autowired
+	EventHandler benchmarkingOutputFile
+	
+	
+	
 	
 	@Test
 	void prepareOrder(){
@@ -125,7 +140,7 @@ class CompileServiceWithSpringIntegrationTest {
 		 
 		// <int:chain input-channel="customer-OutputChannel" output-channel="prepareOrderServiceAcivatorOutput" id="service-activator-chain-prepareOrderChannel-id">
 		//		<int:service-activator id="service-activator-prepareOrderChannel-id" expression="@orderPreparation.prepare(payload)">
-		//			<int:request-handler-advice-chain>
+		//			<int:request-handler-a dvice-chain>
 		//				<bean class="org.springframework.integration.handler.advice.RequestHandlerCircuitBreakerAdvice">
 		//					<property name="threshold" value="2" />
 		//					<property name="halfOpenAfter" value="2000" />
@@ -236,9 +251,127 @@ class CompileServiceWithSpringIntegrationTest {
 	
 	@Test
 	void benchmarkingExample(){
-		// to be completed...
-		// begin by add the orcha program from src/main/orcha/source/BenchmarkingExample
-	}
+				
+		String orchaProgram = 	"title 'benchmarking services'\n" +
+		"description 'Read a tesxt file, dispatch its content to two services, then launch the two services and wait until the two services complete. Write the result to a service into a file.'\n" +
+		"receive event from benchmarkingInputFile\n" +
+		"compute codeToBenchmark1 with event.value\n" +
+		"receive event from benchmarkingInputFile\n" +
+		"compute codeToBenchmark2 with event.value\n" +
+		"when 'codeToBenchmark1 terminates and codeToBenchmark2 terminates'\n" +
+		"send codeToBenchmark1.result to benchmarkingOutputFile"
+		
+		// construct the graph of instructions for the Orcha programm
+		
+		OrchaCodeVisitor orchaCodeVisitor = orchaCodeParser.parse(orchaProgram)
+		
+		// generate an XML file (Spring integration configuration): this is the file to be tested
+		 
+		String path = "." + File.separator + "src" + File.separator + "test" + File.separator + "resources" + File.separator
+		File destinationDirectory = new File(path)
+		compile.compile(orchaCodeVisitor, destinationDirectory)
+		
+		String xmlSpringContextFileName = orchaCodeVisitor.getOrchaMetadata().getTitle() + ".xml"
+		String pathToXmlFile = destinationDirectory.getAbsolutePath() + File.separator + xmlSpringContextFileName
+		
+		// parse the XML file checking is correctness
+		
+		SAXBuilder builder = new SAXBuilder()
+		
+		Document xmlSpringIntegration = builder.build(pathToXmlFile)
+		
+		XPathFactory xFactory = XPathFactory.instance()
 	
+		// <int-file:inbound-channel-adapter id="file-customer-InputChannel-id" directory="data/input" channel="customer-InputChannel" prevent-duplicates="true" filename-pattern="orderToPrepare.json">
+		// <int-file:inbound-channel-adapter id="file-benchmarkingInputFile-InputChannel-id" directory="data/input" channel="benchmarkingInputFile-InputChannel" prevent-duplicates="true" filename-pattern="benchmarkingData.txt">
+		XPathExpression<Element> expr = xFactory.compile("//*[local-name() = 'inbound-channel-adapter']", Filters.element())
+		List<Element> elements = expr.evaluate(xmlSpringIntegration)
+		Assert.assertTrue(elements.size() == 1)
+		Element element = elements.get(0)
+		Assert.assertEquals(element.getAttribute("directory").getValue(), benchmarkingInputFile.input.adapter.directory)
+		Assert.assertEquals(element.getAttribute("filename-pattern").getValue(), benchmarkingInputFile.input.adapter.filenamePattern)
+
+		// <int:chain input-channel="benchmarkingInputFile-InputChannelTransformer" output-channel="benchmarkingInputFile-OutputChannel">
+		//		<int:header-enricher>
+		//			<int:header name="messageID" expression="headers['id'].toString()" />
+	  
+		expr = xFactory.compile("//*[local-name() = 'chain']/*[local-name() = 'header-enricher']/*[local-name() = 'header']", Filters.element())
+		elements = expr.evaluate(xmlSpringIntegration)
+		Assert.assertTrue(elements.size() == 1)
+		element = elements.get(0)
+		 
+		Assert.assertEquals(element.getAttribute("name").getValue(), "messageID")
+		Assert.assertEquals(element.getAttribute("expression").getValue(), "headers['id'].toString()")
+		 
+		//  <int:chain input-channel="benchmarkingInputFile-OutputChannelRoute1" output-channel="codeToBenchmark1ServiceAcivatorOutput" id="service-activator-chain-codeToBenchmark1Channel-id">
+    	//		<int:service-activator id="service-activator-codeToBenchmark1Channel-id" expression="@groovyCodeToBenchmark1.method(payload)">
+		//	<int:chain input-channel="benchmarkingInputFile-OutputChannelRoute2" output-channel="codeToBenchmark2ServiceAcivatorOutput" id="service-activator-chain-codeToBenchmark2Channel-id">
+		//		<int:service-activator id="service-activator-codeToBenchmark2Channel-id" expression="@groovyCodeToBenchmark2.method(payload)">
+	 
+		expr = xFactory.compile("//*[local-name() = 'chain']/*[local-name() = 'service-activator']", Filters.element())
+		elements = expr.evaluate(xmlSpringIntegration)
+		Assert.assertTrue(elements.size() == 2)
+		element = elements.get(0)
+		Assert.assertTrue(element.getAttribute("expression").getValue().contains(codeToBenchmark1.input.adapter.method))
+		element = elements.get(1)
+		Assert.assertTrue(element.getAttribute("expression").getValue().contains(codeToBenchmark2.input.adapter.method))
+		 		
+		// <int:transformer id="transformer-codeToBenchmark2ServiceAcivatorOutput-id" input-channel="codeToBenchmark2ServiceAcivatorOutput" output-channel="codeToBenchmark1codeToBenchmark2AggregatorInput" method="transform">
+		//		<bean class="orcha.lang.compiler.referenceimpl.xmlgenerator.impl.ObjectToApplicationTransformer">
+		//  <property name="application" ref="codeToBenchmark2" />
+	  
+		expr = xFactory.compile("//*[local-name() = 'transformer']/*[local-name() = 'bean'][@class='orcha.lang.compiler.referenceimpl.xmlgenerator.impl.ObjectToApplicationTransformer']/*[local-name() = 'property']", Filters.element())
+		elements = expr.evaluate(xmlSpringIntegration)
+		Assert.assertTrue(elements.size() == 2)
+		element = elements.get(0)
+		Assert.assertEquals(element.getAttribute("name").getValue(), "application")
+		Assert.assertEquals(element.getAttribute("ref").getValue(), codeToBenchmark1.name)
+		element = elements.get(1)
+		Assert.assertEquals(element.getAttribute("name").getValue(), "application")
+		Assert.assertEquals(element.getAttribute("ref").getValue(), codeToBenchmark2.name)
+
+		//<int:aggregator id="aggregator-codeToBenchmark1codeToBenchmark2AggregatorInput-id" input-channel="codeToBenchmark1codeToBenchmark2AggregatorInput" output-channel="codeToBenchmark1codeToBenchmark2AggregatorInputTransformer" release-strategy-expression="size()==2 and ( ([0].payload instanceof T(orcha.lang.configuration.Application) AND [0].payload.state==T(orcha.lang.configuration.State).TERMINATED)  and  ([1].payload instanceof T(orcha.lang.configuration.Application) AND [1].payload.state==T(orcha.lang.configuration.State).TERMINATED) )" correlation-strategy-expression="headers['messageID']" />
+		//<int:transformer id="transformer-codeToBenchmark1codeToBenchmark2AggregatorInput-id" input-channel="codeToBenchmark1codeToBenchmark2AggregatorInputTransformer" output-channel="codeToBenchmark1codeToBenchmark2AggregatorInputAggregatorOutput" expression="payload.?[name=='codeToBenchmark1']" />
+	  		
+		expr = xFactory.compile("//*[local-name() = 'aggregator']", Filters.element())
+		elements = expr.evaluate(xmlSpringIntegration)
+		Assert.assertTrue(elements.size() == 1)
+		element = elements.get(0)
+		String outputChannel = element.getAttribute("output-channel").getValue()
+		println outputChannel
+		expr = xFactory.compile("//*[local-name() = 'transformer'][@input-channel='" + outputChannel + "']", Filters.element())
+		elements = expr.evaluate(xmlSpringIntegration)
+		Assert.assertTrue(elements.size() == 1)
+			 
+		//  <int:transformer id="transformer-codeToBenchmark1codeToBenchmark2AggregatorInputAggregatorOutput-id" input-channel="codeToBenchmark1codeToBenchmark2AggregatorInputAggregatorOutput" output-channel="codeToBenchmark1codeToBenchmark2AggregatorOutputTransformer" method="transform">
+		//		<bean class="orcha.lang.compiler.referenceimpl.xmlgenerator.impl.ApplicationToObjectTransformer" />
+
+		expr = xFactory.compile("//*[local-name() = 'transformer']/*[local-name() = 'bean'][@class='orcha.lang.compiler.referenceimpl.xmlgenerator.impl.ApplicationToObjectTransformer']", Filters.element())
+		elements = expr.evaluate(xmlSpringIntegration)
+		Assert.assertTrue(elements.size() == 1)
+		 
+		//  <int:chain input-channel="codeToBenchmark1codeToBenchmark2AggregatorOutputTransformer" output-channel="codeToBenchmark1OutputFileChannelAdapterbenchmarkingOutputFile">
+		//		<int:object-to-string-transformer />
+	  
+		expr = xFactory.compile("//*[local-name() = 'chain']/*[local-name() = 'object-to-string-transformer']", Filters.element())
+		elements = expr.evaluate(xmlSpringIntegration)
+		Assert.assertTrue(elements.size() == 1)
+		 
+		//   <int-file:outbound-channel-adapter id="file-codeToBenchmark1benchmarkingOutputFileChannel-id" channel="codeToBenchmark1OutputFileChannelAdapterbenchmarkingOutputFile" directory-expression="@benchmarkingOutputFile.output.adapter.directory" filename-generator-expression="@benchmarkingOutputFile.output.adapter.filename" append-new-line="true" mode="REPLACE" auto-create-directory="true" delete-source-files="false" />
+
+		expr = xFactory.compile("//*[local-name() = 'outbound-channel-adapter']", Filters.element())
+		elements = expr.evaluate(xmlSpringIntegration)
+		Assert.assertTrue(elements.size() == 1)
+		element = elements.get(0)
+		Assert.assertEquals(element.getAttribute("directory-expression").getValue(), '@' + benchmarkingOutputFile.name + '.output.adapter.directory')
+		Assert.assertEquals(element.getAttribute("filename-generator-expression").getValue(), '@' + benchmarkingOutputFile.name + '.output.adapter.filename')
+		
+		Assert.assertTrue(new File(pathToXmlFile).delete())
+	
+		String xmlQoSSpringContextFileName = orchaCodeVisitor.getOrchaMetadata().getTitle() + "QoS.xml"
+		String pathToQoSXmlFile = destinationDirectory.getAbsolutePath() + File.separator + xmlQoSSpringContextFileName
+		
+		Assert.assertTrue(new File(pathToQoSXmlFile).delete())
+	}
 
 }
