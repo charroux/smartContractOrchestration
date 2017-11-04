@@ -251,7 +251,7 @@ class CompileServiceWithSpringIntegrationTest {
 	
 	@Test
 	void benchmarkingExample(){
-				
+		
 		String orchaProgram = 	"title 'benchmarking services'\n" +
 		"description 'Read a tesxt file, dispatch its content to two services, then launch the two services and wait until the two services complete. Write the result to a service into a file.'\n" +
 		"receive event from benchmarkingInputFile\n" +
@@ -281,41 +281,41 @@ class CompileServiceWithSpringIntegrationTest {
 		Document xmlSpringIntegration = builder.build(pathToXmlFile)
 		
 		XPathFactory xFactory = XPathFactory.instance()
-	
-		// <int-file:inbound-channel-adapter id="file-customer-InputChannel-id" directory="data/input" channel="customer-InputChannel" prevent-duplicates="true" filename-pattern="orderToPrepare.json">
-		// <int-file:inbound-channel-adapter id="file-benchmarkingInputFile-InputChannel-id" directory="data/input" channel="benchmarkingInputFile-InputChannel" prevent-duplicates="true" filename-pattern="benchmarkingData.txt">
+		
+		// <int-file:inbound-channel-adapter channel="benchmarkingInputFile-InputChannel">
+		// <int-file:file-to-string-transformer input-channel="benchmarkingInputFile-InputChannel"/>
 		XPathExpression<Element> expr = xFactory.compile("//*[local-name() = 'inbound-channel-adapter']", Filters.element())
 		List<Element> elements = expr.evaluate(xmlSpringIntegration)
 		Assert.assertTrue(elements.size() == 1)
 		Element element = elements.get(0)
-		Assert.assertEquals(element.getAttribute("directory").getValue(), benchmarkingInputFile.input.adapter.directory)
-		Assert.assertEquals(element.getAttribute("filename-pattern").getValue(), benchmarkingInputFile.input.adapter.filenamePattern)
+		
+		XPathExpression<Element> expr2 = xFactory.compile("//*[local-name() = 'file-to-string-transformer']", Filters.element())
+		 List<Element> elements2 = expr2.evaluate(xmlSpringIntegration)
+		 Assert.assertTrue(elements2.size() == 1)
+		 Element element2 = elements2.get(0)
+		 
+		Assert.assertEquals(element.getAttribute("channel").getValue(), element2.getAttribute("input-channel").getValue())
 
-		// <int:chain input-channel="benchmarkingInputFile-InputChannelTransformer" output-channel="benchmarkingInputFile-OutputChannel">
-		//		<int:header-enricher>
-		//			<int:header name="messageID" expression="headers['id'].toString()" />
+		// <int-file:file-to-string-transformer output-channel="benchmarkingInputFile-InputChannelTransformer"/>
+		// <int:chain input-channel="benchmarkingInputFile-InputChannelTransformer">
 	  
-		expr = xFactory.compile("//*[local-name() = 'chain']/*[local-name() = 'header-enricher']/*[local-name() = 'header']", Filters.element())
+		expr = xFactory.compile("//*[local-name() = 'chain']", Filters.element())
 		elements = expr.evaluate(xmlSpringIntegration)
-		Assert.assertTrue(elements.size() == 1)
 		element = elements.get(0)
 		 
-		Assert.assertEquals(element.getAttribute("name").getValue(), "messageID")
-		Assert.assertEquals(element.getAttribute("expression").getValue(), "headers['id'].toString()")
+		Assert.assertEquals(element.getAttribute("input-channel").getValue(), element2.getAttribute("output-channel").getValue())
+		
+		// <int:chain output-channel="benchmarkingInputFile-OutputChannel">
+		// <int:recipient-list-router input-channel="benchmarkingInputFile-OutputChannel">
+
+		 expr2 = xFactory.compile("//*[local-name() = 'recipient-list-router']", Filters.element())
+		 elements2 = expr2.evaluate(xmlSpringIntegration)
+		 Assert.assertTrue(elements2.size() == 1)
+		 element2 = elements2.get(0)
 		 
-		//  <int:chain input-channel="benchmarkingInputFile-OutputChannelRoute1" output-channel="codeToBenchmark1ServiceAcivatorOutput" id="service-activator-chain-codeToBenchmark1Channel-id">
-    	//		<int:service-activator id="service-activator-codeToBenchmark1Channel-id" expression="@groovyCodeToBenchmark1.method(payload)">
-		//	<int:chain input-channel="benchmarkingInputFile-OutputChannelRoute2" output-channel="codeToBenchmark2ServiceAcivatorOutput" id="service-activator-chain-codeToBenchmark2Channel-id">
-		//		<int:service-activator id="service-activator-codeToBenchmark2Channel-id" expression="@groovyCodeToBenchmark2.method(payload)">
-	 
-		expr = xFactory.compile("//*[local-name() = 'chain']/*[local-name() = 'service-activator']", Filters.element())
-		elements = expr.evaluate(xmlSpringIntegration)
-		Assert.assertTrue(elements.size() == 2)
-		element = elements.get(0)
-		Assert.assertTrue(element.getAttribute("expression").getValue().contains(codeToBenchmark1.input.adapter.method))
-		element = elements.get(1)
-		Assert.assertTrue(element.getAttribute("expression").getValue().contains(codeToBenchmark2.input.adapter.method))
-		 		
+		 Assert.assertEquals(element.getAttribute("output-channel").getValue(), element2.getAttribute("input-channel").getValue())
+		 
+		 
 		// <int:transformer id="transformer-codeToBenchmark2ServiceAcivatorOutput-id" input-channel="codeToBenchmark2ServiceAcivatorOutput" output-channel="codeToBenchmark1codeToBenchmark2AggregatorInput" method="transform">
 		//		<bean class="orcha.lang.compiler.referenceimpl.xmlgenerator.impl.ObjectToApplicationTransformer">
 		//  <property name="application" ref="codeToBenchmark2" />
@@ -330,25 +330,19 @@ class CompileServiceWithSpringIntegrationTest {
 		Assert.assertEquals(element.getAttribute("name").getValue(), "application")
 		Assert.assertEquals(element.getAttribute("ref").getValue(), codeToBenchmark2.name)
 
-		//<int:aggregator id="aggregator-codeToBenchmark1codeToBenchmark2AggregatorInput-id" input-channel="codeToBenchmark1codeToBenchmark2AggregatorInput" output-channel="codeToBenchmark1codeToBenchmark2AggregatorInputTransformer" release-strategy-expression="size()==2 and ( ([0].payload instanceof T(orcha.lang.configuration.Application) AND [0].payload.state==T(orcha.lang.configuration.State).TERMINATED)  and  ([1].payload instanceof T(orcha.lang.configuration.Application) AND [1].payload.state==T(orcha.lang.configuration.State).TERMINATED) )" correlation-strategy-expression="headers['messageID']" />
-		//<int:transformer id="transformer-codeToBenchmark1codeToBenchmark2AggregatorInput-id" input-channel="codeToBenchmark1codeToBenchmark2AggregatorInputTransformer" output-channel="codeToBenchmark1codeToBenchmark2AggregatorInputAggregatorOutput" expression="payload.?[name=='codeToBenchmark1']" />
+		// <int:aggregator input-channel="codeToBenchmark1codeToBenchmark2AggregatorInput"/>
+		// <int:transformer output-channel="codeToBenchmark1codeToBenchmark2AggregatorInput">
 	  		
 		expr = xFactory.compile("//*[local-name() = 'aggregator']", Filters.element())
 		elements = expr.evaluate(xmlSpringIntegration)
 		Assert.assertTrue(elements.size() == 1)
 		element = elements.get(0)
-		String outputChannel = element.getAttribute("output-channel").getValue()
-		println outputChannel
-		expr = xFactory.compile("//*[local-name() = 'transformer'][@input-channel='" + outputChannel + "']", Filters.element())
-		elements = expr.evaluate(xmlSpringIntegration)
-		Assert.assertTrue(elements.size() == 1)
-			 
-		//  <int:transformer id="transformer-codeToBenchmark1codeToBenchmark2AggregatorInputAggregatorOutput-id" input-channel="codeToBenchmark1codeToBenchmark2AggregatorInputAggregatorOutput" output-channel="codeToBenchmark1codeToBenchmark2AggregatorOutputTransformer" method="transform">
-		//		<bean class="orcha.lang.compiler.referenceimpl.xmlgenerator.impl.ApplicationToObjectTransformer" />
-
-		expr = xFactory.compile("//*[local-name() = 'transformer']/*[local-name() = 'bean'][@class='orcha.lang.compiler.referenceimpl.xmlgenerator.impl.ApplicationToObjectTransformer']", Filters.element())
-		elements = expr.evaluate(xmlSpringIntegration)
-		Assert.assertTrue(elements.size() == 1)
+		
+		expr2 = xFactory.compile("//*[local-name() = 'transformer']", Filters.element())
+		elements2 = expr2.evaluate(xmlSpringIntegration)
+		element2 = elements2.get(1)
+		
+		Assert.assertEquals(element.getAttribute("input-channel").getValue(), element2.getAttribute("output-channel").getValue())
 		 
 		//  <int:chain input-channel="codeToBenchmark1codeToBenchmark2AggregatorOutputTransformer" output-channel="codeToBenchmark1OutputFileChannelAdapterbenchmarkingOutputFile">
 		//		<int:object-to-string-transformer />
@@ -357,7 +351,7 @@ class CompileServiceWithSpringIntegrationTest {
 		elements = expr.evaluate(xmlSpringIntegration)
 		Assert.assertTrue(elements.size() == 1)
 		 
-		//   <int-file:outbound-channel-adapter id="file-codeToBenchmark1benchmarkingOutputFileChannel-id" channel="codeToBenchmark1OutputFileChannelAdapterbenchmarkingOutputFile" directory-expression="@benchmarkingOutputFile.output.adapter.directory" filename-generator-expression="@benchmarkingOutputFile.output.adapter.filename" append-new-line="true" mode="REPLACE" auto-create-directory="true" delete-source-files="false" />
+		//   <int-file:outbound-channel-adapter directory-expression="@benchmarkingOutputFile.output.adapter.directory" />
 
 		expr = xFactory.compile("//*[local-name() = 'outbound-channel-adapter']", Filters.element())
 		elements = expr.evaluate(xmlSpringIntegration)
@@ -365,6 +359,11 @@ class CompileServiceWithSpringIntegrationTest {
 		element = elements.get(0)
 		Assert.assertEquals(element.getAttribute("directory-expression").getValue(), '@' + benchmarkingOutputFile.name + '.output.adapter.directory')
 		Assert.assertEquals(element.getAttribute("filename-generator-expression").getValue(), '@' + benchmarkingOutputFile.name + '.output.adapter.filename')
+		Assert.assertEquals(element.getAttribute("delete-source-files").getValue(), 'false')
+		Assert.assertEquals(element.getAttribute("auto-create-directory").getValue(), 'true')
+		Assert.assertEquals(element.getAttribute("append-new-line").getValue(), 'true')
+		Assert.assertEquals(element.getAttribute("mode").getValue(), 'REPLACE')
+		
 		
 		Assert.assertTrue(new File(pathToXmlFile).delete())
 	
