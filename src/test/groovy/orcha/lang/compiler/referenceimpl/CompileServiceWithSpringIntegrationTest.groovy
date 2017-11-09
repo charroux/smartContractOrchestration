@@ -364,6 +364,18 @@ class CompileServiceWithSpringIntegrationTest {
 		Assert.assertEquals(element.getAttribute("append-new-line").getValue(), 'true')
 		Assert.assertEquals(element.getAttribute("mode").getValue(), 'REPLACE')
 		
+		//  <int:aggregator release-strategy-expression="size()==2" />
+
+		expr = xFactory.compile("//*[local-name() = 'aggregator']", Filters.element())
+		elements = expr.evaluate(xmlSpringIntegration)
+		element = elements.get(0)
+		
+		expr2 = xFactory.compile("//*[local-name() = 'service-activator']", Filters.element())
+		elements2 = expr2.evaluate(xmlSpringIntegration)		
+		
+		Assert.assertTrue(element.getAttribute("release-strategy-expression").getValue().contains("size()=="+elements2.size()))
+		
+		
 		
 		Assert.assertTrue(new File(pathToXmlFile).delete())
 	
