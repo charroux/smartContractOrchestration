@@ -364,17 +364,22 @@ class CompileServiceWithSpringIntegrationTest {
 		Assert.assertEquals(element.getAttribute("append-new-line").getValue(), 'true')
 		Assert.assertEquals(element.getAttribute("mode").getValue(), 'REPLACE')
 		
-		//  <int:aggregator release-strategy-expression="size()==2" />
+		//  <int:aggregator release-strategy-expression="size()==2 and ( ([0].payload instanceof T(orcha.lang.configuration.Application) AND [0].payload.state==T(orcha.lang.configuration.State).TERMINATED)  and  ([1].payload instanceof T(orcha.lang.configuration.Application) AND [1].payload.state==T(orcha.lang.configuration.State).TERMINATED) )"/>
 
 		expr = xFactory.compile("//*[local-name() = 'aggregator']", Filters.element())
 		elements = expr.evaluate(xmlSpringIntegration)
 		element = elements.get(0)
 		
 		expr2 = xFactory.compile("//*[local-name() = 'service-activator']", Filters.element())
-		elements2 = expr2.evaluate(xmlSpringIntegration)		
+		elements2 = expr2.evaluate(xmlSpringIntegration)
+		int size = elements2.size()
 		
-		Assert.assertTrue(element.getAttribute("release-strategy-expression").getValue().contains("size()=="+elements2.size()))
-		
+		Assert.assertTrue(element.getAttribute("release-strategy-expression").getValue().contains("size()=="+size))
+		int i = 0
+		while (i!=size) {
+			Assert.assertTrue(element.getAttribute("release-strategy-expression").getValue().contains("([" + i + "].payload instanceof T(orcha.lang.configuration.Application) AND [" + i + "].payload.state==T(orcha.lang.configuration.State).TERMINATED)"))
+			i++
+		}
 		
 		
 		Assert.assertTrue(new File(pathToXmlFile).delete())
