@@ -57,7 +57,19 @@ class CompileServiceWithSpringIntegrationTest {
 	@Autowired
 	EventHandler benchmarkingOutputFile
 	
+	//the following concerns ComputeInSeries
 	
+	@Autowired
+	Application firstProgram
+	
+	@Autowired
+	EventHandler computesInSeriesInputFile
+	
+	@Autowired
+	Application secondProgram
+	
+	@Autowired
+	EventHandler computesInSeriesOutputFile
 	
 	
 	@Test
@@ -381,7 +393,65 @@ class CompileServiceWithSpringIntegrationTest {
 			i++
 		}
 		
+		Assert.assertTrue(new File(pathToXmlFile).delete())
+	
+		String xmlQoSSpringContextFileName = orchaCodeVisitor.getOrchaMetadata().getTitle() + "QoS.xml"
+		String pathToQoSXmlFile = destinationDirectory.getAbsolutePath() + File.separator + xmlQoSSpringContextFileName
 		
+		Assert.assertTrue(new File(pathToQoSXmlFile).delete())
+	}
+	
+	@Test
+	void ComputesInSeriesConfiguration(){
+		
+		String orchaProgram = 	"title 'computes in series'\n"+
+		"description 'Read the content of a text file. Pass its content to a service. Launch another service in a serie. Then write the result of the lastest service to a file.'\n"+
+		"receive event from computesInSeriesInputFile\n"+
+		"compute firstProgram with event.value\n"+
+		"when 'firstProgram terminates'\n"+
+		"compute secondProgram with firstProgram.result\n"+
+		"when 'secondProgram terminates'\n"+
+		"send secondProgram.result to computesInSeriesOutputFile"
+		
+		// construct the graph of instructions for the Orcha programm
+		
+		OrchaCodeVisitor orchaCodeVisitor = orchaCodeParser.parse(orchaProgram)
+		
+		// generate an XML file (Spring integration configuration): this is the file to be tested
+		 
+		String path = "." + File.separator + "src" + File.separator + "test" + File.separator + "resources" + File.separator
+		File destinationDirectory = new File(path)
+		compile.compile(orchaCodeVisitor, destinationDirectory)
+		
+		String xmlSpringContextFileName = orchaCodeVisitor.getOrchaMetadata().getTitle() + ".xml"
+		String pathToXmlFile = destinationDirectory.getAbsolutePath() + File.separator + xmlSpringContextFileName
+		
+		// parse the XML file checking is correctness
+		
+		SAXBuilder builder = new SAXBuilder()
+		
+		Document xmlSpringIntegration = builder.build(pathToXmlFile)
+		
+		XPathFactory xFactory = XPathFactory.instance()
+				 
+		// <int:service-activator expression="@program1.myMethod(payload)">
+		XPathExpression<Element> expr = xFactory.compile("//*[local-name() = 'service-activator']", Filters.element())
+		List<Element> elements = expr.evaluate(xmlSpringIntegration)
+		
+		Element element = elements.get(0)
+		def s = firstProgram.input.adapter.javaClass
+		def values = s.tokenize( '.' )
+		int sizeValues = values.size()
+		def expression = "@"+values[sizeValues-1]+"."+firstProgram.input.adapter.method+"(payload)"
+		Assert.assertEquals(element.getAttribute("expression").getValue().toLowerCase() , expression.toLowerCase())
+
+		element = elements.get(1)
+		s = secondProgram.input.adapter.javaClass
+		values = s.tokenize( '.' )
+		sizeValues = values.size()
+		expression = "@"+values[sizeValues-1]+"."+secondProgram.input.adapter.method+"(payload)"
+		Assert.assertEquals(element.getAttribute("expression").getValue().toLowerCase() , expression.toLowerCase())
+
 		Assert.assertTrue(new File(pathToXmlFile).delete())
 	
 		String xmlQoSSpringContextFileName = orchaCodeVisitor.getOrchaMetadata().getTitle() + "QoS.xml"
