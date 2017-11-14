@@ -81,6 +81,17 @@ class CompileServiceWithSpringIntegrationTest {
 	@Autowired
 	EventHandler javascriptServiceOutputFile
 	
+	// the following concerns RetryService
+	@Autowired
+	Application serviceWithRetry
+	
+	@Autowired
+	EventHandler retryInputFile
+	
+	@Autowired
+	EventHandler qosOutputFile
+	
+	
 	
 	@Test
 	void prepareOrder(){
@@ -530,5 +541,53 @@ class CompileServiceWithSpringIntegrationTest {
 		String pathToQoSXmlFile = destinationDirectory.getAbsolutePath() + File.separator + xmlQoSSpringContextFileName
 		
 		Assert.assertTrue(new File(pathToQoSXmlFile).delete())
-	}	
+	}
+	
+	@Test
+	void Retry(){
+		
+		String orchaProgram = "package source.qos\n"+
+		"title 'retry'\n"+
+		"description 'Use the retry pattern. The service is automatically launch again 3 times. The two first times the service throws an exception. The third time, the service completes.'\n"+
+		"receive event from retryInputFile\n"+
+		"compute serviceWithRetry with event.value\n"+
+		"when 'serviceWithRetry terminates'\n"+
+		"send serviceWithRetry.result to qosOutputFile"
+				
+		// construct the graph of instructions for the Orcha programm
+		
+		OrchaCodeVisitor orchaCodeVisitor = orchaCodeParser.parse(orchaProgram)
+		
+		// generate an XML file (Spring integration configuration): this is the file to be tested
+		 
+		String path = "." + File.separator + "src" + File.separator + "test" + File.separator + "resources" + File.separator
+		File destinationDirectory = new File(path)
+		compile.compile(orchaCodeVisitor, destinationDirectory)
+		
+		String xmlSpringContextFileName = orchaCodeVisitor.getOrchaMetadata().getTitle() + ".xml"
+		String pathToXmlFile = destinationDirectory.getAbsolutePath() + File.separator + xmlSpringContextFileName
+		
+		// parse the XML file checking is correctness
+		
+		SAXBuilder builder = new SAXBuilder()
+		
+		Document xmlSpringIntegration = builder.build(pathToXmlFile)
+		
+		XPathFactory xFactory = XPathFactory.instance()
+				 
+		// <int:exponential-back-off initial="1000" multiplier="2" maximum="4000" />
+		XPathExpression<Element> expr = xFactory.compile("//*[local-name() = 'exponential-back-off']", Filters.element())
+		List<Element> elements = expr.evaluate(xmlSpringIntegration)
+		Assert.assertTrue(elements.size() == 1)
+		Element element = elements.get(0)
+		Assert.assertEquals(element.getAttribute("multiplier").getValue(),"2")
+		Assert.assertEquals(element.getAttribute("initial").getValue(),"1000")
+		Assert.assertEquals(element.getAttribute("maximum").getValue(),"4000")
+				
+		Assert.assertTrue(new File(pathToXmlFile).delete())
+		String xmlQoSSpringContextFileName = orchaCodeVisitor.getOrchaMetadata().getTitle() + "QoS.xml"
+		String pathToQoSXmlFile = destinationDirectory.getAbsolutePath() + File.separator + xmlQoSSpringContextFileName
+		
+		Assert.assertTrue(new File(pathToQoSXmlFile).delete())
+	}
 }
