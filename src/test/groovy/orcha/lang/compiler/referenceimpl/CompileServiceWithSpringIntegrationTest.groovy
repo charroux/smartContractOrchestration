@@ -71,6 +71,16 @@ class CompileServiceWithSpringIntegrationTest {
 	@Autowired
 	EventHandler computesInSeriesOutputFile
 	
+	// the following concerns javascriptService
+	@Autowired
+	EventHandler javascriptServiceInputFile
+	
+	@Autowired
+	Application javascriptService
+	
+	@Autowired
+	EventHandler javascriptServiceOutputFile
+	
 	
 	@Test
 	void prepareOrder(){
@@ -467,12 +477,58 @@ class CompileServiceWithSpringIntegrationTest {
 		
 		Assert.assertEquals(element.getAttribute("output-channel").getValue() , element2.getAttribute("input-channel").getValue())
 		
-		
-		
 		Assert.assertTrue(new File(pathToXmlFile).delete())
 		String xmlQoSSpringContextFileName = orchaCodeVisitor.getOrchaMetadata().getTitle() + "QoS.xml"
 		String pathToQoSXmlFile = destinationDirectory.getAbsolutePath() + File.separator + xmlQoSSpringContextFileName
 		Assert.assertTrue(new File(pathToQoSXmlFile).delete())
 	}
 	
+	@Test
+	void JavascriptExample(){
+		
+		String orchaProgram = "package source.javascript\n"+
+		"title 'javascript service'\n"+
+		"description 'Read a Json file. Pass its content to a Javascript service. Launch the service, then write the result of the service to a Json file.'\n"+
+		"receive event from javascriptServiceInputFile\n"+
+		"compute javascriptService with event.value\n"+
+		"when 'javascriptService terminates'\n"+
+		"send javascriptService.result to javascriptServiceOutputFile"
+				
+		// construct the graph of instructions for the Orcha programm
+		
+		OrchaCodeVisitor orchaCodeVisitor = orchaCodeParser.parse(orchaProgram)
+		
+		// generate an XML file (Spring integration configuration): this is the file to be tested
+		 
+		String path = "." + File.separator + "src" + File.separator + "test" + File.separator + "resources" + File.separator
+		File destinationDirectory = new File(path)
+		compile.compile(orchaCodeVisitor, destinationDirectory)
+		
+		String xmlSpringContextFileName = orchaCodeVisitor.getOrchaMetadata().getTitle() + ".xml"
+		String pathToXmlFile = destinationDirectory.getAbsolutePath() + File.separator + xmlSpringContextFileName
+		
+		// parse the XML file checking is correctness
+		
+		SAXBuilder builder = new SAXBuilder()
+		
+		Document xmlSpringIntegration = builder.build(pathToXmlFile)
+		
+		XPathFactory xFactory = XPathFactory.instance()
+				 
+		// <int:service-activator expression="@program1.myMethod(payload)">
+		XPathExpression<Element> expr = xFactory.compile("//*[local-name() = 'service-activator']/*[local-name() = 'script']", Filters.element())
+		List<Element> elements = expr.evaluate(xmlSpringIntegration)
+		Assert.assertTrue(elements.size() == 1)
+		Element element = elements.get(0)
+		Assert.assertEquals(element.getAttribute("lang").getValue(),"js")
+		Assert.assertTrue(element.getAttribute("location").getValue().endsWith(".js"))
+		Assert.assertEquals(element.getAttribute("location").getValue(),javascriptService.input.adapter.file)
+		
+				
+		Assert.assertTrue(new File(pathToXmlFile).delete())
+		String xmlQoSSpringContextFileName = orchaCodeVisitor.getOrchaMetadata().getTitle() + "QoS.xml"
+		String pathToQoSXmlFile = destinationDirectory.getAbsolutePath() + File.separator + xmlQoSSpringContextFileName
+		
+		Assert.assertTrue(new File(pathToQoSXmlFile).delete())
+	}	
 }
