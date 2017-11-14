@@ -402,7 +402,7 @@ class CompileServiceWithSpringIntegrationTest {
 	}
 	
 	@Test
-	void ComputesInSeriesConfiguration(){
+	void ComputesInSeries(){
 		
 		String orchaProgram = 	"title 'computes in series'\n"+
 		"description 'Read the content of a text file. Pass its content to a service. Launch another service in a serie. Then write the result of the lastest service to a file.'\n"+
@@ -451,13 +451,28 @@ class CompileServiceWithSpringIntegrationTest {
 		sizeValues = values.size()
 		expression = "@"+values[sizeValues-1]+"."+secondProgram.input.adapter.method+"(payload)"
 		Assert.assertEquals(element.getAttribute("expression").getValue().toLowerCase() , expression.toLowerCase())
-
+		
+		//	<int:transformer id="transformer-firstProgramAggregatorInputAggregatorOutput-id" input-channel="firstProgramAggregatorInputAggregatorOutput" output-channel="firstProgramAggregatorOutputTransformer" method="transform">
+		//	<int:chain input-channel="firstProgramAggregatorOutputTransformer" output-channel="secondProgramServiceAcivatorOutput" id="service-activator-chain-secondProgramChannel-id">
+		
+		def id = "transformer-"+firstProgram.name+"AggregatorInputAggregatorOutput-id"
+		expr = xFactory.compile("//*[local-name() = 'transformer'][@id='"+id+"']", Filters.element())
+		elements = expr.evaluate(xmlSpringIntegration)
+		element = elements.get(0)
+			
+		id = "service-activator-chain-"+secondProgram.name+"Channel-id"
+		XPathExpression<Element> expr2 = xFactory.compile("//*[local-name() = 'chain'][@id='"+id+"']", Filters.element())
+		List<Element> elements2 = expr2.evaluate(xmlSpringIntegration)
+		Element element2 = elements2.get(0)
+		
+		Assert.assertEquals(element.getAttribute("output-channel").getValue() , element2.getAttribute("input-channel").getValue())
+		
+		
+		
 		Assert.assertTrue(new File(pathToXmlFile).delete())
-	
 		String xmlQoSSpringContextFileName = orchaCodeVisitor.getOrchaMetadata().getTitle() + "QoS.xml"
 		String pathToQoSXmlFile = destinationDirectory.getAbsolutePath() + File.separator + xmlQoSSpringContextFileName
-		
 		Assert.assertTrue(new File(pathToQoSXmlFile).delete())
 	}
-
+	
 }
