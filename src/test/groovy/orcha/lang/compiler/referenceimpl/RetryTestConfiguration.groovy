@@ -3,7 +3,6 @@ package orcha.lang.compiler.referenceimpl
 import org.springframework.boot.SpringBootConfiguration
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import configuration.qos.ServiceRetryConfiguration
 import orcha.lang.compiler.Compile
 import orcha.lang.compiler.qualityOfService.QualityOfService
 import orcha.lang.compiler.referenceimpl.xmlgenerator.XmlGenerator
@@ -88,3 +87,4 @@ trait RetryTestConfiguration{
 	}
 
 }
+
