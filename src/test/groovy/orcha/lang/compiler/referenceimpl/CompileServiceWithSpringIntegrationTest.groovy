@@ -535,6 +535,47 @@ class CompileServiceWithSpringIntegrationTest {
 		Assert.assertTrue(element.getAttribute("location").getValue().endsWith(".js"))
 		Assert.assertEquals(element.getAttribute("location").getValue(),javascriptService.input.adapter.file)
 		
+		// <int:json-to-object-transformer type="service.javascript.Person" />
+		expr = xFactory.compile("//*[local-name() = 'json-to-object-transformer']", Filters.element())
+		elements = expr.evaluate(xmlSpringIntegration)
+		Assert.assertTrue(elements.size() == 1)
+		element = elements.get(0)
+    	Assert.assertEquals(element.getAttribute("type").getValue(),javascriptService.input.type)
+		
+		// <int-file:file-to-string-transformer input-channel="javascriptServiceInputFile-InputChannel" output-channel="javascriptServiceInputFile-InputChannelTransformer" delete-files="false" />
+		// <int:chain input-channel="javascriptServiceInputFile-InputChannelTransformer" output-channel="javascriptServiceInputFile-OutputChannel">
+	  
+		expr = xFactory.compile("//*[local-name() = 'json-to-object-transformer']/..", Filters.element())
+		 elements = expr.evaluate(xmlSpringIntegration)
+		 element = elements.get(0)
+		 
+		 XPathExpression<Element> expr2 = xFactory.compile("//*[local-name() = 'file-to-string-transformer']", Filters.element())
+		  List<Element> elements2 = expr2.evaluate(xmlSpringIntegration)
+		  Element element2 = elements2.get(0)
+		 
+		 Assert.assertEquals(element.getAttribute("input-channel").getValue(), element2.getAttribute("output-channel").getValue())
+		  
+		//  <int:transformer output-channel="javascriptServiceAggregatorOutputTransformer" method="transform">
+		//   <int:chain input-channel="javascriptServiceAggregatorOutputTransformer" output-channel="javascriptServiceOutputFileChannelAdapterjavascriptServiceOutputFile">
+
+		expr = xFactory.compile("//*[local-name() = 'object-to-json-transformer']/..", Filters.element())
+		 elements = expr.evaluate(xmlSpringIntegration)
+		 element = elements.get(0)
+		 
+		 def id = "transformer-"+javascriptService.name+"AggregatorInputAggregatorOutput-id"
+		 expr2 = xFactory.compile("//*[local-name() = 'transformer'][@id='"+id+"']", Filters.element())
+		 elements2 = expr2.evaluate(xmlSpringIntegration)
+		 element2 = elements2.get(0)
+		  
+		 Assert.assertEquals(element.getAttribute("input-channel").getValue(), element2.getAttribute("output-channel").getValue())
+		 
+		 //<int:object-to-json-transformer />
+		 expr = xFactory.compile("//*[local-name() = 'object-to-json-transformer']", Filters.element())
+		  elements = expr.evaluate(xmlSpringIntegration)
+		  Assert.assertTrue(elements.size()==1)
+		 
+		
+		
 				
 		Assert.assertTrue(new File(pathToXmlFile).delete())
 		String xmlQoSSpringContextFileName = orchaCodeVisitor.getOrchaMetadata().getTitle() + "QoS.xml"
@@ -576,13 +617,23 @@ class CompileServiceWithSpringIntegrationTest {
 		XPathFactory xFactory = XPathFactory.instance()
 				 
 		// <int:exponential-back-off initial="1000" multiplier="2" maximum="4000" />
-		XPathExpression<Element> expr = xFactory.compile("//*[local-name() = 'exponential-back-off']", Filters.element())
+		XPathExpression<Element> expr = xFactory.compile("//*[local-name() = 'service-activator']//*[local-name() = 'exponential-back-off']", Filters.element())
 		List<Element> elements = expr.evaluate(xmlSpringIntegration)
 		Assert.assertTrue(elements.size() == 1)
 		Element element = elements.get(0)
 		Assert.assertEquals(element.getAttribute("multiplier").getValue(),"2")
 		Assert.assertEquals(element.getAttribute("initial").getValue(),"1000")
 		Assert.assertEquals(element.getAttribute("maximum").getValue(),"4000")
+		
+		// the presence of <int:request-handler-advice-chain>
+		expr = xFactory.compile("//*[local-name() = 'service-activator']//*[local-name() = 'request-handler-advice-chain']", Filters.element())
+		elements = expr.evaluate(xmlSpringIntegration)
+		Assert.assertTrue(elements.size() == 1)
+		
+		// the presence of <int:retry-advice>
+		expr = xFactory.compile("//*[local-name() = 'service-activator']//*[local-name() = 'retry-advice']", Filters.element())
+		elements = expr.evaluate(xmlSpringIntegration)
+		Assert.assertTrue(elements.size() == 1)
 				
 		Assert.assertTrue(new File(pathToXmlFile).delete())
 		String xmlQoSSpringContextFileName = orchaCodeVisitor.getOrchaMetadata().getTitle() + "QoS.xml"
@@ -590,4 +641,5 @@ class CompileServiceWithSpringIntegrationTest {
 		
 		Assert.assertTrue(new File(pathToQoSXmlFile).delete())
 	}
+	
 }
