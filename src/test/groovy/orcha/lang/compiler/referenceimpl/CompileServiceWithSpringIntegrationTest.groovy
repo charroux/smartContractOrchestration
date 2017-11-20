@@ -91,6 +91,10 @@ class CompileServiceWithSpringIntegrationTest {
 	@Autowired
 	EventHandler qosOutputFile
 	
+	// the following concerns Circuit breaker
+	@Autowired
+	Application serviceWithCircuitBreaker
+	
 	
 	
 	@Test
@@ -642,4 +646,61 @@ class CompileServiceWithSpringIntegrationTest {
 		Assert.assertTrue(new File(pathToQoSXmlFile).delete())
 	}
 	
+	@Test
+	void CircuitBreaker(){
+	
+		// the Orcha source program
+			
+		String orchaProgram = 	"package source.qos\n"+
+		"description 'Use the circuit breaker pattern. Read all files whose names start with circuitBreakerInputFile at the rate of one file per second. Then pass the content of each file to a service. The service fails the two first times. Then the circuit breaker in opened. The thrid attemps to launch the service occurs before the circuit breaker returns to the half opened state, so the service is no more call.'\n"+
+		"title 'circuit breaker'\n"+
+		"receive event from circuitBreakerInputFile\n"+
+		"compute serviceWithCircuitBreaker with event.value\n"+
+		"when 'serviceWithCircuitBreaker terminates'\n"+
+		"send serviceWithCircuitBreaker.result to qosOutputFile"
+
+		
+		// construct the graph of instructions for the Orcha programm
+		
+		OrchaCodeVisitor orchaCodeVisitor = orchaCodeParser.parse(orchaProgram)
+		
+		// generate an XML file (Spring integration configuration): this is the file to be tested
+		 
+		String path = "." + File.separator + "src" + File.separator + "test" + File.separator + "resources" + File.separator
+		File destinationDirectory = new File(path)
+		compile.compile(orchaCodeVisitor, destinationDirectory)
+		
+		String xmlSpringContextFileName = orchaCodeVisitor.getOrchaMetadata().getTitle() + ".xml"
+		String pathToXmlFile = destinationDirectory.getAbsolutePath() + File.separator + xmlSpringContextFileName
+		
+		// parse the XML file checking is correctness
+		
+		SAXBuilder builder = new SAXBuilder()
+		Document xmlSpringIntegration = builder.build(pathToXmlFile)
+		XPathFactory xFactory = XPathFactory.instance()
+		
+		//<int:service-activator id="service-activator-serviceWithCircuitBreakerChannel-id" expression="@service.myMethod(payload)">
+		//<int:request-handler-advice-chain>
+		//  <bean class="org.springframework.integration.handler.advice.RequestHandlerCircuitBreakerAdvice">
+		//	<property name="threshold" value="2" />
+		//	<property name="halfOpenAfter" value="5000" />
+		
+		 XPathExpression<Element> expr = xFactory.compile("//*[local-name() = 'chain']/*[local-name() = 'service-activator']/*[local-name() = 'request-handler-advice-chain']/*[local-name() = 'bean']/*[local-name() = 'property']", Filters.element())
+		 List<Element> elements = expr.evaluate(xmlSpringIntegration)
+		 Assert.assertTrue(elements.size() == 2)
+		 
+		 Class<?> beanClass = serviceWithCircuitBreaker.getClass()
+		 
+		 Assert.assertTrue(beanClass.isAnnotationPresent(CircuitBreaker.class))
+		 
+		 Element element = elements.get(0)
+		 int numberOfFailuresBeforeOpening = beanClass.getAnnotation(CircuitBreaker.class).numberOfFailuresBeforeOpening()
+		 Assert.assertEquals(element.getAttribute("value").getValue(), numberOfFailuresBeforeOpening.toString())
+		 
+		 element = elements.get(1)
+		 long intervalBeforeHalfOpening = beanClass.getAnnotation(CircuitBreaker.class).intervalBeforeHalfOpening()
+		 Assert.assertEquals(element.getAttribute("value").getValue(), intervalBeforeHalfOpening.toString())
+	}
+
+		
 }
