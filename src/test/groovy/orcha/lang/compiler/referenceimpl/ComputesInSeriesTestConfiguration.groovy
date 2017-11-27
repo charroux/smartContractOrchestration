@@ -16,11 +16,8 @@ import orcha.lang.configuration.JavaServiceAdapter
 import orcha.lang.configuration.Output
 import orcha.lang.configuration.OutputFileAdapter
 import orcha.lang.configuration.OutputFileAdapter.WritingMode
-import service.GroovyCode1
-import service.GroovyCodeToBenchmark1
-import service.GroovyCodeToBenchmark2
-import service.Program1
-import service.Program2
+import service.Program1Test
+import service.Program2Test
 import orcha.lang.compiler.qualityOfService.QualityOfServiceImpl
 import orcha.lang.compiler.referenceimpl.xmlgenerator.impl.JDom2XmlGeneratorForSpringIntegration
 import orcha.lang.compiler.visitor.impl.OrchaCodeParserImpl
@@ -40,28 +37,28 @@ trait ComputesInSeriesTestConfiguration {
 	}
 		
 	@Bean
-	Program1 program1(){
-		return new Program1()
+	Program1Test program1(){
+		return new Program1Test()
 	}
 	
 	@Bean
 	Application firstProgram(){
 		def program1 = new Application(name: "firstProgram", language: "Java")
-		def javaAdapter = new JavaServiceAdapter(javaClass: 'service.Program1', method:'myMethod')
+		def javaAdapter = new JavaServiceAdapter(javaClass: 'service.Program1Test', method:'myMethod')
 		program1.input = new Input(type: "java.lang.Integer", adapter: javaAdapter)
 		program1.output = new Output(type: "java.lang.Integer", adapter: javaAdapter)
 		return program1
 	}
 	
 	@Bean
-	Program2 program2(){
-		return new Program2()
+	Program2Test program2(){
+		return new Program2Test()
 	}
 	
 	@Bean
 	Application secondProgram(){
 		def program2 = new Application(name: "secondProgram", language: "Java")
-		def javaAdapter = new JavaServiceAdapter(javaClass: 'service.Program2', method:'myMethod')
+		def javaAdapter = new JavaServiceAdapter(javaClass: 'service.Program2Test', method:'myMethod')
 		program2.input = new Input(type: "java.lang.Integer", adapter: javaAdapter)
 		program2.output = new Output(type: "java.lang.Integer", adapter: javaAdapter)
 		return program2

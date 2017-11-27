@@ -20,16 +20,18 @@ import orcha.lang.compiler.referenceimpl.xmlgenerator.impl.JDom2XmlGeneratorForS
 import orcha.lang.compiler.visitor.impl.OrchaCodeParserImpl
 import orcha.lang.configuration.CircuitBreaker
 import orcha.lang.configuration.Retry
-import service.prepareOrder.OrderPreparation
-import service.qos.Service
+import service.ServiceTest
 
+@Retry(maxNumberOfAttempts=3, intervalBetweenTheFirstAndSecondAttempt=1000L, intervalMultiplierBetweenAttemps=2, maximumIntervalBetweenAttempts=4000L)
+class ServiceRetryTestConfiguration extends Application{
+}
 // Test configurations
 trait RetryTestConfiguration{
 
 	@Bean
 	Application serviceWithRetry(){
-		def program = new ServiceRetryConfiguration(name: "serviceWithRetry", language: "Java", description: "The service is retried 3 times. Two exceptions occurs during the two first attempts. Then the service completes at the thrid attempts.")
-		def javaAdapter = new JavaServiceAdapter(javaClass: 'service.qos.Service', method:'myMethod')
+		def program = new ServiceRetryTestConfiguration(name: "serviceWithRetry", language: "Java", description: "The service is retried 3 times. Two exceptions occurs during the two first attempts. Then the service completes at the thrid attempts.")
+		def javaAdapter = new JavaServiceAdapter(javaClass: 'service.ServiceTest', method:'myMethod')
 		program.input = new Input(type: "java.lang.Integer", adapter: javaAdapter)
 		program.output = new Output(type: "java.lang.Integer", adapter: javaAdapter)
 		return program
@@ -44,8 +46,8 @@ trait RetryTestConfiguration{
 	}
 	
 	@Bean
-	Service service(){
-		return new Service()
+	ServiceTest service(){
+		return new ServiceTest()
 	}
 	
 	@Bean

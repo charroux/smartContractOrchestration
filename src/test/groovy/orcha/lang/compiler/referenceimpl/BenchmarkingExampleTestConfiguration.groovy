@@ -16,9 +16,9 @@ import orcha.lang.configuration.JavaServiceAdapter
 import orcha.lang.configuration.Output
 import orcha.lang.configuration.OutputFileAdapter
 import orcha.lang.configuration.OutputFileAdapter.WritingMode
-import service.GroovyCode1
-import service.GroovyCodeToBenchmark1
-import service.GroovyCodeToBenchmark2
+import service.GroovyCodeToBenchmark1Test
+import service.GroovyCodeToBenchmark2Test
+import service.GroovyCode1Test
 import orcha.lang.compiler.qualityOfService.QualityOfServiceImpl
 import orcha.lang.compiler.referenceimpl.xmlgenerator.impl.JDom2XmlGeneratorForSpringIntegration
 import orcha.lang.compiler.visitor.impl.OrchaCodeParserImpl
@@ -38,8 +38,8 @@ trait BenchmarkingExampleTestConfiguration {
 	}
 	
 	@Bean
-	GroovyCodeToBenchmark1 groovyCodeToBenchmark1(){
-		return new GroovyCodeToBenchmark1()
+	GroovyCodeToBenchmark1Test groovyCodeToBenchmark1(){
+		return new GroovyCodeToBenchmark1Test()
 	}
 	
 	@Bean
@@ -54,8 +54,8 @@ trait BenchmarkingExampleTestConfiguration {
 	}
 	
 	@Bean
-	GroovyCodeToBenchmark2 groovyCodeToBenchmark2(){
-		return new GroovyCodeToBenchmark2()
+	GroovyCodeToBenchmark2Test groovyCodeToBenchmark2(){
+		return new GroovyCodeToBenchmark2Test()
 	}
 	
 	@Bean
