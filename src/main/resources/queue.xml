@@ -5,9 +5,8 @@
   <bean id="errorUnwrapper" class="orcha.lang.compiler.referenceimpl.xmlgenerator.impl.ErrorUnwrapper" />
   <int:channel id="recoveryChannel" />
   <int:transformer input-channel="recoveryChannel" output-channel="loggingChannel" expression="'Failure after many attemps for the message :' + payload.failedMessage.payload" />
-  <int-file:inbound-channel-adapter id="file-queueInputFile-InputChannel-id" directory="data/input" channel="queueInputFile-InputChannel" prevent-duplicates="true" filename-pattern="queueInputFile*.txt" queue-size="20">
-    <int:poller fixed-delay="500" />
-  </int-file:inbound-channel-adapter>
+  <int:poller fixed-delay="1000" default="true" />
+  <int-file:inbound-channel-adapter id="file-queueInputFile-InputChannel-id" directory="data/input" channel="queueInputFile-InputChannel" prevent-duplicates="true" filename-pattern="queueInputFile*.txt" queue-size="20" />
   <int-file:file-to-string-transformer input-channel="queueInputFile-InputChannel" output-channel="queueInputFile-InputChannelTransformer" delete-files="false" />
   <int:chain input-channel="queueInputFile-InputChannelTransformer" output-channel="queueInputFile-OutputChannel">
     <int:header-enricher>
@@ -16,7 +15,6 @@
   </int:chain>
   <int:chain input-channel="queueInputFile-OutputChannel" output-channel="serviceWithQueueServiceAcivatorOutput" id="service-activator-chain-serviceWithQueueChannel-id">
     <int:service-activator id="service-activator-serviceWithQueueChannel-id" expression="@enQueuedService.myMethod(payload)">
-      <int:poller fixed-delay="1000" />
       <int:request-handler-advice-chain />
     </int:service-activator>
   </int:chain>

@@ -86,12 +86,12 @@ class ServiceActivator implements Chain, Poller, QoS, orcha.lang.compiler.refere
 				
 		chain.addContent(serviceActivatorElement)
 											
-		if(instructionNode.options!=null && instructionNode.options.queue!=null){
+		/*if(instructionNode.options!=null && instructionNode.options.queue!=null){
 			
 			Element pollerElement = poller(instructionNode.options.queue)
 			serviceActivatorElement.addContent(pollerElement)
 							
-		}
+		}*/
 						
 		Element adviceChainElement = new Element("request-handler-advice-chain", namespace)
 		serviceActivatorElement.addContent(adviceChainElement)
