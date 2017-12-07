@@ -47,23 +47,21 @@ class InboundChannelAdapter implements Poller, Chain, HeaderEnricher, Filter, Tr
 	private Element addDefaultPoller(InstructionNode instructionNode) {
 
 		Element pollerElement
-		
-		if(instructionNode.options!=null && instructionNode.options.queue!=null){
+
 			QueueOption queueOption = new QueueOption(fixedDelay: 1000)
 			pollerElement = poller(queueOption)
-		}
-		pollerElement.setAttribute("default", "true")
-		
+			pollerElement.setAttribute("default", "true")
+	
 		return pollerElement
 	}
 	
 	public void file(InstructionNode instructionNode) {
 
 		Element rootElement = xmlSpringIntegration.getRootElement()	
-		
+
 		Element pollerElement = this.addDefaultPoller(instructionNode)
 		rootElement.addContent(pollerElement)
-		
+
 		Element fileAdapter = this.inboundChannelAdapter(instructionNode)
 		rootElement.addContent(fileAdapter)
 		
