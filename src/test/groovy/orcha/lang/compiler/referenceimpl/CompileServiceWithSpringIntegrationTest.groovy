@@ -17,6 +17,9 @@ import service.callingServiceByEMail.Customer
 import java.nio.file.FileSystems
 import java.nio.file.Files
 import java.nio.file.Path
+
+import javax.validation.Payload
+
 import orcha.lang.compiler.Compile
 import orcha.lang.compiler.visitor.OrchaCodeParser
 import orcha.lang.compiler.visitor.OrchaCodeVisitor
@@ -700,6 +703,115 @@ class CompileServiceWithSpringIntegrationTest {
 		 element = elements.get(1)
 		 long intervalBeforeHalfOpening = beanClass.getAnnotation(CircuitBreaker.class).intervalBeforeHalfOpening()
 		 Assert.assertEquals(element.getAttribute("value").getValue(), intervalBeforeHalfOpening.toString())
+	}
+	
+	@Test
+	void EventFilteringExample(){
+	
+		// the Orcha source program
+			
+		String orchaProgram = 	"title 'event filtering'\n"+
+								"description 'Read a text file. Continue only if the content of the file is 0. Then pass 0 as an argument to a service. Wait the service to complete. Then write the result of the service to a file.'\n"+
+								"receive event from eventFilteringInputFile condition 'event == 0'\n"+
+								"compute eventFilteringCode with event.value\n"+
+								"when 'eventFilteringCode terminates'\n"+
+								"send eventFilteringCode.result to eventFilteringOutputFile"
+
+		// construct the graph of instructions for the Orcha programm
+		
+		OrchaCodeVisitor orchaCodeVisitor = orchaCodeParser.parse(orchaProgram)
+		
+		// generate an XML file (Spring integration configuration): this is the file to be tested
+		 
+		String path = "." + File.separator + "src" + File.separator + "test" + File.separator + "resources" + File.separator
+		File destinationDirectory = new File(path)
+		compile.compile(orchaCodeVisitor, destinationDirectory)
+		
+		String xmlSpringContextFileName = orchaCodeVisitor.getOrchaMetadata().getTitle() + ".xml"
+		String pathToXmlFile = destinationDirectory.getAbsolutePath() + File.separator + xmlSpringContextFileName
+		
+		// parse the XML file checking is correctness
+		
+		SAXBuilder builder = new SAXBuilder()
+		
+		Document xmlSpringIntegration = builder.build(pathToXmlFile)
+		
+		XPathFactory xFactory = XPathFactory.instance()
+
+		// <int:filter expression="payload == 0" />
+		XPathExpression<Element> expr = xFactory.compile("//*[local-name() = 'filter']", Filters.element())
+		List<Element> elements = expr.evaluate(xmlSpringIntegration)
+		Assert.assertTrue(elements.size() == 1)
+		Element element = elements.get(0)
+		Assert.assertTrue(element.getAttribute("expression").getValue().contains("payload"))
+		
+
+		Assert.assertTrue(new File(pathToXmlFile).delete())
+	
+		String xmlQoSSpringContextFileName = orchaCodeVisitor.getOrchaMetadata().getTitle() + "QoS.xml"
+		String pathToQoSXmlFile = destinationDirectory.getAbsolutePath() + File.separator + xmlQoSSpringContextFileName
+		
+		Assert.assertTrue(new File(pathToQoSXmlFile).delete())
+		
+	}
+	
+	@Test
+	void Queue(){
+	
+		// the Orcha source program
+			
+		String orchaProgram = 	"package source.qos\n"+
+				"title 'queue'\n"+
+				"description 'Add a queue to the input file reader, in front of a service and to the output file writer.'\n"+
+				"receive event from queueInputFile\n"+
+				"compute serviceWithQueue with event.value\n"+
+				"when 'serviceWithQueue terminates'\n"+
+				"send serviceWithQueue.result to queueOutputFile"
+
+		// construct the graph of instructions for the Orcha programm
+		
+		OrchaCodeVisitor orchaCodeVisitor = orchaCodeParser.parse(orchaProgram)
+		
+		// generate an XML file (Spring integration configuration): this is the file to be tested
+		 
+		String path = "." + File.separator + "src" + File.separator + "test" + File.separator + "resources" + File.separator
+		File destinationDirectory = new File(path)
+		compile.compile(orchaCodeVisitor, destinationDirectory)
+		
+		String xmlSpringContextFileName = orchaCodeVisitor.getOrchaMetadata().getTitle() + ".xml"
+		String pathToXmlFile = destinationDirectory.getAbsolutePath() + File.separator + xmlSpringContextFileName
+		
+		// parse the XML file checking is correctness
+		
+		SAXBuilder builder = new SAXBuilder()
+		
+		Document xmlSpringIntegration = builder.build(pathToXmlFile)
+		
+		XPathFactory xFactory = XPathFactory.instance()
+
+		//<int-file:inbound-channel-adapter id="file-queueInputFile-InputChannel-id" directory="data/input" channel="queueInputFile-InputChannel" prevent-duplicates="true" filename-pattern="queueInputFile*.txt" queue-size="20" />
+		XPathExpression<Element> expr = xFactory.compile("//*[local-name() = 'inbound-channel-adapter']", Filters.element())
+		List<Element> elements = expr.evaluate(xmlSpringIntegration)
+		Assert.assertTrue(elements.size() == 1)
+		Element element = elements.get(0)
+		Assert.assertTrue(element.getAttribute("queue-size").getValue().length()>0)
+		
+		//<int:channel id="serviceWithQueueAggregatorOutputTransformer">
+		//	<int:queue capacity="20" />
+		expr = xFactory.compile("//*[local-name() = 'channel']/*[local-name() = 'queue']", Filters.element())
+		elements = expr.evaluate(xmlSpringIntegration)
+		Assert.assertTrue(elements.size() == 1)
+		element = elements.get(0)
+		Assert.assertTrue(element.getAttribute("capacity").getValue().length()>0)
+		
+
+		Assert.assertTrue(new File(pathToXmlFile).delete())
+	
+		String xmlQoSSpringContextFileName = orchaCodeVisitor.getOrchaMetadata().getTitle() + "QoS.xml"
+		String pathToQoSXmlFile = destinationDirectory.getAbsolutePath() + File.separator + xmlQoSSpringContextFileName
+		
+		Assert.assertTrue(new File(pathToQoSXmlFile).delete())
+		
 	}
 
 		

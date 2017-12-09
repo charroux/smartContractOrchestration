@@ -5,15 +5,14 @@
   <bean id="errorUnwrapper" class="orcha.lang.compiler.referenceimpl.xmlgenerator.impl.ErrorUnwrapper" />
   <int:channel id="recoveryChannel" />
   <int:transformer input-channel="recoveryChannel" output-channel="loggingChannel" expression="'Failure after many attemps for the message :' + payload.failedMessage.payload" />
-  <int-file:inbound-channel-adapter id="file-eventFilteringInputFile-InputChannel-id" directory="data/input" channel="eventFilteringInputFile-InputChannel" prevent-duplicates="true" filename-pattern="eventFilteringInputFile.txt">
-    <int:poller fixed-delay="1000" />
-  </int-file:inbound-channel-adapter>
+  <int:poller fixed-delay="1000" default="true" />
+  <int-file:inbound-channel-adapter id="file-eventFilteringInputFile-InputChannel-id" directory="data/input" channel="eventFilteringInputFile-InputChannel" prevent-duplicates="true" filename-pattern="eventFilteringInputFile.txt" />
   <int-file:file-to-string-transformer input-channel="eventFilteringInputFile-InputChannel" output-channel="eventFilteringInputFile-InputChannelTransformer" delete-files="false" />
   <int:chain input-channel="eventFilteringInputFile-InputChannelTransformer" output-channel="eventFilteringInputFile-OutputChannel">
     <int:header-enricher>
       <int:header name="messageID" expression="headers['id'].toString()" />
     </int:header-enricher>
-    <int:filter expression="payload == 0" />
+    <int:filter expression="payload.equals('0')" />
   </int:chain>
   <int:chain input-channel="eventFilteringInputFile-OutputChannel" output-channel="eventFilteringCodeServiceAcivatorOutput" id="service-activator-chain-eventFilteringCodeChannel-id">
     <int:service-activator id="service-activator-eventFilteringCodeChannel-id" expression="@groovyEventFilteringCode.method(payload)">
