@@ -813,6 +813,65 @@ class CompileServiceWithSpringIntegrationTest {
 		Assert.assertTrue(new File(pathToQoSXmlFile).delete())
 		
 	}
+	
+	@Test
+	void EventSourcing(){
+	
+		// the Orcha source program
+			
+		String orchaProgram = 	"package source.eventSourcing\n"+
+				"title 'event sourcing'\n"+
+				"description 'Store into a NoSQL database (MongoDB): the input event (coming from a Json file), the output of a first service call, the input of a second service call and the output event.'\n"+
+				"receive event from eventSourcingInputFile\n"+
+				"compute serviceWithEventSourcingAfterService with event.value\n"+
+				"when 'serviceWithEventSourcingAfterService terminates'\n"+
+				"compute serviceWithEventSourcingBeforeService with serviceWithEventSourcingAfterService.result\n"+
+				"when 'serviceWithEventSourcingBeforeService terminates'\n"+
+				"send serviceWithEventSourcingBeforeService.result to eventSourcingOutputFile"
 
+		// construct the graph of instructions for the Orcha programm
 		
+		OrchaCodeVisitor orchaCodeVisitor = orchaCodeParser.parse(orchaProgram)
+		
+		// generate an XML file (Spring integration configuration): this is the file to be tested
+		 
+		String path = "." + File.separator + "src" + File.separator + "test" + File.separator + "resources" + File.separator
+		File destinationDirectory = new File(path)
+		compile.compile(orchaCodeVisitor, destinationDirectory)
+		
+		String xmlSpringContextFileName = orchaCodeVisitor.getOrchaMetadata().getTitle() + ".xml"
+		String pathToXmlFile = destinationDirectory.getAbsolutePath() + File.separator + xmlSpringContextFileName
+		
+		// parse the XML file checking is correctness
+		
+		SAXBuilder builder = new SAXBuilder()
+		
+		Document xmlSpringIntegration = builder.build(pathToXmlFile)
+		
+		XPathFactory xFactory = XPathFactory.instance()
+
+		//   <int-file:inbound-channel-adapter id="file-eventSourcingInputFile-InputChannel-id" directory="data/input" channel="eventSourcingInputFile-InputChannel" prevent-duplicates="true" filename-pattern="eventSourcingInputFile.json" />
+
+		XPathExpression<Element> expr = xFactory.compile("//*[local-name() = 'inbound-channel-adapter']", Filters.element())
+		List<Element> elements = expr.evaluate(xmlSpringIntegration)
+		Assert.assertTrue(elements.size() == 1)
+		Element element = elements.get(0)
+		Assert.assertTrue(element.getAttribute("filename-pattern").getValue().endsWith(".json"))
+		
+		//    <int:service-activator id="service-activator-serviceWithEventSourcingBeforeServiceChannel-id">
+		//	  <int:service-activator id="service-activator-serviceWithEventSourcingAfterServiceChannel-id">
+		expr = xFactory.compile("//*[local-name() = 'service-activator']", Filters.element())
+		elements = expr.evaluate(xmlSpringIntegration)
+		Assert.assertTrue(elements.size() == 2)
+		
+
+		Assert.assertTrue(new File(pathToXmlFile).delete())
+	
+		String xmlQoSSpringContextFileName = orchaCodeVisitor.getOrchaMetadata().getTitle() + "QoS.xml"
+		String pathToQoSXmlFile = destinationDirectory.getAbsolutePath() + File.separator + xmlQoSSpringContextFileName
+		
+		Assert.assertTrue(new File(pathToQoSXmlFile).delete())
+		
+	}
+	
 }
