@@ -533,7 +533,10 @@ class CompileServiceWithSpringIntegrationTest {
 		
 		XPathFactory xFactory = XPathFactory.instance()
 				 
-		// <int:service-activator expression="@program1.myMethod(payload)">
+		// <int:service-activator id="service-activator-javascriptServiceChannel-id">
+		//	<int-script:script lang="js" location="file:src/test/orcha/service/javascriptServiceTest.js" />
+		//	<int:request-handler-advice-chain />
+		// </int:service-activator>
 		XPathExpression<Element> expr = xFactory.compile("//*[local-name() = 'service-activator']/*[local-name() = 'script']", Filters.element())
 		List<Element> elements = expr.evaluate(xmlSpringIntegration)
 		Assert.assertTrue(elements.size() == 1)
@@ -703,6 +706,13 @@ class CompileServiceWithSpringIntegrationTest {
 		 element = elements.get(1)
 		 long intervalBeforeHalfOpening = beanClass.getAnnotation(CircuitBreaker.class).intervalBeforeHalfOpening()
 		 Assert.assertEquals(element.getAttribute("value").getValue(), intervalBeforeHalfOpening.toString())
+		 
+		 Assert.assertTrue(new File(pathToXmlFile).delete())
+		 
+		 String xmlQoSSpringContextFileName = orchaCodeVisitor.getOrchaMetadata().getTitle() + "QoS.xml"
+		 String pathToQoSXmlFile = destinationDirectory.getAbsolutePath() + File.separator + xmlQoSSpringContextFileName
+			 
+		 Assert.assertTrue(new File(pathToQoSXmlFile).delete())
 	}
 	
 	@Test
