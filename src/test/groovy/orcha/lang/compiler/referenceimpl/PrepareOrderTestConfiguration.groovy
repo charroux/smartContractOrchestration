@@ -18,7 +18,7 @@ import orcha.lang.configuration.JavaServiceAdapter
 import orcha.lang.configuration.Output
 import orcha.lang.configuration.OutputFileAdapter
 import orcha.lang.configuration.Retry
-import service.prepareOrder.OrderPreparation
+import service.OrderPreparationTest
 import orcha.lang.configuration.OutputFileAdapter.WritingMode
 
 @CircuitBreaker(numberOfFailuresBeforeOpening=2, intervalBeforeHalfOpening=2000L)
@@ -46,8 +46,8 @@ trait PrepareOrderTestConfiguration{
 	}
 	
 	@Bean
-	OrderPreparation orderPreparation(){
-		return new OrderPreparation()
+	OrderPreparationTest orderPreparation(){
+		return new OrderPreparationTest()
 	}
 	
 	@Bean

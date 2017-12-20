@@ -16,9 +16,8 @@ import orcha.lang.configuration.JavaServiceAdapter
 import orcha.lang.configuration.Output
 import orcha.lang.configuration.OutputFileAdapter
 import orcha.lang.configuration.OutputFileAdapter.WritingMode
-import service.GroovyCodeToBenchmark1Test
-import service.GroovyCodeToBenchmark2Test
-import service.GroovyCode1Test
+import service.Program1Test
+import service.Program2Test
 import orcha.lang.compiler.qualityOfService.QualityOfServiceImpl
 import orcha.lang.compiler.referenceimpl.xmlgenerator.impl.JDom2XmlGeneratorForSpringIntegration
 import orcha.lang.compiler.visitor.impl.OrchaCodeParserImpl
@@ -27,52 +26,48 @@ import orcha.lang.configuration.Retry
 import service.prepareOrder.OrderPreparation
 
 // Test configurations
-trait BenchmarkingExampleTestConfiguration {
+trait ComputesInSeriesTestConfiguration {
 
 	@Bean
-	EventHandler benchmarkingInputFile(){
-		def eventHandler = new EventHandler(name: "benchmarkingInputFile")
-		def fileAdapter = new InputFileAdapter(directory: 'data/input', filenamePattern: "benchmarkingData.txt")
+	EventHandler computesInSeriesInputFile(){
+		def eventHandler = new EventHandler(name: "computesInSeriesInputFile")
+		def fileAdapter = new InputFileAdapter(directory: 'data/input', filenamePattern: "computesInSeriesInputFile.txt")
 		eventHandler.input = new Input(mimeType: "text/plain", type: "java.lang.Integer", adapter: fileAdapter)
 		return eventHandler
 	}
-	
+		
 	@Bean
-	GroovyCodeToBenchmark1Test groovyCodeToBenchmark1(){
-		return new GroovyCodeToBenchmark1Test()
+	Program1Test program1(){
+		return new Program1Test()
 	}
 	
 	@Bean
-	Application codeToBenchmark1(){
-		def code1Application = new Application(name: "codeToBenchmark1", language: "Groovy", description:"Receives and integer and returns the opposite value")
-		def groovyCode1Adapter = new JavaServiceAdapter(javaClass: 'service.GroovyCodeToBenchmark1', method:'method')
-		def code1Input = new Input(type: "java.lang.Integer", adapter: groovyCode1Adapter)
-		code1Application.input = code1Input
-		def code1Output = new Output(type: "java.lang.Integer", adapter: groovyCode1Adapter)
-		code1Application.output = code1Output
-		return code1Application
+	Application firstProgram(){
+		def program1 = new Application(name: "firstProgram", language: "Java")
+		def javaAdapter = new JavaServiceAdapter(javaClass: 'service.Program1Test', method:'myMethod')
+		program1.input = new Input(type: "java.lang.Integer", adapter: javaAdapter)
+		program1.output = new Output(type: "java.lang.Integer", adapter: javaAdapter)
+		return program1
 	}
 	
 	@Bean
-	GroovyCodeToBenchmark2Test groovyCodeToBenchmark2(){
-		return new GroovyCodeToBenchmark2Test()
+	Program2Test program2(){
+		return new Program2Test()
 	}
 	
 	@Bean
-	Application codeToBenchmark2(){
-		def code1Application = new Application(name: "codeToBenchmark2", language: "Groovy", description: "Return the received integer")
-		def groovyCode1Adapter = new JavaServiceAdapter(javaClass: 'service.GroovyCodeToBenchmark2', method:'method')
-		def code1Input = new Input(type: "java.lang.Integer", adapter: groovyCode1Adapter)
-		code1Application.input = code1Input
-		def code1Output = new Output(type: "java.lang.Integer", adapter: groovyCode1Adapter)
-		code1Application.output = code1Output
-		return code1Application
+	Application secondProgram(){
+		def program2 = new Application(name: "secondProgram", language: "Java")
+		def javaAdapter = new JavaServiceAdapter(javaClass: 'service.Program2Test', method:'myMethod')
+		program2.input = new Input(type: "java.lang.Integer", adapter: javaAdapter)
+		program2.output = new Output(type: "java.lang.Integer", adapter: javaAdapter)
+		return program2
 	}
 	
 	@Bean
-	EventHandler benchmarkingOutputFile(){
-		def eventHandler = new EventHandler(name: "benchmarkingOutputFile")
-		def fileAdapter = new OutputFileAdapter(directory: 'data/output', createDirectory: true, filename:'benchmarkingOutputFile.txt', appendNewLine: true, writingMode: WritingMode.REPLACE)
+	EventHandler computesInSeriesOutputFile(){
+		def eventHandler = new EventHandler(name: "computesInSeriesOutputFile")
+		def fileAdapter = new OutputFileAdapter(directory: 'data/output', createDirectory: true, filename:'computesInSeriesOutputFile.txt', appendNewLine: true, writingMode: WritingMode.REPLACE)
 		eventHandler.output = new Output(mimeType: "text/plain", type: "java.lang.String", adapter: fileAdapter)
 		return eventHandler
 	}
