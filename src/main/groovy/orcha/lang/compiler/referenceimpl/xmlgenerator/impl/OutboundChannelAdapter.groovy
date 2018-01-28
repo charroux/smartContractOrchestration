@@ -5,8 +5,10 @@ import org.jdom2.Element
 import org.jdom2.Namespace
 import orcha.lang.compiler.InstructionNode
 import orcha.lang.compiler.OrchaCompilationException
+import orcha.lang.configuration.Application
 import orcha.lang.configuration.EventHandler
 import orcha.lang.configuration.EventSourcing.JoinPoint
+import orcha.lang.configuration.InputFileAdapter
 
 class OutboundChannelAdapter implements Chain, Transformer{
 	
@@ -77,6 +79,74 @@ class OutboundChannelAdapter implements Chain, Transformer{
 			outboundAdapterElement.setAttribute("append-new-line", eventHandler.output.adapter.appendNewLine.toString())
 			outboundAdapterElement.setAttribute("mode", eventHandler.output.adapter.writingMode.toString())
 			outboundAdapterElement.setAttribute("auto-create-directory", eventHandler.output.adapter.createDirectory.toString())
+			outboundAdapterElement.setAttribute("delete-source-files", "false")
+			rootElement.addContent(outboundAdapterElement)					
+		
+	}
+	
+
+	public void file(InstructionNode instructionNode, EventHandler eventHandler1) {
+		
+		Element rootElement = xmlSpringIntegration.getRootElement()
+		
+		Namespace namespace = Namespace.getNamespace("int", "http://www.springframework.org/schema/integration")
+		
+		def instruction = instructionNode.instruction
+		
+		//def outputName = instruction.variable
+		Application eventHandler = instruction.springBean
+		//def outputChannel = outputName + "OutputFileChannelAdapter" + eventHandler.name
+		def outputChannel = instructionNode.inputName
+		String directoryExpression = "@" + eventHandler1.name + ".input.adapter.directory"
+		String filenameExpression = "@" + eventHandler1.name + ".input.adapter.filenamePattern"
+					
+		
+/*			if(instruction.variableProperty=="result" || instruction.variableProperty=="error"){
+				
+				Element chainElement = this.transform(instructionNode, instructionNode.inputName, outputChannel)
+				rootElement.addContent(chainElement)
+											
+			} else if(instruction.variableProperty == "value"){		// case where the previous instruction is like: receive event from file
+																	// and the current instruction is like: send event.value to output
+			
+				// look for the index i of the current instruction into all the instructions
+				int i=0
+				while(i<instructions.size() && instructions.get(i)!=instruction){
+					i++
+				}
+				
+				// search the previous instruction (decrease i) so its variable matches
+				i--
+				while(i>=0 && instruction.variable!=instructions.get(i).variable){
+					i--
+				}
+				
+				def instructionToConnectToTheInput = instructions.get(i)
+				
+				Element channelElement = new Element("channel", namespace)
+				channelElement.setAttribute("id", instructionToConnectToTheInput.springIntegrationOutputChannel)
+				rootElement.addContent(channelElement)
+				
+				Element chainElement = this.transform(instructionNode, instructionToConnectToTheInput.springIntegrationOutputChannel, outputChannel)
+				rootElement.addContent(chainElement)			
+			
+			} else {
+				throw new OrchaCompilationException("Property for variable " + instruction.variable + " should be value or result")
+			}*/
+			
+			
+			Element channelElement = new Element("channel", namespace)
+			channelElement.setAttribute("id", outputChannel)
+			rootElement.addContent(channelElement)
+			
+			Element outboundAdapterElement = new Element("outbound-channel-adapter", Namespace.getNamespace("int-file", "http://www.springframework.org/schema/integration/file"))
+			outboundAdapterElement.setAttribute("id", "file-"+outputChannel+"Channel-id")
+			outboundAdapterElement.setAttribute("channel", outputChannel)
+			outboundAdapterElement.setAttribute("directory-expression", directoryExpression)
+			outboundAdapterElement.setAttribute("filename-generator-expression", filenameExpression)
+			/*outboundAdapterElement.setAttribute("append-new-line", eventHandler.output.adapter.appendNewLine.toString())
+			outboundAdapterElement.setAttribute("mode", eventHandler.output.adapter.writingMode.toString())
+			outboundAdapterElement.setAttribute("auto-create-directory", eventHandler.output.adapter.createDirectory.toString())*/
 			outboundAdapterElement.setAttribute("delete-source-files", "false")
 			rootElement.addContent(outboundAdapterElement)					
 		

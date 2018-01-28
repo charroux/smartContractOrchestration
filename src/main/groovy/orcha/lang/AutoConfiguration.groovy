@@ -31,6 +31,7 @@ class AutoConfiguration extends ImportDynamicResourcesForConfiguration{
 	@Autowired
 	ConfigurationProperties configurationProperties
 	
+	
 	@Autowired
 	ApplicationContext context
 

@@ -1,5 +1,7 @@
 package orcha.lang.configuration
 
+import org.springframework.beans.factory.annotation.Autowired
+
 import groovy.transform.EqualsAndHashCode;
 import groovy.transform.ToString;
 
@@ -26,7 +28,8 @@ enum BidirectionalAdapter{
 	AMQP,
 	WebService,
 	JavaApplication,
-	ScriptingApplication
+	ScriptingApplication,
+	OrchaApplication
 }
 
 public class ConfigurableProperties{
@@ -140,6 +143,14 @@ class JavaServiceAdapter extends ConfigurableProperties{
 class ScriptServiceAdapter extends ConfigurableProperties{
 	def adapter = BidirectionalAdapter.ScriptingApplication
 	def file
+}
+
+@ToString
+@EqualsAndHashCode
+class OrchaServiceAdapter extends ConfigurableProperties{
+	def adapter = BidirectionalAdapter.OrchaApplication
+	EventHandler input
+	EventHandler output
 }
 
 @EqualsAndHashCode

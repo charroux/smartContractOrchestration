@@ -6,6 +6,7 @@ import org.jdom2.Namespace
 import orcha.lang.compiler.Instruction
 import orcha.lang.compiler.InstructionNode
 import orcha.lang.configuration.JavaServiceAdapter
+import orcha.lang.configuration.OrchaServiceAdapter
 import orcha.lang.configuration.ScriptServiceAdapter
 import orcha.lang.configuration.EventSourcing.JoinPoint
 
@@ -26,12 +27,6 @@ class ServiceActivator implements Chain, Poller, QoS, orcha.lang.compiler.refere
 		def applicationName = instruction.springBean.name
 		String outputServiceChannel = applicationName + "ServiceAcivatorOutput"
 		String id = applicationName + 'Channel'
-/*		def transformerBean = applicationName + "TransformerBean"
-		def transformerRef = applicationName
-		
-		def outputTransformerChannel = outputServiceChannel + "TransformerChannel"
-		
-		def errorExpression = '@errorUnwrapper.transform(payload)'*/
 		
 		Element chain = chain("service-activator-chain-"+id+"-id", instructionNode.inputName, outputServiceChannel)
 		rootElement.addContent(chain)

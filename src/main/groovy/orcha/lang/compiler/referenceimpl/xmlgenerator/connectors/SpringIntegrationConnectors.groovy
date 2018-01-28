@@ -264,7 +264,7 @@ class SpringIntegrationConnectors{
 		}
 	}*/	
 	
-		def serviceActivator(InstructionNode instructionNode, boolean computeFails, String failChannel, boolean isScript){
+	def serviceActivator(InstructionNode instructionNode, boolean computeFails, String failChannel, boolean isScript){
 		
 		Instruction instruction = instructionNode.instruction
 		

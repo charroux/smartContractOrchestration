@@ -22,6 +22,7 @@ import orcha.lang.compiler.referenceimpl.ExpressionParser
 import orcha.lang.compiler.referenceimpl.xmlgenerator.XmlGenerator
 import orcha.lang.compiler.visitor.OrchaCodeVisitor
 import orcha.lang.configuration.ComposeEventAdapter
+import orcha.lang.configuration.ConfigurableProperties
 import orcha.lang.configuration.DatabaseAdapter
 import orcha.lang.configuration.EventHandler
 import orcha.lang.configuration.HttpAdapter
@@ -29,6 +30,7 @@ import orcha.lang.configuration.InputFileAdapter
 import orcha.lang.configuration.JavaServiceAdapter
 import orcha.lang.configuration.MailReceiverAdapter
 import orcha.lang.configuration.MailSenderAdapter
+import orcha.lang.configuration.OrchaServiceAdapter
 import orcha.lang.configuration.OutputFileAdapter
 import orcha.lang.configuration.ScriptServiceAdapter
 import orcha.lang.contract.ContractGenerator.Format
@@ -508,7 +510,7 @@ class JDom2XmlGeneratorForSpringIntegration implements XmlGenerator{
 			generateApplication(instructionNode, computeFails, failChannel, xmlSpringIntegration)
 			
 		} else if(instruction.instruction == "when"){
-		
+			
 			if(instructionNode.next.instruction.instruction == "when"){
 				
 				if(expressionParser.isSeveralWhenWithSameApplicationsInExpression(instructionNode.next)){
@@ -617,6 +619,10 @@ class JDom2XmlGeneratorForSpringIntegration implements XmlGenerator{
 			boolean isScript = true
 			serviceActivator.service(instructionNode, computeFails, failChannel, isScript)
 			
+		} else if(instructionNode.instruction.springBean.input.adapter instanceof OrchaServiceAdapter){
+			
+			this.generateRedirectInputEventToSendEventHandler(instructionNode, xmlSpringIntegration)
+	
 		}
 		
 /*		if(instructionNode.instruction.springBean.input.adapter instanceof MailSenderAdapter){
@@ -667,6 +673,31 @@ class JDom2XmlGeneratorForSpringIntegration implements XmlGenerator{
 			
 		} else {
 			throw new OrchaCompilationException(eventHandler.toString() + " not supported yet.")
+		}
+	}
+	
+	private void generateRedirectInputEventToSendEventHandler(InstructionNode instructionNode, Document xmlSpringIntegration){
+		
+		OutboundChannelAdapter outboundChannelAdapter = new OutboundChannelAdapter(xmlSpringIntegration)
+		
+		OrchaServiceAdapter orchaServiceAdapter = instructionNode.instruction.springBean.input.adapter
+		
+		def adapter = orchaServiceAdapter.input.input.adapter
+		
+		if(adapter instanceof DatabaseAdapter){
+			
+			throw new OrchaCompilationException(adapter.toString() + " not supported yet.")
+			
+		} else if(adapter instanceof InputFileAdapter){
+			
+			outboundChannelAdapter.file(instructionNode, orchaServiceAdapter.input)
+			
+		} else if(adapter instanceof MailSenderAdapter){
+				
+			throw new OrchaCompilationException(adapter.toString() + " not supported yet.")
+			
+		} else {
+			throw new OrchaCompilationException(adapter.toString() + " not supported yet.")
 		}
 	}
 	
