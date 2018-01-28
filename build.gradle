@@ -160,11 +160,3 @@ task generateContract(type: JavaExec) {
 		args Eval.me(orchaFile)
 	}
 }
-
-jacocoTestReport {
-	reports {
-		xml.enabled false
-		csv.enabled false
-		html.destination "${buildDir}/jacocoHtml"
-	}
-}

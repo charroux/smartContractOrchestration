@@ -5,8 +5,9 @@
   <bean id="errorUnwrapper" class="orcha.lang.compiler.referenceimpl.xmlgenerator.impl.ErrorUnwrapper" />
   <int:channel id="recoveryChannel" />
   <int:transformer input-channel="recoveryChannel" output-channel="loggingChannel" expression="'Failure after many attemps for the message :' + payload.failedMessage.payload" />
-  <int:poller fixed-delay="1000" default="true" />
-  <int-file:inbound-channel-adapter id="file-customer-InputChannel-id" directory="data/input" channel="customer-InputChannel" prevent-duplicates="true" filename-pattern="orderToPrepare.json" />
+  <int-file:inbound-channel-adapter id="file-customer-InputChannel-id" directory="data/input" channel="customer-InputChannel" prevent-duplicates="true" filename-pattern="orderToPrepare.json">
+    <int:poller fixed-delay="1000" />
+  </int-file:inbound-channel-adapter>
   <int-file:file-to-string-transformer input-channel="customer-InputChannel" output-channel="customer-InputChannelTransformer" delete-files="false" />
   <int:chain input-channel="customer-InputChannelTransformer" output-channel="customer-OutputChannel">
     <int:json-to-object-transformer type="service.prepareOrder.Order" />
