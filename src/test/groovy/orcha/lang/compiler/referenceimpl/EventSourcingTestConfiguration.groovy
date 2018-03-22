@@ -35,6 +35,7 @@ import orcha.lang.configuration.OutputFileAdapter.WritingMode
 
 /**
  * The configuration to store the input event into MongoDB (note the joinPoint set to after)
+ * 
  * @author Ben C.
  *
  */
