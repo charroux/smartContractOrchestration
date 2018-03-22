@@ -3,6 +3,7 @@ stages:
   - codeCoverage
   
 buildAndUnitTesting:
+  image: openjdk:8-jdk
   stage: build
   script:
     - chmod +x gradlew
