@@ -1,5 +1,4 @@
 stages:
-  - build
   - codeCoverage
   
 buildAndUnitTesting:
@@ -10,6 +9,8 @@ buildAndUnitTesting:
     - ./gradlew build
     
 codeCoverage:
+  image: openjdk:8-jdk
   stage: codeCoverage
   script:
+    - chmod +x gradlew
     - ./gradlew test jacocoTestReport
