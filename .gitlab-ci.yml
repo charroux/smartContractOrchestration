@@ -19,7 +19,7 @@ codeCoverage:
     
 compileContract:
   image: openjdk:8-jdk
-  stage: build
+  stage: compileContract
   script:
     - chmod +x gradlew
     - ./gradlew compileOrcha -PorchaFile="['restWebService/RestWebService.groovy']"
