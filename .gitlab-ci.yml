@@ -5,7 +5,7 @@ stages:
 buildAndUnitTesting:
   stage: build
   script:
-    - ./gradlew assemble
+    - ./gradlew build
     
 codeCoverage:
   stage: codeCoverage
