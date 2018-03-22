@@ -1,0 +1,13 @@
+stages:
+  - build
+  - codeCoverage
+  
+buildAndUnitTesting:
+  stage: build
+  script:
+    - ./gradlew assemble
+    
+codeCoverage:
+  stage: codeCoverage
+  script:
+    - ./gradlew test jacocoTestReport
