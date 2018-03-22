@@ -5,6 +5,7 @@ stages:
 buildAndUnitTesting:
   stage: build
   script:
+    - chmod +x gradlew
     - ./gradlew build
     
 codeCoverage:
