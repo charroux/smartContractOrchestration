@@ -1,6 +1,7 @@
 stages:
   - build
   - codeCoverage
+  - compileContract
   
 buildAndUnitTesting:
   image: openjdk:8-jdk
@@ -15,3 +16,10 @@ codeCoverage:
   script:
     - chmod +x gradlew
     - ./gradlew test jacocoTestReport
+    
+compileContract:
+  image: openjdk:8-jdk
+  stage: build
+  script:
+    - chmod +x gradlew
+    - ./gradlew compileOrcha -PorchaFile="['restWebService/RestWebService.groovy']"

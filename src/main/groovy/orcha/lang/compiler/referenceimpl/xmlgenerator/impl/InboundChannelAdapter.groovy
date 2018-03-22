@@ -4,6 +4,8 @@ import orcha.lang.compiler.Instruction
 import orcha.lang.compiler.InstructionNode
 import orcha.lang.compiler.OrchaCompilationException
 import orcha.lang.compiler.qualityOfService.QueueOption
+import orcha.lang.configuration.HttpAdapter
+import orcha.lang.configuration.Input
 import org.springframework.http.MediaType
 
 import org.jdom2.Document
@@ -18,30 +20,6 @@ class InboundChannelAdapter implements Poller, Chain, HeaderEnricher, Filter, Tr
 	public InboundChannelAdapter(Document xmlSpringIntegration) {
 		super();
 		this.xmlSpringIntegration = xmlSpringIntegration;
-	}
-
-	private Element inboundChannelAdapter(InstructionNode instructionNode){
-		
-		Instruction instruction = instructionNode.instruction
-		def inputChannel = instructionNode.inputName
-		
-		Namespace namespace = Namespace.getNamespace("int-file", "http://www.springframework.org/schema/integration/file")
-		
-		Element element = new Element("inbound-channel-adapter", namespace)
-		element.setAttribute("id", "file-"+inputChannel+"-id")
-		element.setAttribute("directory", instruction.springBean.input.adapter.directory)
-		element.setAttribute("channel", inputChannel)
-		element.setAttribute("prevent-duplicates", "true")
-		
-		if(instruction.springBean.input.adapter.filenamePattern != null){
-			element.setAttribute("filename-pattern", instruction.springBean.input.adapter.filenamePattern)
-		}		
-		
-		if(instructionNode.options!=null && instructionNode.options.queue!=null){
-			element.setAttribute("queue-size", instructionNode.options.queue.capacity.toString())
-		} 
-				
-		return element
 	}
 	
 	private Element addDefaultPoller(InstructionNode instructionNode) {
@@ -62,14 +40,26 @@ class InboundChannelAdapter implements Poller, Chain, HeaderEnricher, Filter, Tr
 		Element pollerElement = this.addDefaultPoller(instructionNode)
 		rootElement.addContent(pollerElement)
 
-		Element fileAdapter = this.inboundChannelAdapter(instructionNode)
-		rootElement.addContent(fileAdapter)
+		Instruction instruction = instructionNode.instruction
+		def inputChannel = instructionNode.inputName
 		
 		Namespace namespace = Namespace.getNamespace("int-file", "http://www.springframework.org/schema/integration/file")
 		
-		Instruction instruction = instructionNode.instruction
+		Element fileAdapter = new Element("inbound-channel-adapter", namespace)
+		fileAdapter.setAttribute("id", "file-"+inputChannel+"-id")
+		fileAdapter.setAttribute("directory", instruction.springBean.input.adapter.directory)
+		fileAdapter.setAttribute("channel", inputChannel)
+		fileAdapter.setAttribute("prevent-duplicates", "true")
 		
-		def inputChannel = instructionNode.inputName
+		if(instruction.springBean.input.adapter.filenamePattern != null){
+			fileAdapter.setAttribute("filename-pattern", instruction.springBean.input.adapter.filenamePattern)
+		}
+		
+		if(instructionNode.options!=null && instructionNode.options.queue!=null){
+			fileAdapter.setAttribute("queue-size", instructionNode.options.queue.capacity.toString())
+		}
+		
+		rootElement.addContent(fileAdapter)
 		
 		Element stringTransformer = new Element("file-to-string-transformer", namespace)
 		stringTransformer.setAttribute("input-channel", inputChannel)
@@ -104,6 +94,48 @@ class InboundChannelAdapter implements Poller, Chain, HeaderEnricher, Filter, Tr
 			chain.addContent(conditionFilter)
 		}
 				
+	}
+	
+	public void http(InstructionNode instructionNode) {
+
+		Element rootElement = xmlSpringIntegration.getRootElement()
+		
+		Instruction instruction = instructionNode.instruction
+		def inputChannel = instructionNode.inputName
+		
+		Namespace namespace = Namespace.getNamespace("int", "http://www.springframework.org/schema/integration")
+			
+		Element channel = new Element("channel", namespace)
+		channel.setAttribute("id", inputChannel)
+		rootElement.addContent(channel)
+		
+		namespace = Namespace.getNamespace("int-http", "http://www.springframework.org/schema/integration/http")
+		
+		HttpAdapter httpAdapter = instruction.springBean.input.adapter
+		
+		Element adapter = new Element("inbound-channel-adapter", namespace)
+		adapter.setAttribute("id", "http-"+inputChannel+"-id")
+		adapter.setAttribute("channel", inputChannel)
+		adapter.setAttribute("status-code-expression", "T(org.springframework.http.HttpStatus).NO_CONTENT")
+		adapter.setAttribute("supported-methods", httpAdapter.method.toString())
+		adapter.setAttribute("path", httpAdapter.url)
+		
+		Input input = instruction.springBean.input		
+		adapter.setAttribute("request-payload-type", input.type)
+		
+		Element requestMapping = new Element("request-mapping", namespace)		
+		requestMapping.setAttribute("consumes", input.mimeType)
+		adapter.addContent(requestMapping)
+		
+		rootElement.addContent(adapter)
+		
+		Element chain = chain(inputChannel, instructionNode.outputName)
+		rootElement.addContent(chain)
+		
+		def id = "headers['id'].toString()"
+		Element messageIDEnricher = headerEnricher("messageID", id)
+		chain.addContent(messageIDEnricher)
+		
 	}
 	
 }

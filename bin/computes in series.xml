@@ -5,8 +5,9 @@
   <bean id="errorUnwrapper" class="orcha.lang.compiler.referenceimpl.xmlgenerator.impl.ErrorUnwrapper" />
   <int:channel id="recoveryChannel" />
   <int:transformer input-channel="recoveryChannel" output-channel="loggingChannel" expression="'Failure after many attemps for the message :' + payload.failedMessage.payload" />
-  <int:poller fixed-delay="1000" default="true" />
-  <int-file:inbound-channel-adapter id="file-computesInSeriesInputFile-InputChannel-id" directory="data/input" channel="computesInSeriesInputFile-InputChannel" prevent-duplicates="true" filename-pattern="computesInSeriesInputFile.txt" />
+  <int-file:inbound-channel-adapter id="file-computesInSeriesInputFile-InputChannel-id" directory="data/input" channel="computesInSeriesInputFile-InputChannel" prevent-duplicates="true" filename-pattern="computesInSeriesInputFile.txt">
+    <int:poller fixed-delay="1000" />
+  </int-file:inbound-channel-adapter>
   <int-file:file-to-string-transformer input-channel="computesInSeriesInputFile-InputChannel" output-channel="computesInSeriesInputFile-InputChannelTransformer" delete-files="false" />
   <int:chain input-channel="computesInSeriesInputFile-InputChannelTransformer" output-channel="computesInSeriesInputFile-OutputChannel">
     <int:header-enricher>
@@ -14,7 +15,7 @@
     </int:header-enricher>
   </int:chain>
   <int:chain input-channel="computesInSeriesInputFile-OutputChannel" output-channel="firstProgramServiceAcivatorOutput" id="service-activator-chain-firstProgramChannel-id">
-    <int:service-activator id="service-activator-firstProgramChannel-id" expression="@program1Test.myMethod(payload)">
+    <int:service-activator id="service-activator-firstProgramChannel-id" expression="@program1.myMethod(payload)">
       <int:request-handler-advice-chain />
     </int:service-activator>
   </int:chain>
@@ -29,7 +30,7 @@
     <bean class="orcha.lang.compiler.referenceimpl.xmlgenerator.impl.ApplicationToObjectTransformer" />
   </int:transformer>
   <int:chain input-channel="firstProgramAggregatorOutputTransformer" output-channel="secondProgramServiceAcivatorOutput" id="service-activator-chain-secondProgramChannel-id">
-    <int:service-activator id="service-activator-secondProgramChannel-id" expression="@program2Test.myMethod(payload)">
+    <int:service-activator id="service-activator-secondProgramChannel-id" expression="@program2.myMethod(payload)">
       <int:request-handler-advice-chain />
     </int:service-activator>
   </int:chain>

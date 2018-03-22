@@ -9,8 +9,8 @@ import org.springframework.context.annotation.ImportResource;
  * 
  */
 @ImportResource({
-    "prepare order behavior.xml",
-    "prepare order behaviorQoS.xml"
+    "order over http.xml",
+    "order over httpQoS.xml"
 })
 public class ImportDynamicResourcesForConfiguration {
 

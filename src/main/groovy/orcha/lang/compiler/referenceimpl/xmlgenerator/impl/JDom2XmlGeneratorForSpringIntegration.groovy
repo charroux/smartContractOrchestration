@@ -582,7 +582,7 @@ class JDom2XmlGeneratorForSpringIntegration implements XmlGenerator{
 		
 		if(eventHandler.input!=null && eventHandler.input.adapter instanceof HttpAdapter){
 				
-			throw new OrchaCompilationException(eventHandler.toString() + " not supported yet.")
+			inboundChannelAdapter.http(instructionNode)
 			
 		} else if(eventHandler.input!=null && eventHandler.input.adapter instanceof InputFileAdapter){
 		

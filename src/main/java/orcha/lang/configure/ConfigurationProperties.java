@@ -10,17 +10,17 @@ package orcha.lang.configure;
 @org.springframework.boot.context.properties.ConfigurationProperties(prefix = "driving")
 public class ConfigurationProperties {
 
-    public ConfigurationProperties.PrepareOrderTestReport prepareOrderTestReport = new PrepareOrderTestReport();
+    public ConfigurationProperties.HttpResponse httpResponse = new HttpResponse();
 
-    public ConfigurationProperties.PrepareOrderTestReport getPrepareOrderTestReport() {
-        return prepareOrderTestReport;
+    public ConfigurationProperties.HttpResponse getHttpResponse() {
+        return httpResponse;
     }
 
-    public void setPrepareOrderTestReport(ConfigurationProperties.PrepareOrderTestReport prepareOrderTestReport) {
-        this.prepareOrderTestReport = prepareOrderTestReport;
+    public void setHttpResponse(ConfigurationProperties.HttpResponse httpResponse) {
+        this.httpResponse = httpResponse;
     }
 
-    public class PrepareOrderTestReport {
+    public class HttpResponse {
 
         public String directory;
         public String filename;

@@ -5,8 +5,9 @@
   <bean id="errorUnwrapper" class="orcha.lang.compiler.referenceimpl.xmlgenerator.impl.ErrorUnwrapper" />
   <int:channel id="recoveryChannel" />
   <int:transformer input-channel="recoveryChannel" output-channel="loggingChannel" expression="'Failure after many attemps for the message :' + payload.failedMessage.payload" />
-  <int:poller fixed-delay="1000" default="true" />
-  <int-file:inbound-channel-adapter id="file-retryInputFile-InputChannel-id" directory="data/input" channel="retryInputFile-InputChannel" prevent-duplicates="true" filename-pattern="retryInputFile.txt" />
+  <int-file:inbound-channel-adapter id="file-retryInputFile-InputChannel-id" directory="data/input" channel="retryInputFile-InputChannel" prevent-duplicates="true" filename-pattern="retryInputFile.txt">
+    <int:poller fixed-delay="1000" />
+  </int-file:inbound-channel-adapter>
   <int-file:file-to-string-transformer input-channel="retryInputFile-InputChannel" output-channel="retryInputFile-InputChannelTransformer" delete-files="false" />
   <int:chain input-channel="retryInputFile-InputChannelTransformer" output-channel="retryInputFile-OutputChannel">
     <int:header-enricher>
@@ -14,7 +15,7 @@
     </int:header-enricher>
   </int:chain>
   <int:chain input-channel="retryInputFile-OutputChannel" output-channel="serviceWithRetryServiceAcivatorOutput" id="service-activator-chain-serviceWithRetryChannel-id">
-    <int:service-activator id="service-activator-serviceWithRetryChannel-id" expression="@serviceTest.myMethod(payload)">
+    <int:service-activator id="service-activator-serviceWithRetryChannel-id" expression="@service.myMethod(payload)">
       <int:request-handler-advice-chain>
         <int:retry-advice max-attempts="3" recovery-channel="recoveryChannel">
           <int:exponential-back-off initial="1000" multiplier="2" maximum="4000" />
