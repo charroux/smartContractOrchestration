@@ -5,8 +5,9 @@
   <bean id="errorUnwrapper" class="orcha.lang.compiler.referenceimpl.xmlgenerator.impl.ErrorUnwrapper" />
   <int:channel id="recoveryChannel" />
   <int:transformer input-channel="recoveryChannel" output-channel="loggingChannel" expression="'Failure after many attemps for the message :' + payload.failedMessage.payload" />
-  <int:poller fixed-delay="1000" default="true" />
-  <int-file:inbound-channel-adapter id="file-javascriptServiceInputFile-InputChannel-id" directory="data/input" channel="javascriptServiceInputFile-InputChannel" prevent-duplicates="true" filename-pattern="javascriptServiceInputFile.json" />
+  <int-file:inbound-channel-adapter id="file-javascriptServiceInputFile-InputChannel-id" directory="data/input" channel="javascriptServiceInputFile-InputChannel" prevent-duplicates="true" filename-pattern="javascriptServiceInputFile.json">
+    <int:poller fixed-delay="1000" />
+  </int-file:inbound-channel-adapter>
   <int-file:file-to-string-transformer input-channel="javascriptServiceInputFile-InputChannel" output-channel="javascriptServiceInputFile-InputChannelTransformer" delete-files="false" />
   <int:chain input-channel="javascriptServiceInputFile-InputChannelTransformer" output-channel="javascriptServiceInputFile-OutputChannel">
     <int:json-to-object-transformer type="service.javascript.Person" />
@@ -16,7 +17,7 @@
   </int:chain>
   <int:chain input-channel="javascriptServiceInputFile-OutputChannel" output-channel="javascriptServiceServiceAcivatorOutput" id="service-activator-chain-javascriptServiceChannel-id">
     <int:service-activator id="service-activator-javascriptServiceChannel-id">
-      <int-script:script lang="js" location="file:src/test/orcha/service/javascriptServiceTest.js" />
+      <int-script:script lang="js" location="file:src/main/orcha/service/javascript/javascriptService.js" />
       <int:request-handler-advice-chain />
     </int:service-activator>
   </int:chain>

@@ -5,8 +5,9 @@
   <bean id="errorUnwrapper" class="orcha.lang.compiler.referenceimpl.xmlgenerator.impl.ErrorUnwrapper" />
   <int:channel id="recoveryChannel" />
   <int:transformer input-channel="recoveryChannel" output-channel="loggingChannel" expression="'Failure after many attemps for the message :' + payload.failedMessage.payload" />
-  <int:poller fixed-delay="1000" default="true" />
-  <int-file:inbound-channel-adapter id="file-circuitBreakerInputFile-InputChannel-id" directory="data/input" channel="circuitBreakerInputFile-InputChannel" prevent-duplicates="true" filename-pattern="circuitBreakerInputFile*.txt" />
+  <int-file:inbound-channel-adapter id="file-circuitBreakerInputFile-InputChannel-id" directory="data/input" channel="circuitBreakerInputFile-InputChannel" prevent-duplicates="true" filename-pattern="circuitBreakerInputFile*.txt">
+    <int:poller fixed-delay="1000" />
+  </int-file:inbound-channel-adapter>
   <int-file:file-to-string-transformer input-channel="circuitBreakerInputFile-InputChannel" output-channel="circuitBreakerInputFile-InputChannelTransformer" delete-files="false" />
   <int:chain input-channel="circuitBreakerInputFile-InputChannelTransformer" output-channel="circuitBreakerInputFile-OutputChannel">
     <int:header-enricher>

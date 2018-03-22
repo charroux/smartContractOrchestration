@@ -16,7 +16,7 @@
   </int:chain>
   <int:chain input-channel="eventSourcingInputFile-OutputChannel" output-channel="serviceWithEventSourcingAfterServiceServiceAcivatorOutput" id="service-activator-chain-serviceWithEventSourcingAfterServiceChannel-id">
     <int:service-activator id="service-activator-serviceWithEventSourcingAfterServiceChannel-id">
-      <int-script:script lang="js" location="file:src/test/orcha/service/serviceWithEventSourcingAfterServiceTest.js" />
+      <int-script:script lang="js" location="file:src/main/orcha/service/eventSourcing/serviceWithEventSourcingAfterService.js" />
       <int:request-handler-advice-chain />
     </int:service-activator>
   </int:chain>
@@ -35,7 +35,7 @@
   </int:transformer>
   <int:chain input-channel="serviceWithEventSourcingAfterServiceAggregatorOutputTransformer" output-channel="serviceWithEventSourcingBeforeServiceServiceAcivatorOutput" id="service-activator-chain-serviceWithEventSourcingBeforeServiceChannel-id">
     <int:service-activator id="service-activator-serviceWithEventSourcingBeforeServiceChannel-id">
-      <int-script:script lang="js" location="file:src/test/orcha/service/serviceWithEventSourcingBeforeServiceTest.js" />
+      <int-script:script lang="js" location="file:src/main/orcha/service/eventSourcing/serviceWithEventSourcingBeforeService.js" />
       <int:request-handler-advice-chain>
         <ref bean="eventSourcingAdvice" />
       </int:request-handler-advice-chain>
