@@ -1,0 +1,9 @@
+# bin must exits because xml files are copied into this folder
+/bin/*/*
+
+# gradle build folder
+/build
+
+# IDE
+.project
+.classpath
