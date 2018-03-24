@@ -94,14 +94,10 @@ class Compiler implements CommandLineRunner{
 			if(orchaSourceTestFile != null){
 				OrchaCodeVisitor orchaTestCodeVisitor = orchaTestCodeParser.parse(orchaSourceTestFile)
 				compile.compileForTesting(orchaTestCodeVisitor)
+			} else {
+				compile.compileForTesting(null)
 			}
 			
-			
-/*			if(testFiles!=null && testFiles.length > 0){
-				OrchaCodeVisitor orchaTestCodeVisitor = orchaTestCodeParser.parse(testFiles[0])
-				compile.compileForTesting(orchaTestCodeVisitor)
-			}
-*/			
 		}
 		
 	}

@@ -56,18 +56,32 @@ class CompileServiceWithSpringIntegration implements Compile{
 		orchaLauncherGenerator.generateForLaunching(xmlSpringContextFileName, xmlSpringContextQoSFileName)
 	}
 
+	/**
+	 * @param orchaCodeParser or null if there is no testing file but an empty test launcher should be generated
+	 * @throws OrchaCompilationException
+	 * @throws OrchaConfigurationException
+	 */
+
 	@Override
 	public void compileForTesting(OrchaCodeVisitor orchaCodeParser) throws OrchaCompilationException, OrchaConfigurationException {
 		
-		String path = "." + File.separator + "src" + File.separator + "test" + File.separator + "resources" + File.separator
-		log.info 'Transpilatation of the orcha testing program \"' + orchaCodeParser.getOrchaMetadata().getTitle() + '\" into the directory ' + path
-		
-		this.compile(orchaCodeParser, new File(path));
-		
-		String xmlSpringContextFileName = orchaCodeParser.getOrchaMetadata().getTitle() + ".xml"
-		String xmlSpringContextQoSFileName = orchaCodeParser.getOrchaMetadata().getTitle() + "QoS.xml"
-		
-		orchaLauncherGenerator.generateForTesting(xmlSpringContextFileName, xmlSpringContextQoSFileName)
+		if(orchaCodeParser != null){
+
+			String path = "." + File.separator + "src" + File.separator + "test" + File.separator + "resources" + File.separator
+			log.info 'Transpilatation of the orcha testing program \"' + orchaCodeParser.getOrchaMetadata().getTitle() + '\" into the directory ' + path
+			
+			this.compile(orchaCodeParser, new File(path));
+			
+			String xmlSpringContextFileName = orchaCodeParser.getOrchaMetadata().getTitle() + ".xml"
+			String xmlSpringContextQoSFileName = orchaCodeParser.getOrchaMetadata().getTitle() + "QoS.xml"
+			
+			orchaLauncherGenerator.generateForTesting(xmlSpringContextFileName, xmlSpringContextQoSFileName)
+	
+		} else {
+			
+			orchaLauncherGenerator.generateForTesting(null, null)
+			
+		}
 	}
 
 	/**
