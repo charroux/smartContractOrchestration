@@ -2,6 +2,7 @@ stages:
   - build
   - codeCoverage
   - compileContract
+  - deployContract
   
 buildAndUnitTesting:
   image: openjdk:8-jdk
@@ -23,3 +24,21 @@ compileContract:
   script:
     - chmod +x gradlew
     - ./gradlew compileOrcha -PorchaFile="['restWebService/RestWebService.groovy']"
+ 
+ deploy_dev:
+  stage: deployContract
+  image: ruby:2.3
+  script:
+    - apt-get update -qy
+    - apt-get install -y ruby-dev
+    - gem install dpl
+    - dpl --provider=heroku --app=orcha-prepare-order --api-key=$HEROKU_API_KEY
+  environment:
+    name: dev
+    url: https://orcha-prepare-order.herokuapp.com
+    only:
+      - master
+    tags:
+      - docker
+
+   
