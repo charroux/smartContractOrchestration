@@ -16,7 +16,7 @@
   </int:chain>
   <int:chain input-channel="javascriptServiceInputFile-OutputChannel" output-channel="javascriptServiceServiceAcivatorOutput" id="service-activator-chain-javascriptServiceChannel-id">
     <int:service-activator id="service-activator-javascriptServiceChannel-id">
-      <int-script:script lang="js" location="file:src/main/orcha/service/javascript/javascriptService.js" />
+      <int-script:script lang="js" location="file:src/test/orcha/service/javascriptServiceTest.js" />
       <int:request-handler-advice-chain />
     </int:service-activator>
   </int:chain>

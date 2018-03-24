@@ -38,6 +38,9 @@ jar {
 	baseName = 'Orcha'
 	version =  'alpha-1.1'
 	// exclude ('source/**', 'configuration/**', 'service/**')
+	manifest {
+		attributes 'Main-Class' : 'orcha.lang.OrchaSpringIntegrationLauncher'
+	}
 }
 
 dependencies {
