@@ -36,9 +36,6 @@ deploy_dev:
   environment:
     name: dev
     url: https://orcha-prepare-order.herokuapp.com
-    only:
-      - master
-    tags:
-      - docker
+
 
    
