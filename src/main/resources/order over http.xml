@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:context="http://www.springframework.org/schema/context" xmlns:int="http://www.springframework.org/schema/integration" xmlns:int-amqp="http://www.springframework.org/schema/integration/amqp" xmlns:int-event="http://www.springframework.org/schema/integration/event" xmlns:int-file="http://www.springframework.org/schema/integration/file" xmlns:int-groovy="http://www.springframework.org/schema/integration/groovy" xmlns:int-http="http://www.springframework.org/schema/integration/http" xmlns:int-jdbc="http://www.springframework.org/schema/integration/jdbc" xmlns:int-mail="http://www.springframework.org/schema/integration/mail" xmlns:int-script="http://www.springframework.org/schema/integration/scripting" xmlns:int-stream="http://www.springframework.org/schema/integration/stream" xmlns:jdbc="http://www.springframework.org/schema/jdbc" xmlns:rabbit="http://www.springframework.org/schema/rabbit" xmlns:stream="http://www.springframework.org/schema/integration/stream" xmlns:task="http://www.springframework.org/schema/task" xmlns:util="http://www.springframework.org/schema/util" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration-4.3.xsd http://www.springframework.org/schema/integration/mail http://www.springframework.org/schema/integration/mail/spring-integration-mail-4.3.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd http://www.springframework.org/schema/integration/file http://www.springframework.org/schema/integration/file/spring-integration-file-4.3.xsd http://www.springframework.org/schema/integration/stream http://www.springframework.org/schema/integration/stream/spring-integration-stream-4.3.xsd http://www.springframework.org/schema/integration/jdbc http://www.springframework.org/schema/integration/jdbc/spring-integration-jdbc-4.3.xsd http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-4.3.xsd http://www.springframework.org/schema/integration/http http://www.springframework.org/schema/integration/http/spring-integration-http-4.3.xsd http://www.springframework.org/schema/integration/groovy http://www.springframework.org/schema/integration/groovy/spring-integration-groovy-4.3.xsd http://www.springframework.org/schema/integration/scripting http://www.springframework.org/schema/integration/scripting/spring-integration-scripting-4.3.xsd http://www.springframework.org/schema/integration/event http://www.springframework.org/schema/integration/event/spring-integration-event-4.3.xsd http://www.springframework.org/schema/rabbit http://www.springframework.org/schema/rabbit/spring-rabbit.xsd http://www.springframework.org/schema/integration/amqp http://www.springframework.org/schema/integration/amqp/spring-integration-amqp-4.3.xsd http://www.springframework.org/schema/integration/stream http://www.springframework.org/schema/integration/stream/spring-integration-stream-4.3.xsd">
+  <int:logging-channel-adapter id="loggingChannel" level="INFO" />
+  <stream:stderr-channel-adapter channel="errorChannel" append-newline="true" />
+  <bean id="errorUnwrapper" class="orcha.lang.compiler.referenceimpl.xmlgenerator.impl.ErrorUnwrapper" />
+  <int:channel id="recoveryChannel" />
+  <int:transformer input-channel="recoveryChannel" output-channel="loggingChannel" expression="'Failure after many attemps for the message :' + payload.failedMessage.payload" />
+  <int:channel id="remoteCustomerOverHttp-InputChannel" />
+  <int-http:inbound-channel-adapter id="http-remoteCustomerOverHttp-InputChannel-id" channel="remoteCustomerOverHttp-InputChannel" status-code-expression="T(org.springframework.http.HttpStatus).NO_CONTENT" supported-methods="POST" path="/remoteCustomerOverHttp" request-payload-type="service.restWebService.Order">
+    <int-http:request-mapping consumes="application/json" />
+  </int-http:inbound-channel-adapter>
+  <int:chain input-channel="remoteCustomerOverHttp-InputChannel" output-channel="remoteCustomerOverHttp-OutputChannel">
+    <int:header-enricher>
+      <int:header name="messageID" expression="headers['id'].toString()" />
+    </int:header-enricher>
+  </int:chain>
+  <int:chain input-channel="remoteCustomerOverHttp-OutputChannel" output-channel="preparingOrderServiceAcivatorOutput" id="service-activator-chain-preparingOrderChannel-id">
+    <int:service-activator id="service-activator-preparingOrderChannel-id" expression="@preparation.prepare(payload)">
+      <int:request-handler-advice-chain />
+    </int:service-activator>
+  </int:chain>
+  <int:transformer id="transformer-preparingOrderServiceAcivatorOutput-id" input-channel="preparingOrderServiceAcivatorOutput" output-channel="preparingOrderAggregatorInput" method="transform">
+    <bean class="orcha.lang.compiler.referenceimpl.xmlgenerator.impl.ObjectToApplicationTransformer">
+      <property name="application" ref="preparingOrder" />
+    </bean>
+  </int:transformer>
+  <int:aggregator id="aggregator-preparingOrderAggregatorInput-id" input-channel="preparingOrderAggregatorInput" output-channel="preparingOrderAggregatorInputTransformer" release-strategy-expression="size()==1 and ( ([0].payload instanceof T(orcha.lang.configuration.Application) AND [0].payload.state==T(orcha.lang.configuration.State).TERMINATED) )" correlation-strategy-expression="headers['messageID']" />
+  <int:transformer id="transformer-preparingOrderAggregatorInput-id" input-channel="preparingOrderAggregatorInputTransformer" output-channel="preparingOrderAggregatorInputAggregatorOutput" expression="payload.?[name=='preparingOrder']" />
+  <int:transformer id="transformer-preparingOrderAggregatorInputAggregatorOutput-id" input-channel="preparingOrderAggregatorInputAggregatorOutput" output-channel="preparingOrderAggregatorOutputTransformer" method="transform">
+    <bean class="orcha.lang.compiler.referenceimpl.xmlgenerator.impl.ApplicationToObjectTransformer" />
+  </int:transformer>
+  <int:chain input-channel="preparingOrderAggregatorOutputTransformer" output-channel="preparingOrderOutputFileChannelAdapterhttpResponse">
+    <int:object-to-json-transformer />
+  </int:chain>
+  <int:channel id="preparingOrderOutputFileChannelAdapterhttpResponse" />
+  <int-file:outbound-channel-adapter id="file-preparingOrderhttpResponseChannel-id" channel="preparingOrderOutputFileChannelAdapterhttpResponse" directory-expression="@httpResponse.output.adapter.directory" filename-generator-expression="@httpResponse.output.adapter.filename" append-new-line="true" mode="REPLACE" auto-create-directory="true" delete-source-files="false" />
+</beans>
