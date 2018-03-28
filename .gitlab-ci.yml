@@ -25,7 +25,6 @@ compileContract:
     - chmod +x gradlew
     - ./gradlew compileOrcha -PorchaFile="['restWebService/RestWebService.groovy']"
  
- 
 deploy_dev:
   stage: deployContract
   image: ruby:2.3
