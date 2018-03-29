@@ -25,7 +25,6 @@ compileContract:
     - chmod +x gradlew
     - ./gradlew compileOrcha -PorchaFile="['restWebService/RestWebService.groovy']"
  
- 
 deploy_dev:
   stage: deployContract
   image: ruby:2.3
@@ -33,7 +32,7 @@ deploy_dev:
     - apt-get update -qy
     - apt-get install -y ruby-dev
     - gem install dpl
-    - dpl --provider=heroku --app=orcha-prepare-order --api-key=$HEROKU_API_KEY
+    - dpl --provider=heroku --app=orcha-prepare-order --api-key=$HEROKU_API_KEY # HEROKU_API_KEY set into gitlab https://gitlab.com/BenOrcha/orcha/settings/ci_cd 
   environment:
     name: dev
     url: https://orcha-prepare-order.herokuapp.com
