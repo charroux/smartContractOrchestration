@@ -26,12 +26,15 @@ import service.order.VendorOrderConverter
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.*;
 
+import javax.validation.constraints.AssertTrue
+
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes=[orcha.lang.ImportDynamicResourcesForTestConfiguration.class])
 class SpringTestOrchaTests {	
 	
 	@Test
 	void test(){
+		Assert.assertTrue(false);
 		Thread.sleep(3000)	// !!!!! to wait for file writing
 	}
 	
