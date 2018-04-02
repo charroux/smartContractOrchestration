@@ -58,7 +58,7 @@ public @interface Retry {
 	
 	public enum JoinPoint { before, after, beforeAndAfter }
 	
-	public enum MessageStore { mongoDB }
+	public enum MessageStore { mongoDB, Redis }
 	
    String eventName()
    MessageStore messageStore()

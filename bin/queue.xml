@@ -14,7 +14,7 @@
     </int:header-enricher>
   </int:chain>
   <int:chain input-channel="queueInputFile-OutputChannel" output-channel="serviceWithQueueServiceAcivatorOutput" id="service-activator-chain-serviceWithQueueChannel-id">
-    <int:service-activator id="service-activator-serviceWithQueueChannel-id" expression="@enQueuedServiceTest.myMethod(payload)">
+    <int:service-activator id="service-activator-serviceWithQueueChannel-id" expression="@enQueuedService.myMethod(payload)">
       <int:request-handler-advice-chain />
     </int:service-activator>
   </int:chain>

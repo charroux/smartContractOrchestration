@@ -76,6 +76,11 @@ dependencies {
 	compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.5'
 	compile group: 'org.apache.logging.log4j', name: 'log4j-jcl', version: '2.5'
 	
+	// Redis
+	compile group: 'org.apache.commons', name: 'commons-pool2', version: '2.5.0'
+	compile group: 'redis.clients', name: 'jedis', version: '2.9.0'
+	
+	
 	compile group: 'org.hibernate', name: 'hibernate-validator', version: '5.4.0.Final'
 	
 	compile group: 'com.sun.codemodel', name: 'codemodel', version: '2.6'
@@ -90,6 +95,8 @@ dependencies {
 	compile 'org.springframework.integration:spring-integration-scripting:4.3.7.RELEASE'
 	compile 'org.springframework.integration:spring-integration-amqp:4.3.7.RELEASE'
 	compile 'org.springframework.integration:spring-integration-mongodb:4.3.7.RELEASE'
+	compile 'org.springframework.integration:spring-integration-redis:4.3.7.RELEASE'
+	//compile 'org.springframework.data:spring-data-redis:2.0.5.RELEASE'
 	
 	compile group: 'org.jdom', name: 'jdom2', version: '2.0.6'
 	compile group: 'jaxen', name: 'jaxen', version: '1.1.6'

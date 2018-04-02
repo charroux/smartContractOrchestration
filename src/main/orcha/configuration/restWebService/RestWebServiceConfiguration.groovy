@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Configuration
 import groovy.util.logging.Slf4j
 import orcha.lang.configuration.Application
 import orcha.lang.configuration.EventHandler
+import orcha.lang.configuration.EventSourcing
 import orcha.lang.configuration.HttpAdapter
 import orcha.lang.configuration.Input
 import orcha.lang.configuration.JavaServiceAdapter

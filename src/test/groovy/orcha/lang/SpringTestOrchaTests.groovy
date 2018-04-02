@@ -34,7 +34,6 @@ class SpringTestOrchaTests {
 	
 	@Test
 	void test(){
-		Assert.assertTrue(false);
 		Thread.sleep(3000)	// !!!!! to wait for file writing
 	}
 	

@@ -30,6 +30,11 @@
     <bean class="orcha.lang.compiler.referenceimpl.xmlgenerator.impl.ApplicationToObjectTransformer" />
   </int:transformer>
   <int:chain input-channel="preparingOrderAggregatorOutputTransformer" output-channel="preparingOrderOutputFileChannelAdapterhttpResponse">
+    <int:transformer expression="payload">
+      <int:request-handler-advice-chain>
+        <ref bean="eventSourcingAdvice" />
+      </int:request-handler-advice-chain>
+    </int:transformer>
     <int:object-to-json-transformer />
   </int:chain>
   <int:channel id="preparingOrderOutputFileChannelAdapterhttpResponse" />

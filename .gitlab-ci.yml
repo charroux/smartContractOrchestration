@@ -1,6 +1,22 @@
 stages:
+  - build
+  - codeCoverage
   - deployContract
-
+  
+buildAndUnitTesting:
+  image: openjdk:8-jdk
+  stage: build
+  script:
+    - chmod +x gradlew
+    - ./gradlew build
+    
+codeCoverage:
+  image: openjdk:8-jdk
+  stage: codeCoverage
+  script:
+    - chmod +x gradlew
+    - ./gradlew test jacocoTestReport
+ 
 deploy_dev:
   stage: deployContract
   image: ruby:2.3

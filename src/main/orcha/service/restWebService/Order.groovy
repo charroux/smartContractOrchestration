@@ -5,7 +5,7 @@ import groovy.transform.EqualsAndHashCode
 
 @ToString
 @EqualsAndHashCode
-class Order {
+class Order implements Serializable{
 	
 	int number
 	Product product
@@ -14,6 +14,6 @@ class Order {
 
 @ToString
 @EqualsAndHashCode
-class Product{
+class Product  implements Serializable{
 	String specification
 }
