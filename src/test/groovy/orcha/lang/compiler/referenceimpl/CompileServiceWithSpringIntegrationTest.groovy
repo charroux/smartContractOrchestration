@@ -98,7 +98,8 @@ class CompileServiceWithSpringIntegrationTest {
 	@Autowired
 	Application serviceWithCircuitBreaker
 	
-	
+	@Autowired
+	EventHandler eventSourcingInputFile
 	
 	@Test
 	void prepareOrder(){
@@ -810,6 +811,151 @@ class CompileServiceWithSpringIntegrationTest {
 		String xmlQoSSpringContextFileName = orchaCodeVisitor.getOrchaMetadata().getTitle() + "QoS.xml"
 		String pathToQoSXmlFile = destinationDirectory.getAbsolutePath() + File.separator + xmlQoSSpringContextFileName
 		
+		Assert.assertTrue(new File(pathToQoSXmlFile).delete())
+		
+	}
+	
+	@Test
+	void eventSourcing() {
+
+		// the Orcha source program
+		
+		String orchaProgram = "package source.eventSourcing\n"+
+			"title 'event sourcing'\n"+
+			"description 'Store into a NoSQL database (MongoDB): the input event (coming from a Json file), the output of a first service call, the input of a second service call and the output event.'\n"+
+			"receive event from eventSourcingInputFile\n"+
+			"compute serviceWithEventSourcingAfterService with event.value\n"+
+			"when 'serviceWithEventSourcingAfterService terminates'\n"+
+			"compute serviceWithEventSourcingBeforeService with serviceWithEventSourcingAfterService.result\n"+
+			"when 'serviceWithEventSourcingBeforeService terminates'\n" + 
+			"send serviceWithEventSourcingBeforeService.result to eventSourcingOutputFile"
+
+		// construct the graph of instructions for the Orcha programm
+		
+		OrchaCodeVisitor orchaCodeVisitor = orchaCodeParser.parse(orchaProgram)
+		
+		// generate an XML file (Spring integration configuration): this is the file to be tested
+		 
+		String path = "." + File.separator + "src" + File.separator + "test" + File.separator + "resources" + File.separator
+		File destinationDirectory = new File(path)
+		compile.compile(orchaCodeVisitor, destinationDirectory)
+		
+		String xmlSpringContextFileName = orchaCodeVisitor.getOrchaMetadata().getTitle() + ".xml"
+		String pathToXmlFile = destinationDirectory.getAbsolutePath() + File.separator + xmlSpringContextFileName
+		
+		// parse the XML file checking is correctness
+		
+		SAXBuilder builder = new SAXBuilder()
+		
+		Document xmlSpringIntegration = builder.build(pathToXmlFile)
+		
+		XPathFactory xFactory = XPathFactory.instance()
+
+		// <int:transformer id="transformer-serviceWithEventSourcingAfterServiceServiceAcivatorOutput-id" input-channel="serviceWithEventSourcingAfterServiceServiceAcivatorOutput" output-channel="serviceWithEventSourcingAfterServiceAggregatorInput" method="transform">
+		//		<int:request-handler-advice-chain>
+		//  		<ref bean="eventSourcingAdvice" />
+		//		</int:request-handler-advice-chain>
+		// </int:transformer>
+		XPathExpression<Element> expr = xFactory.compile("//*[local-name() = 'transformer']/*[local-name() = 'request-handler-advice-chain']/*[local-name() = 'ref']", Filters.element())
+		
+		List<Element> elements = expr.evaluate(xmlSpringIntegration)
+		Assert.assertTrue(elements.size() == 2)
+		
+		Element element = elements.get(0)
+		Assert.assertEquals(element.getAttribute("bean").getValue(), "eventSourcingAdvice")
+		
+		element = elements.get(1)
+		Assert.assertEquals(element.getAttribute("bean").getValue(), "eventSourcingAdvice")
+		
+		// <int:chain input-channel="serviceWithEventSourcingAfterServiceAggregatorOutputTransformer" output-channel="serviceWithEventSourcingBeforeServiceServiceAcivatorOutput" id="service-activator-chain-serviceWithEventSourcingBeforeServiceChannel-id">
+		//		<int:service-activator id="service-activator-serviceWithEventSourcingBeforeServiceChannel-id">
+		//  			<int:request-handler-advice-chain>
+		//					<ref bean="eventSourcingAdvice" />
+		expr = xFactory.compile("//*[local-name() = 'chain']/*[local-name() = 'service-activator']/*[local-name() = 'request-handler-advice-chain']/*[local-name() = 'ref']", Filters.element())
+		
+		elements = expr.evaluate(xmlSpringIntegration)
+		Assert.assertTrue(elements.size() == 1)
+		
+		element = elements.get(0)
+		Assert.assertEquals(element.getAttribute("bean").getValue(), "eventSourcingAdvice")
+		
+		// <int:chain input-channel="serviceWithEventSourcingBeforeServiceAggregatorOutputTransformer" output-channel="serviceWithEventSourcingBeforeServiceOutputFileChannelAdaptereventSourcingOutputFile">
+		//		<int:transformer expression="payload">
+		//			<int:request-handler-advice-chain>
+        //				<ref bean="eventSourcingAdvice" />
+		expr = xFactory.compile("//*[local-name() = 'chain']/*[local-name() = 'transformer']/*[local-name() = 'request-handler-advice-chain']/*[local-name() = 'ref']", Filters.element())
+		 
+		elements = expr.evaluate(xmlSpringIntegration)
+		Assert.assertTrue(elements.size() == 1)
+		 
+		element = elements.get(0)
+		Assert.assertEquals(element.getAttribute("bean").getValue(), "eventSourcingAdvice")
+		 
+		
+		Assert.assertTrue(new File(pathToXmlFile).delete())
+		
+		String xmlQoSSpringContextFileName = orchaCodeVisitor.getOrchaMetadata().getTitle() + "QoS.xml"
+		String pathToQoSXmlFile = destinationDirectory.getAbsolutePath() + File.separator + xmlQoSSpringContextFileName
+			
+		// parse the XML file checking is correctness
+		
+		builder = new SAXBuilder()
+		
+		xmlSpringIntegration = builder.build(pathToQoSXmlFile)
+		
+		xFactory = XPathFactory.instance()
+
+		expr = xFactory.compile("//*[local-name() = 'bean']", Filters.element())
+		 
+		List<Element> beanElements = expr.evaluate(xmlSpringIntegration)
+		Assert.assertTrue(beanElements.size() == 4)
+
+		element = beanElements.get(0)
+		// <bean class="orcha.lang.compiler.referenceimpl.xmlgenerator.impl.EventSourcingAdvice" id="eventSourcingAdvice" />
+		Assert.assertEquals(element.getAttribute("id").getValue(), "eventSourcingAdvice")
+
+		
+		expr = xFactory.compile("//*[local-name() = 'channel']", Filters.element())
+		 
+		List<Element> channelElements = expr.evaluate(xmlSpringIntegration)
+		Assert.assertTrue(channelElements.size() == 2)
+		
+		element = channelElements.get(0)
+		// <int:channel id="eventSourcingChannel" />
+		Assert.assertEquals(element.getAttribute("id").getValue(), "eventSourcingChannel")
+		
+ 
+		// <int:header-enricher input-channel="eventSourcingChannel" output-channel="eventSourcingQueueChannel">
+		expr = xFactory.compile("//*[local-name() = 'header-enricher']", Filters.element())
+		 
+		elements = expr.evaluate(xmlSpringIntegration)
+		Assert.assertTrue(elements.size() == 1)
+
+		element = elements.get(0)
+		Assert.assertEquals(element.getAttribute("input-channel").getValue(), "eventSourcingChannel")
+		Assert.assertEquals(element.getAttribute("output-channel").getValue(), "eventSourcingQueueChannel")
+
+		// <int:channel id="eventSourcingQueueChannel">
+		element = channelElements.get(1)
+		// <int:channel id="eventSourcingChannel" />
+		Assert.assertEquals(element.getAttribute("id").getValue(), "eventSourcingQueueChannel")
+
+		
+		// <int:channel id="eventSourcingQueueChannel">
+		//		<int:queue message-store="mongoDbMessageStore" />
+		expr = xFactory.compile("//*[local-name() = 'channel']/*[local-name() = 'queue']", Filters.element())
+		 
+		elements = expr.evaluate(xmlSpringIntegration)
+		Assert.assertTrue(elements.size() == 1)
+
+		element = elements.get(0)
+		Assert.assertEquals(element.getAttribute("message-store").getValue(), "mongoDbMessageStore")
+		
+
+		element = beanElements.get(1)
+		// <bean class="org.springframework.integration.mongodb.store.MongoDbMessageStore" id="mongoDbMessageStore">
+		Assert.assertEquals(element.getAttribute("id").getValue(), "mongoDbMessageStore")
+
 		Assert.assertTrue(new File(pathToQoSXmlFile).delete())
 		
 	}

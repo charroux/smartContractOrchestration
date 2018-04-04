@@ -19,9 +19,18 @@ import orcha.lang.configuration.OutputFileAdapter.WritingMode
 import service.restWebService.Preparation
 
 
-/*@EventSourcing(messageStore=MessageStore.Redis, joinPoint=JoinPoint.before, eventName="")
+@EventSourcing(messageStore=MessageStore.mongoDB, joinPoint=JoinPoint.after, eventName="")
+class BookingDemandEventHandler extends EventHandler{
+}
+
+
+@EventSourcing(messageStore=MessageStore.mongoDB, joinPoint=JoinPoint.after, eventName="")
+class BookingApplication extends Application{
+}
+
+@EventSourcing(messageStore=MessageStore.mongoDB, joinPoint=JoinPoint.before, eventName="")
 class BookingReceiptEventHandler extends EventHandler{
-}*/
+}
 
 @Configuration
 @Slf4j
@@ -33,7 +42,7 @@ class HotelBookingConfiguration {
 	 */
 	@Bean
 	EventHandler onlineBookingDemand(){
-		EventHandler eventHandler = new EventHandler(name: "onlineBookingDemand")
+		EventHandler eventHandler = new BookingDemandEventHandler(name: "onlineBookingDemand")
 		def httpAdapter = new HttpAdapter(url: '/onlineBookingDemand', method: HttpAdapter.Method.POST)
 		eventHandler.input = new Input(mimeType: "application/json", type: "service.hotelBooking.Booking", adapter: httpAdapter)
 		return eventHandler
@@ -41,7 +50,7 @@ class HotelBookingConfiguration {
 	
 	@Bean
 	Application book(){
-		def jsApp = new Application(name: "book", language: "js", specifications: "Book a room in an hotel.", description: "Book a room in an hotel.")
+		def jsApp = new BookingApplication(name: "book", language: "js", specifications: "Book a room in an hotel.", description: "Book a room in an hotel.")
 		def scriptAdapter = new ScriptServiceAdapter(file: 'file:src/main/orcha/service/hotelBooking/hotelBooking.js')
 		jsApp.input = new Input(type: "service.hotelBooking.Booking", adapter: scriptAdapter)
 		jsApp.output = new Output(type: "service.hotelBooking.BookingReceipt", adapter: scriptAdapter)
