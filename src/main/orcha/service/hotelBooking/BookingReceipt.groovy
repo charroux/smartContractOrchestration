@@ -7,7 +7,7 @@ import groovy.transform.ToString
  *
  */
 @ToString
-class BookingReceipt {
+class BookingReceipt implements Serializable{
 	
 	Booking booking
 	boolean booked

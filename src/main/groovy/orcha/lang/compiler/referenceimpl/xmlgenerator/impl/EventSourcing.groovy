@@ -6,6 +6,8 @@ import org.jdom2.Document
 import org.jdom2.Element
 import org.jdom2.Namespace
 import orcha.lang.compiler.InstructionNode
+import orcha.lang.compiler.OrchaCompilationException
+import orcha.lang.compiler.qualityOfService.EventSourcingOption
 
 class EventSourcing implements Bean, HeaderEnricher, QoS{
 	
@@ -16,23 +18,23 @@ class EventSourcing implements Bean, HeaderEnricher, QoS{
 		this.xmlSpringIntegration = xmlSpringIntegration;
 	}
 	
-	public void eventSourcing(List<InstructionNode> eventsSourcing){
-		
+	private mongoDBEventSourcing() {
+	
 		Element rootElement = xmlSpringIntegration.getRootElement()
 		
 		Namespace namespace = Namespace.getNamespace("int", "http://www.springframework.org/schema/integration")
 		
-		Element beanElement = bean("eventSourcingAdvice", "orcha.lang.compiler.referenceimpl.xmlgenerator.impl.EventSourcingAdvice")
+		Element beanElement = bean("eventSourcingMongoDBAdvice", "orcha.lang.compiler.referenceimpl.xmlgenerator.impl.EventSourcingMongoDBAdvice")
 		rootElement.addContent(beanElement)
 		
 		Element channelElement = new Element("channel", namespace)
-		channelElement.setAttribute("id", "eventSourcingChannel")
+		channelElement.setAttribute("id", "eventSourcingMongoDBChannel")
 		rootElement.addContent(channelElement)
 		
-		Element headerEnricherElement = headerEnricher("eventSourcingChannel", "eventSourcingQueueChannel", "timestampSession", "@orchaSession.timestamp")
+		Element headerEnricherElement = headerEnricher("eventSourcingMongoDBChannel", "eventSourcingMongoDBQueueChannel", "timestampSession", "@orchaSession.timestamp")
 		rootElement.addContent(headerEnricherElement)
 		
-		Element messageStoreQueueElement = messageStoreQueue("eventSourcingQueueChannel", "mongoDbMessageStore")
+		Element messageStoreQueueElement = messageStoreQueue("eventSourcingMongoDBQueueChannel", "mongoDbMessageStore")
 		rootElement.addContent(messageStoreQueueElement)
 		
 		beanElement = bean("mongoDbMessageStore", "org.springframework.integration.mongodb.store.MongoDbMessageStore")
@@ -53,4 +55,66 @@ class EventSourcing implements Bean, HeaderEnricher, QoS{
 	
 	}
 
+	private redisEventSourcing() {
+		
+		Element rootElement = xmlSpringIntegration.getRootElement()
+			
+		Namespace namespace = Namespace.getNamespace("int", "http://www.springframework.org/schema/integration")
+			
+		Element beanElement = bean("eventSourcingRedisAdvice", "orcha.lang.compiler.referenceimpl.xmlgenerator.impl.EventSourcingRedisAdvice")
+		rootElement.addContent(beanElement)
+			
+		Element channelElement = new Element("channel", namespace)
+		channelElement.setAttribute("id", "eventSourcingRedisChannel")
+		rootElement.addContent(channelElement)
+			
+		Element headerEnricherElement = headerEnricher("eventSourcingRedisChannel", "eventSourcingRedisQueueChannel", "timestampSession", "@orchaSession.timestamp")
+		rootElement.addContent(headerEnricherElement)
+			
+		Element messageStoreQueueElement = messageStoreQueue("eventSourcingRedisQueueChannel", "redisMessageStore")
+		rootElement.addContent(messageStoreQueueElement)
+		
+		beanElement = bean("redisMessageStore", "org.springframework.integration.redis.store.RedisMessageStore")
+		Element constructorArgElement = new Element("constructor-arg", Namespace.getNamespace("", "http://www.springframework.org/schema/beans"))
+		constructorArgElement.setAttribute("ref", "redisConnectionFactory")
+		beanElement.addContent(constructorArgElement)
+		rootElement.addContent(beanElement)
+		
+		def properties = [port: '6379']
+		beanElement = beanWithValue("redisConnectionFactory", "org.springframework.data.redis.connection.jedis.JedisConnectionFactory", properties)
+		rootElement.addContent(beanElement)
+		
+	}
+	
+	public void eventSourcing(List<EventSourcingOption> eventsSourcing){
+		
+		def founded = []
+		
+		eventsSourcing.each{ eventSourcingOption ->
+			
+			if(founded.contains(eventSourcingOption.messageStore) == false) {
+			
+				switch(eventSourcingOption.messageStore) {
+					
+					case orcha.lang.configuration.EventSourcing.MessageStore.mongoDB:
+						mongoDBEventSourcing()
+						founded.add(eventSourcingOption.messageStore)
+						break;
+						
+					case orcha.lang.configuration.EventSourcing.MessageStore.Redis:
+						founded.add(eventSourcingOption.messageStore)
+						redisEventSourcing()
+						break;
+						
+					default:
+						throw new OrchaCompilationException(eventSourcingOption.messageStore.toString() + " not supported yet.")
+				}
+			
+			}
+			
+				
+		}
+		
+	}		
+		
 }

@@ -168,13 +168,19 @@ class OutboundChannelAdapter implements Chain, Transformer{
 				Element transformer = new Element("transformer", namespace)
 				transformer.setAttribute("expression", "payload")
 				chainElement.addContent(transformer)
-					
+				
 				Element adviceChain = new Element("request-handler-advice-chain", namespace)
+				transformer.addContent(adviceChain)
+				
+				Element eventSourcingElement = eventSourcing(instructionNode.options.eventSourcing)
+				adviceChain.addContent(eventSourcingElement)
+					
+				/*Element adviceChain = new Element("request-handler-advice-chain", namespace)
 				transformer.addContent(adviceChain)
 					
 				Element refElement = new Element("ref", Namespace.getNamespace("", "http://www.springframework.org/schema/beans"))
 				refElement.setAttribute("bean", "eventSourcingAdvice")
-				adviceChain.addContent(refElement)
+				adviceChain.addContent(refElement)*/
 				
 			}
 		}

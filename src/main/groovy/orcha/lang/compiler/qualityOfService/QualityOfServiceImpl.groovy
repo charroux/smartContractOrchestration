@@ -8,6 +8,7 @@ import orcha.lang.configuration.EventSourcing.JoinPoint
 import orcha.lang.configuration.Queue
 import orcha.lang.configuration.CircuitBreaker
 import orcha.lang.configuration.EventSourcing
+import orcha.lang.configuration.EventSourcing.MessageStore
 
 class QualityOfServiceImpl implements QualityOfService{
 	
@@ -333,9 +334,10 @@ class QualityOfServiceImpl implements QualityOfService{
 			//String className = "orcha.lang.compiler.referenceimpl.xmlgenerator.impl.ObjectToApplicationTransformer"
 			boolean resumeAtStoppingPoint = beanClass.getAnnotation(EventSourcing.class).resumeAtStoppingPoint()
 			JoinPoint joinPoint = beanClass.getAnnotation(EventSourcing.class).joinPoint()
+			MessageStore messageStore = beanClass.getAnnotation(EventSourcing.class).messageStore()
 				
 			//return new EventSourcingOption(eventName: eventName, className: className, resumeAtStoppingPoint: resumeAtStoppingPoint)
-			return new EventSourcingOption(eventName: eventName, joinPoint: joinPoint, resumeAtStoppingPoint: resumeAtStoppingPoint)
+			return new EventSourcingOption(messageStore: messageStore, eventName: eventName, joinPoint: joinPoint, resumeAtStoppingPoint: resumeAtStoppingPoint)
 			
 		} else {
 			return null

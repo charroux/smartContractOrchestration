@@ -1,8 +1,10 @@
 package orcha.lang.compiler.qualityOfService
 
+import groovy.transform.EqualsAndHashCode
 import groovy.transform.ToString;
 import orcha.lang.configuration.EventSourcing
 import orcha.lang.configuration.EventSourcing.JoinPoint
+import orcha.lang.configuration.EventSourcing.MessageStore
 
 @ToString
 class QualityOfServicesOptions {
@@ -42,6 +44,7 @@ class CircuitBreakerOption {
 
 @ToString
 class EventSourcingOption {
+	MessageStore messageStore
 	String eventName
 	//String className
 	JoinPoint joinPoint

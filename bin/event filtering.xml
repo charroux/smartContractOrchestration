@@ -12,10 +12,10 @@
     <int:header-enricher>
       <int:header name="messageID" expression="headers['id'].toString()" />
     </int:header-enricher>
-    <int:filter expression="payload == 0" />
+    <int:filter expression="payload.equals('0')" />
   </int:chain>
   <int:chain input-channel="eventFilteringInputFile-OutputChannel" output-channel="eventFilteringCodeServiceAcivatorOutput" id="service-activator-chain-eventFilteringCodeChannel-id">
-    <int:service-activator id="service-activator-eventFilteringCodeChannel-id" expression="@groovyEventFilteringCodeTest.method(payload)">
+    <int:service-activator id="service-activator-eventFilteringCodeChannel-id" expression="@groovyEventFilteringCode.method(payload)">
       <int:request-handler-advice-chain />
     </int:service-activator>
   </int:chain>

@@ -3,7 +3,7 @@ package service.hotelBooking
 import groovy.transform.ToString
 
 @ToString
-class Booking {
+class Booking implements Serializable{
 	
 	Date begin
 	Date end

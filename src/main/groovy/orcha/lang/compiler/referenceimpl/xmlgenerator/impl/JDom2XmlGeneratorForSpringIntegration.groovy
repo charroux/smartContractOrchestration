@@ -79,7 +79,7 @@ class JDom2XmlGeneratorForSpringIntegration implements XmlGenerator{
 			 generateXMLForInstruction(it, orchaCodeParser, alreadyDoneInstructions, xmlSpringIntegration)
 			 
 			 if(it.options!=null && it.options.eventSourcing!=null){
-				 eventsSourcing.add(it)
+				 eventsSourcing.add(it.options.eventSourcing)
 			 }
 		 }		
 		

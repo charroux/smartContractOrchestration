@@ -11,16 +11,14 @@ import org.springframework.integration.handler.advice.AbstractRequestHandlerAdvi
 import org.springframework.messaging.Message
 
 @Slf4j
-class EventSourcingAdvice extends AbstractRequestHandlerAdvice{
+class EventSourcingMongoDBAdvice extends AbstractRequestHandlerAdvice{
 	
 	@Autowired
 	ApplicationContext context
 	
 	public Object doInvoke(ExecutionCallback callback, Object target, Message message) throws Exception{
-		//log.info "target1: " + target
-		//log.info "message: " + message
 		log.info "payload: " + message.payload
-		DirectChannel directChannel =  context.getBean("eventSourcingChannel")
+		DirectChannel directChannel =  context.getBean("eventSourcingMongoDBChannel")
 		directChannel.send(message)
 		Object object = callback.execute()
 		return object

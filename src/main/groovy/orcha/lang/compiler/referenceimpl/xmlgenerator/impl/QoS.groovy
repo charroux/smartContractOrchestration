@@ -1,5 +1,6 @@
 package orcha.lang.compiler.referenceimpl.xmlgenerator.impl
 
+import orcha.lang.compiler.OrchaCompilationException
 import orcha.lang.compiler.qualityOfService.EventSourcingOption
 import orcha.lang.compiler.qualityOfService.QueueOption
 import orcha.lang.compiler.qualityOfService.RetryOption
@@ -32,7 +33,17 @@ trait QoS {
 		Namespace namespace = Namespace.getNamespace("", "http://www.springframework.org/schema/beans")
 
 		Element eventSourcing = new Element("ref", namespace)
-		eventSourcing.setAttribute("bean", "eventSourcingAdvice")
+		
+		switch(eventSourcingOption.messageStore) {
+			case orcha.lang.configuration.EventSourcing.MessageStore.mongoDB:
+				eventSourcing.setAttribute("bean", "eventSourcingMongoDBAdvice")
+				break;
+			case orcha.lang.configuration.EventSourcing.MessageStore.Redis:
+				eventSourcing.setAttribute("bean", "eventSourcingRedisAdvice")
+				break;
+			default:
+				throw new OrchaCompilationException(eventSourcingOption.messageStore.toString() + " not supported yet.")				
+		}
 		
 		return eventSourcing
 		
