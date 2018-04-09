@@ -853,7 +853,7 @@ class CompileServiceWithSpringIntegrationTest {
 
 		// <int:transformer id="transformer-serviceWithEventSourcingAfterServiceServiceAcivatorOutput-id" input-channel="serviceWithEventSourcingAfterServiceServiceAcivatorOutput" output-channel="serviceWithEventSourcingAfterServiceAggregatorInput" method="transform">
 		//		<int:request-handler-advice-chain>
-		//  		<ref bean="eventSourcingAdvice" />
+		//  		<ref bean="eventSourcingMongoDBAdvice" />
 		//		</int:request-handler-advice-chain>
 		// </int:transformer>
 		XPathExpression<Element> expr = xFactory.compile("//*[local-name() = 'transformer']/*[local-name() = 'request-handler-advice-chain']/*[local-name() = 'ref']", Filters.element())
@@ -862,34 +862,34 @@ class CompileServiceWithSpringIntegrationTest {
 		Assert.assertTrue(elements.size() == 2)
 		
 		Element element = elements.get(0)
-		Assert.assertEquals(element.getAttribute("bean").getValue(), "eventSourcingAdvice")
+		Assert.assertEquals(element.getAttribute("bean").getValue(), "eventSourcingMongoDBAdvice")
 		
 		element = elements.get(1)
-		Assert.assertEquals(element.getAttribute("bean").getValue(), "eventSourcingAdvice")
+		Assert.assertEquals(element.getAttribute("bean").getValue(), "eventSourcingMongoDBAdvice")
 		
 		// <int:chain input-channel="serviceWithEventSourcingAfterServiceAggregatorOutputTransformer" output-channel="serviceWithEventSourcingBeforeServiceServiceAcivatorOutput" id="service-activator-chain-serviceWithEventSourcingBeforeServiceChannel-id">
 		//		<int:service-activator id="service-activator-serviceWithEventSourcingBeforeServiceChannel-id">
 		//  			<int:request-handler-advice-chain>
-		//					<ref bean="eventSourcingAdvice" />
+		//					<ref bean="eventSourcingMongoDBAdvice" />
 		expr = xFactory.compile("//*[local-name() = 'chain']/*[local-name() = 'service-activator']/*[local-name() = 'request-handler-advice-chain']/*[local-name() = 'ref']", Filters.element())
 		
 		elements = expr.evaluate(xmlSpringIntegration)
 		Assert.assertTrue(elements.size() == 1)
 		
 		element = elements.get(0)
-		Assert.assertEquals(element.getAttribute("bean").getValue(), "eventSourcingAdvice")
+		Assert.assertEquals(element.getAttribute("bean").getValue(), "eventSourcingMongoDBAdvice")
 		
 		// <int:chain input-channel="serviceWithEventSourcingBeforeServiceAggregatorOutputTransformer" output-channel="serviceWithEventSourcingBeforeServiceOutputFileChannelAdaptereventSourcingOutputFile">
 		//		<int:transformer expression="payload">
 		//			<int:request-handler-advice-chain>
-        //				<ref bean="eventSourcingAdvice" />
+        //				<ref bean="eventSourcingMongoDBAdvice" />
 		expr = xFactory.compile("//*[local-name() = 'chain']/*[local-name() = 'transformer']/*[local-name() = 'request-handler-advice-chain']/*[local-name() = 'ref']", Filters.element())
 		 
 		elements = expr.evaluate(xmlSpringIntegration)
 		Assert.assertTrue(elements.size() == 1)
 		 
 		element = elements.get(0)
-		Assert.assertEquals(element.getAttribute("bean").getValue(), "eventSourcingAdvice")
+		Assert.assertEquals(element.getAttribute("bean").getValue(), "eventSourcingMongoDBAdvice")
 		 
 		
 		Assert.assertTrue(new File(pathToXmlFile).delete())
@@ -911,8 +911,8 @@ class CompileServiceWithSpringIntegrationTest {
 		Assert.assertTrue(beanElements.size() == 4)
 
 		element = beanElements.get(0)
-		// <bean class="orcha.lang.compiler.referenceimpl.xmlgenerator.impl.EventSourcingAdvice" id="eventSourcingAdvice" />
-		Assert.assertEquals(element.getAttribute("id").getValue(), "eventSourcingAdvice")
+		// <bean class="orcha.lang.compiler.referenceimpl.xmlgenerator.impl.EventSourcingAdvice" id="eventSourcingMongoDBAdvice" />
+		Assert.assertEquals(element.getAttribute("id").getValue(), "eventSourcingMongoDBAdvice")
 
 		
 		expr = xFactory.compile("//*[local-name() = 'channel']", Filters.element())
@@ -921,27 +921,27 @@ class CompileServiceWithSpringIntegrationTest {
 		Assert.assertTrue(channelElements.size() == 2)
 		
 		element = channelElements.get(0)
-		// <int:channel id="eventSourcingChannel" />
-		Assert.assertEquals(element.getAttribute("id").getValue(), "eventSourcingChannel")
+		// <int:channel id="eventSourcingMongoDBChannel" />
+		Assert.assertEquals(element.getAttribute("id").getValue(), "eventSourcingMongoDBChannel")
 		
  
-		// <int:header-enricher input-channel="eventSourcingChannel" output-channel="eventSourcingQueueChannel">
+		// <int:header-enricher input-channel="eventSourcingMongoDBChannel" output-channel="eventSourcingMongoDBQueueChannel">
 		expr = xFactory.compile("//*[local-name() = 'header-enricher']", Filters.element())
 		 
 		elements = expr.evaluate(xmlSpringIntegration)
 		Assert.assertTrue(elements.size() == 1)
 
 		element = elements.get(0)
-		Assert.assertEquals(element.getAttribute("input-channel").getValue(), "eventSourcingChannel")
-		Assert.assertEquals(element.getAttribute("output-channel").getValue(), "eventSourcingQueueChannel")
+		Assert.assertEquals(element.getAttribute("input-channel").getValue(), "eventSourcingMongoDBChannel")
+		Assert.assertEquals(element.getAttribute("output-channel").getValue(), "eventSourcingMongoDBQueueChannel")
 
-		// <int:channel id="eventSourcingQueueChannel">
+		// <int:channel id="eventSourcingMongoDBQueueChannel">
 		element = channelElements.get(1)
-		// <int:channel id="eventSourcingChannel" />
-		Assert.assertEquals(element.getAttribute("id").getValue(), "eventSourcingQueueChannel")
+		// <int:channel id="eventSourcingMongoDBQueueChannel" />
+		Assert.assertEquals(element.getAttribute("id").getValue(), "eventSourcingMongoDBQueueChannel")
 
 		
-		// <int:channel id="eventSourcingQueueChannel">
+		// <int:channel id="eventSourcingMongoDBQueueChannel">
 		//		<int:queue message-store="mongoDbMessageStore" />
 		expr = xFactory.compile("//*[local-name() = 'channel']/*[local-name() = 'queue']", Filters.element())
 		 
