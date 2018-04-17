@@ -6,5 +6,33 @@
 </head>
 <body>
 
+<h1>Building</h1>
+
+<ul>
+<li>Unzip the project</li>
+<li>Open a teminal in the main directory of the project</li>
+</ul>
+
+<img alt="Main project directory" src="img\mainProjectFolder.png">
+
+<ul>
+<li>Build the project unsing the command line: gradlew build</li>
+</ul>
+
+<h1>Using smart contracts</h1>
+
+<h2>Order preparation</h2>
+
+<ul>
+<li><a href="https://gitlab.com/BenOrcha/orcha/blob/cicd/src/main/orcha/source/prepareOrder/PrepareOrder.groovy">The contract written in Orcha</a></li>
+<li><a href="https://gitlab.com/BenOrcha/orcha/tree/cicd/src/main/orcha/service/prepareOrder">The services called by the contract with the data structure</a></li>
+<li><a href="https://gitlab.com/BenOrcha/orcha/blob/cicd/src/main/orcha/configuration/prepareOrder/PrepareOrderConfiguration.groovy">The configuration of the smart contract</a></li>
+<li><a href="https://gitlab.com/BenOrcha/orcha/blob/cicd/data/input/orderToPrepare.json">The input data of the smart contract</a></li>
+</ul>
+
+<ul>
+<li>Compiling the smart contract using the command line: gradlew compileOrcha -PorchaFile="['prepareOrder/PrepareOrder.groovy']"</li>
+<li>The generated file</li>
+</ul>
 </body>
 </html>
