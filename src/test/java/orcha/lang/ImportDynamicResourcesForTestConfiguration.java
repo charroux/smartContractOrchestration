@@ -18,7 +18,8 @@ import org.springframework.context.annotation.ImportResource;
     "generated"
 })
 @ImportResource({
-
+    "classpath:/test for PrepareOrder.xml",
+    "classpath:/test for PrepareOrderQoS.xml"
 })
 public class ImportDynamicResourcesForTestConfiguration {
 
