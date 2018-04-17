@@ -13,7 +13,7 @@
     <int:header-enricher>
       <int:header name="messageID" expression="headers['id'].toString()" />
     </int:header-enricher>
-    <int:filter expression="payload.product.specification == 'TV'" />
+    <int:filter expression="payload.order.product.specification == 'TV'" />
   </int:chain>
   <int:chain input-channel="customer-OutputChannel" output-channel="prepareOrderServiceAcivatorOutput" id="service-activator-chain-prepareOrderChannel-id">
     <int:service-activator id="service-activator-prepareOrderChannel-id" expression="@orderPreparation.prepare(payload)">

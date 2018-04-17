@@ -89,7 +89,18 @@ class InboundChannelAdapter implements Poller, Chain, HeaderEnricher, Filter, Tr
 			
 		if(instructionNode.next.instruction.instruction!="receive" && instructionNode.instruction.condition!=null){
 			String condition = instructionNode.instruction.condition
-			condition = condition.replaceFirst(instructionNode.instruction.variable, "payload")
+			
+			condition = condition.trim()
+			
+			if(condition.startsWith("==")) {
+				condition = "payload " + condition
+			} else {
+				condition = "payload." + condition
+			}
+			
+			
+			//condition = condition.replaceFirst(instructionNode.instruction.variable, "payload")
+			
 			Element conditionFilter = filter(condition)
 			chain.addContent(conditionFilter)
 		}

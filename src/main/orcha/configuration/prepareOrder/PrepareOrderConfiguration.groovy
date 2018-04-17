@@ -49,7 +49,7 @@ class PrepareOrderConfiguration {
 	@Bean
 	EventHandler delivery(){
 		def eventHandler = new EventHandler(name: "delivery")
-		def fileAdapter = new OutputFileAdapter(directory: 'data/output', createDirectory: true, filename:'preparedOrder.txt', appendNewLine: true, writingMode: WritingMode.REPLACE)
+		def fileAdapter = new OutputFileAdapter(directory: 'data/output', createDirectory: true, filename:'preparedOrder.json', appendNewLine: true, writingMode: WritingMode.REPLACE)
 		eventHandler.output = new Output(mimeType: "application/json", type: "service.prepareOrder.PreparedOrder", adapter: fileAdapter)
 		return eventHandler
 	}

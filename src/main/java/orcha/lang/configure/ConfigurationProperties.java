@@ -10,17 +10,17 @@ package orcha.lang.configure;
 @org.springframework.boot.context.properties.ConfigurationProperties(prefix = "driving")
 public class ConfigurationProperties {
 
-    public ConfigurationProperties.BookingRespons bookingRespons = new BookingRespons();
+    public ConfigurationProperties.Accounting accounting = new Accounting();
 
-    public ConfigurationProperties.BookingRespons getBookingRespons() {
-        return bookingRespons;
+    public ConfigurationProperties.Accounting getAccounting() {
+        return accounting;
     }
 
-    public void setBookingRespons(ConfigurationProperties.BookingRespons bookingRespons) {
-        this.bookingRespons = bookingRespons;
+    public void setAccounting(ConfigurationProperties.Accounting accounting) {
+        this.accounting = accounting;
     }
 
-    public class BookingRespons {
+    public class Accounting {
 
         public String directory;
         public String filename;

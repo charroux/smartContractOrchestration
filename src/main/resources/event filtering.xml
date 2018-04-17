@@ -9,10 +9,11 @@
   <int-file:inbound-channel-adapter id="file-eventFilteringInputFile-InputChannel-id" directory="data/input" channel="eventFilteringInputFile-InputChannel" prevent-duplicates="true" filename-pattern="eventFilteringInputFile.txt" />
   <int-file:file-to-string-transformer input-channel="eventFilteringInputFile-InputChannel" output-channel="eventFilteringInputFile-InputChannelTransformer" delete-files="false" />
   <int:chain input-channel="eventFilteringInputFile-InputChannelTransformer" output-channel="eventFilteringInputFile-OutputChannel">
+    <int:json-to-object-transformer type="java.lang.Integer" />
     <int:header-enricher>
       <int:header name="messageID" expression="headers['id'].toString()" />
     </int:header-enricher>
-    <int:filter expression="payload.equals('0')" />
+    <int:filter expression="payload == 0" />
   </int:chain>
   <int:chain input-channel="eventFilteringInputFile-OutputChannel" output-channel="eventFilteringCodeServiceAcivatorOutput" id="service-activator-chain-eventFilteringCodeChannel-id">
     <int:service-activator id="service-activator-eventFilteringCodeChannel-id" expression="@groovyEventFilteringCode.method(payload)">

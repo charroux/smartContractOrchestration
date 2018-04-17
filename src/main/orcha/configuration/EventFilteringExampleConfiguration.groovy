@@ -19,7 +19,7 @@ class EventFilteringExampleConfiguration {
 	EventHandler eventFilteringInputFile(){
 		def eventHandler = new EventHandler(name: "eventFilteringInputFile")
 		def fileAdapter = new InputFileAdapter(directory: 'data/input', filenamePattern: "eventFilteringInputFile.txt")
-		eventHandler.input = new Input(mimeType: "text/plain", type: "java.lang.Integer", adapter: fileAdapter)
+		eventHandler.input = new Input(mimeType: "application/json", type: "java.lang.Integer", adapter: fileAdapter)
 		return eventHandler
 	}
 	
