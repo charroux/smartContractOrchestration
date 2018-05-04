@@ -27,7 +27,7 @@
       <property name="application" ref="serviceWithRetry" />
     </bean>
   </int:transformer>
-  <int:aggregator id="aggregator-serviceWithRetryAggregatorInput-id" input-channel="serviceWithRetryAggregatorInput" output-channel="serviceWithRetryAggregatorInputTransformer" release-strategy-expression="size()==1 and ( ([0].payload instanceof T(orcha.lang.configuration.Application) AND [0].payload.state==T(orcha.lang.configuration.State).TERMINATED) )" correlation-strategy-expression="headers['messageID']" />
+  <int:aggregator id="aggregator-serviceWithRetryAggregatorInput-id" input-channel="serviceWithRetryAggregatorInput" output-channel="serviceWithRetryAggregatorInputTransformer" release-strategy-expression="size()==1 and ( ([0].payload instanceof T(orcha.lang.configuration.Application) and [0].payload.state==T(orcha.lang.configuration.State).TERMINATED) )" correlation-strategy-expression="headers['messageID']" />
   <int:transformer id="transformer-serviceWithRetryAggregatorInput-id" input-channel="serviceWithRetryAggregatorInputTransformer" output-channel="serviceWithRetryAggregatorInputAggregatorOutput" expression="payload.?[name=='serviceWithRetry']" />
   <int:transformer id="transformer-serviceWithRetryAggregatorInputAggregatorOutput-id" input-channel="serviceWithRetryAggregatorInputAggregatorOutput" output-channel="serviceWithRetryAggregatorOutputTransformer" method="transform">
     <bean class="orcha.lang.compiler.referenceimpl.xmlgenerator.impl.ApplicationToObjectTransformer" />

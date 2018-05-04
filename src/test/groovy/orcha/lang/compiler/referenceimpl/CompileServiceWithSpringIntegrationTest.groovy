@@ -299,7 +299,7 @@ class CompileServiceWithSpringIntegrationTest {
 		"compute codeToBenchmark1 with event.value\n" +
 		"receive event from benchmarkingInputFile\n" +
 		"compute codeToBenchmark2 with event.value\n" +
-		"when 'codeToBenchmark1 terminates and codeToBenchmark2 terminates'\n" +
+		"when '(codeToBenchmark1 terminates condition == -1) and (codeToBenchmark2 terminates condition == 1)'\n" +
 		"send codeToBenchmark1.result to benchmarkingOutputFile"
 		
 		// construct the graph of instructions for the Orcha programm
@@ -418,7 +418,7 @@ class CompileServiceWithSpringIntegrationTest {
 		Assert.assertTrue(element.getAttribute("release-strategy-expression").getValue().contains("size()=="+size))
 		int i = 0
 		while (i!=size) {
-			Assert.assertTrue(element.getAttribute("release-strategy-expression").getValue().contains("([" + i + "].payload instanceof T(orcha.lang.configuration.Application) AND [" + i + "].payload.state==T(orcha.lang.configuration.State).TERMINATED)"))
+			Assert.assertTrue(element.getAttribute("release-strategy-expression").getValue().contains("([" + i + "].payload instanceof T(orcha.lang.configuration.Application) and [" + i + "].payload.state==T(orcha.lang.configuration.State).TERMINATED) and [" + i + "].payload.output.value=="))
 			i++
 		}
 		

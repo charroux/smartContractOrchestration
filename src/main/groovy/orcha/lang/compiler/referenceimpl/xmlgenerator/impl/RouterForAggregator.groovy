@@ -15,7 +15,7 @@ class RouterForAggregator {
 		this.xmlSpringIntegration = xmlSpringIntegration;
 	}
 	
-	public void routerForAggregator(InstructionNode instructionNode, Document xmlSpringIntegration){
+	public void routerForAggregator(InstructionNode instructionNode){
 		
 		Element rootElement = xmlSpringIntegration.getRootElement()
 		

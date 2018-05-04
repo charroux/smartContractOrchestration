@@ -23,7 +23,7 @@
       <property name="application" ref="firstProgram" />
     </bean>
   </int:transformer>
-  <int:aggregator id="aggregator-firstProgramAggregatorInput-id" input-channel="firstProgramAggregatorInput" output-channel="firstProgramAggregatorInputTransformer" release-strategy-expression="size()==1 and ( ([0].payload instanceof T(orcha.lang.configuration.Application) AND [0].payload.state==T(orcha.lang.configuration.State).TERMINATED) )" correlation-strategy-expression="headers['messageID']" />
+  <int:aggregator id="aggregator-firstProgramAggregatorInput-id" input-channel="firstProgramAggregatorInput" output-channel="firstProgramAggregatorInputTransformer" release-strategy-expression="size()==1 and ( ([0].payload instanceof T(orcha.lang.configuration.Application) and [0].payload.state==T(orcha.lang.configuration.State).TERMINATED) )" correlation-strategy-expression="headers['messageID']" />
   <int:transformer id="transformer-firstProgramAggregatorInput-id" input-channel="firstProgramAggregatorInputTransformer" output-channel="firstProgramAggregatorInputAggregatorOutput" expression="payload.?[name=='firstProgram']" />
   <int:transformer id="transformer-firstProgramAggregatorInputAggregatorOutput-id" input-channel="firstProgramAggregatorInputAggregatorOutput" output-channel="firstProgramAggregatorOutputTransformer" method="transform">
     <bean class="orcha.lang.compiler.referenceimpl.xmlgenerator.impl.ApplicationToObjectTransformer" />
@@ -38,7 +38,7 @@
       <property name="application" ref="secondProgram" />
     </bean>
   </int:transformer>
-  <int:aggregator id="aggregator-secondProgramAggregatorInput-id" input-channel="secondProgramAggregatorInput" output-channel="secondProgramAggregatorInputTransformer" release-strategy-expression="size()==1 and ( ([0].payload instanceof T(orcha.lang.configuration.Application) AND [0].payload.state==T(orcha.lang.configuration.State).TERMINATED) )" correlation-strategy-expression="headers['messageID']" />
+  <int:aggregator id="aggregator-secondProgramAggregatorInput-id" input-channel="secondProgramAggregatorInput" output-channel="secondProgramAggregatorInputTransformer" release-strategy-expression="size()==1 and ( ([0].payload instanceof T(orcha.lang.configuration.Application) and [0].payload.state==T(orcha.lang.configuration.State).TERMINATED) )" correlation-strategy-expression="headers['messageID']" />
   <int:transformer id="transformer-secondProgramAggregatorInput-id" input-channel="secondProgramAggregatorInputTransformer" output-channel="secondProgramAggregatorInputAggregatorOutput" expression="payload.?[name=='secondProgram']" />
   <int:transformer id="transformer-secondProgramAggregatorInputAggregatorOutput-id" input-channel="secondProgramAggregatorInputAggregatorOutput" output-channel="secondProgramAggregatorOutputTransformer" method="transform">
     <bean class="orcha.lang.compiler.referenceimpl.xmlgenerator.impl.ApplicationToObjectTransformer" />

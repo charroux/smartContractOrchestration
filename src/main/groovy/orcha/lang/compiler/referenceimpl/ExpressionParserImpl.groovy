@@ -56,10 +56,7 @@ class ExpressionParserImpl implements ExpressionParser{
 		return applicationNames[0]
 	}
 	
-	@Override
-	public String releaseExpression(String expression, List<InstructionNode> graphOfInstructions) {
-		
-		List<String> applicationsNamesInExpression = this.getApplicationsNamesInExpression(expression, graphOfInstructions)
+	private String releaseSpringLanguageExpression(String expression, List<String> applicationsNamesInExpression) {
 		
 		String size = "size()=="  + applicationsNamesInExpression.size()
 		
@@ -72,14 +69,27 @@ class ExpressionParserImpl implements ExpressionParser{
 			
 			def expr = this.addParenthesis(expression, releaseExpression)
 			expression = expr.get("expression")
-			releaseExpression = expr.get("releaseExpression") 
+			releaseExpression = expr.get("releaseExpression")
 			
 			name = names.next()
+			
+			if(expression.startsWith("and ")){					// "and (codeToBenchmark2 terminates condition == 1)"
+				releaseExpression = releaseExpression + " and ("
+				index = expression.indexOf("and ") + "and".length() + 1
+				expression = expression.substring(index)
+				expression = expression.trim()
+			} else if(expression.startsWith("or ")){
+				releaseExpression = releaseExpression + " or ("
+				index = expression.indexOf("or ") + "or".length() + 1
+				expression = expression.substring(index)
+				expression = expression.trim()
+			}
+			
 			index = expression.indexOf(name) + name.length() + 1
 			expression = expression.substring(index)
 			expression = expression.trim()							// "terminates and b terminates"
-			if(expression.startsWith("terminates")){				
-				releaseExpression = releaseExpression + " ([" + i + "].payload instanceof T(orcha.lang.configuration.Application) AND [" + i + "].payload.state==T(orcha.lang.configuration.State).TERMINATED) "
+			if(expression.startsWith("terminates")){
+				releaseExpression = releaseExpression + " ([" + i + "].payload instanceof T(orcha.lang.configuration.Application) and [" + i + "].payload.state==T(orcha.lang.configuration.State).TERMINATED) "
 				
 				index = expression.indexOf("terminates") + "terminates".length()
 				if(index >= expression.length()){
@@ -92,7 +102,7 @@ class ExpressionParserImpl implements ExpressionParser{
 				
 				expr = this.addParenthesis(expression, releaseExpression)
 				expression = expr.get("expression")
-				releaseExpression = expr.get("releaseExpression") 
+				releaseExpression = expr.get("releaseExpression")
 				
 				if(expression.startsWith("and ")){					// "and b terminates"
 					releaseExpression = releaseExpression + " and "
@@ -106,7 +116,7 @@ class ExpressionParserImpl implements ExpressionParser{
 					expression = expression.trim()
 				} else if(expression.startsWith("condition ")){
 					
-					releaseExpression = releaseExpression + " and "
+					releaseExpression = releaseExpression + "and "
 					index = expression.indexOf("condition ") + "condition".length() + 1
 					expression = expression.substring(index)
 					expression = expression.trim()
@@ -118,9 +128,9 @@ class ExpressionParserImpl implements ExpressionParser{
 					String condition
 					
 					if(leftOperatorInExpression == true){
-						condition = " [" + i + "].payload.output.value." + expression.substring(0, endOfConditionIndex) + " "
+						condition = "[" + i + "].payload.output.value." + expression.substring(0, endOfConditionIndex) + " "
 					} else {
-						condition = " [" + i + "].payload.output.value" + expression.substring(0, endOfConditionIndex) + " "
+						condition = "[" + i + "].payload.output.value" + expression.substring(0, endOfConditionIndex) + " "
 					}
 					
 					
@@ -128,21 +138,33 @@ class ExpressionParserImpl implements ExpressionParser{
 					
 					expression = expression.substring(endOfConditionIndex)
 					
-				} 
+				}
 				
 				i++
 				
-			} 
+			}
 			
 		}
 		
+		releaseExpression = size + " and " + "( " + releaseExpression
 		
+		if(applicationsNamesInExpression.size() > 1) {
+			releaseExpression = releaseExpression + ")"
+		}
 		
-		releaseExpression = size + " and " + "(" + releaseExpression + ")"
-		
-		
+		releaseExpression = releaseExpression + " )"
 		
 		return releaseExpression
+
+	}
+	
+	@Override
+	public String releaseExpression(String expression, List<InstructionNode> graphOfInstructions) {
+		
+		List<String> applicationsNamesInExpression = this.getApplicationsNamesInExpression(expression, graphOfInstructions)
+		
+		return this.releaseSpringLanguageExpression(expression, applicationsNamesInExpression)
+		
 	}
 	
 	@Override
