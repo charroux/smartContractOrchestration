@@ -10,17 +10,17 @@ package orcha.lang.configure;
 @org.springframework.boot.context.properties.ConfigurationProperties(prefix = "driving")
 public class ConfigurationProperties {
 
-    public ConfigurationProperties.BenchmarkingOutputFile benchmarkingOutputFile = new BenchmarkingOutputFile();
+    public ConfigurationProperties.ComputesInSeriesOutputFile computesInSeriesOutputFile = new ComputesInSeriesOutputFile();
 
-    public ConfigurationProperties.BenchmarkingOutputFile getBenchmarkingOutputFile() {
-        return benchmarkingOutputFile;
+    public ConfigurationProperties.ComputesInSeriesOutputFile getComputesInSeriesOutputFile() {
+        return computesInSeriesOutputFile;
     }
 
-    public void setBenchmarkingOutputFile(ConfigurationProperties.BenchmarkingOutputFile benchmarkingOutputFile) {
-        this.benchmarkingOutputFile = benchmarkingOutputFile;
+    public void setComputesInSeriesOutputFile(ConfigurationProperties.ComputesInSeriesOutputFile computesInSeriesOutputFile) {
+        this.computesInSeriesOutputFile = computesInSeriesOutputFile;
     }
 
-    public class BenchmarkingOutputFile {
+    public class ComputesInSeriesOutputFile {
 
         public String directory;
         public String filename;

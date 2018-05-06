@@ -10,7 +10,7 @@ import orcha.lang.configuration.OrchaServiceAdapter
 import orcha.lang.configuration.ScriptServiceAdapter
 import orcha.lang.configuration.EventSourcing.JoinPoint
 
-class ServiceActivator implements Chain, Poller, QoS, orcha.lang.compiler.referenceimpl.xmlgenerator.impl.Bean, Transformer{
+class ServiceActivator implements Chain, Poller, QoS, orcha.lang.compiler.referenceimpl.xmlgenerator.impl.Bean, Transformer, HeaderEnricher{
 	
 	Document xmlSpringIntegration
 	public ServiceActivator(Document xmlSpringIntegration) {
@@ -19,6 +19,10 @@ class ServiceActivator implements Chain, Poller, QoS, orcha.lang.compiler.refere
 	}
 
 	public void service(InstructionNode instructionNode, boolean computeFails, String failChannel, boolean isScript){
+		this.service(instructionNode, 0, 0, computeFails, failChannel, isScript)
+	}
+	
+	public void service(InstructionNode instructionNode, int sequenceNumber, int sequenceSize, boolean computeFails, String failChannel, boolean isScript){
 		
 		Element rootElement = xmlSpringIntegration.getRootElement()
 		
@@ -46,6 +50,15 @@ class ServiceActivator implements Chain, Poller, QoS, orcha.lang.compiler.refere
 			
 		}
 		
+		if(sequenceSize > 1) {
+			
+			Element header = headerEnricher("sequenceSize", sequenceSize.toString())
+			chain.addContent(header)
+			
+			header = headerEnricher("sequenceNumber", sequenceNumber.toString())
+			chain.addContent(header)
+			
+		}
 		
 		Element serviceActivatorElement
 				

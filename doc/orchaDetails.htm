@@ -45,14 +45,13 @@
         	</p>
         	<p>For Orcha, the language family is that one of human activities. So Orcha (ORChestration of Human Activities) is a <i>first language</i> of the family of human activities common to human beings and machines.
         	</p>
-        	<p>To be used by humans, not only Information Technology specialists, but for everybody, Orcha has:
+        	<p>To be used by humans, not only Information Technology specialists, but for everybody, Orcha has:</p>
         		<ul>
         			<li>Instructions describing daily life activities</li>
         			<li>Almost no learning time</li>
         			<li>Out of the box use with a simple <a href="#tooling">tooling</a></li>
         		</ul>
-        	</p>
-        	<p>To be a <i>first language</i> of the family of human activities:
+        	<p>To be a <i>first language</i> of the family of human activities:</p>
         		<ul>
         			<li>Activities triggered by events for <a href="#event">real world/virtual world interactions</a></li>
         			<li>Orcha is <a href="#businessAdaptation">adaptable to any domain/business</a></li>
@@ -60,14 +59,12 @@
  					<li>While an activity is processed, Orcha accepts the <a href="#activityAddition">addition of new activities</a> to reflect changes in the business</li>
 					<li>Orcha relies and improves <a href="#method">enterprise practices</a> so it can be easily adopted</li>
         		</ul>
-        	</p>
-        	<p>To be used by machines :
+        	<p>To be used by machines :</p>
         		<ul>
         			<li>Orcha programs have a few <a href="#language">instructions</a> (compute, receive, from, send, to, condition, when)</li>
         			<li>Orcha programs are represented by simple abstract syntax trees easy to parse by programs</li>
         			<li>All terms added to the instructions set that enhance the vocabulary of Orcha are fully specified by a simple language easy to interpret by programs (the <a href="#configuration">Orcha configuration language</a>)</li>
-        		</ul>
-        	</p>
+        		</ul> 
         </div>  
       </div>
            
@@ -214,7 +211,7 @@
           <code>receive event from orchaEventHandler<br>
           </code>
           <p>receives all the events from all the send instructions. In order to select the events to be received, which is often useful, a condition can be added to the receive instruction:</p>
-          <code>receive event from orchaEventHandler condition event.price < 1000<br>
+          <code>receive event from orchaEventHandler condition event.price &lt; 1000<br>
           </code>
           <p>Events are filtered so only the selected events will be processed.</p>
           <p>Notice that the above receive instruction receives and filters the local events (events sent by any send instruction from all the running Orcha programs). But this publication/subscription mechanism can be used remotely using a message broker. Simply use the instruction</p>
@@ -245,13 +242,11 @@
           </code>
           <p>Unlike procedural programming where subprograms are sometimes used to improve the readability, Orcha subprograms are used to:
           </p>
-          <p>
-          	<ul>
+          <ul>
           		<li>Improve performance and reliability because subprograms are loosely coupled components that can be processed in different processes or machines</li>
           		<li>Enhance the reusability of Orcha subprograms that can be integrated into many main programs</li>
           		<li>Modelize high level business/domain activities in main program hiding low level details in subprograms</li>
-          	</ul>
-          </p>
+          </ul>
       </div>  
       </div>
            
@@ -283,7 +278,7 @@
           compute vendor2 with order.value<br><br>
           when "(vendor1 terminates) and (vendor2 terminates)"<br>
           compute selectBestVendor with vendor1.result, vendor2.result<br>
-          when  "selectBestVendor terminates condition price<1000"<br>
+          when  "selectBestVendor terminates condition price &lt; 1000"<br>
 		  send selectBestVendor.result to seller<br>
           </code>
           
@@ -311,16 +306,13 @@
           <p>
           The Orcha configuration language is divided into two parts:
           </p>
-          <p>
           	<ul>
           		<li>The configuration of service calls (an application call) with the compute instruction</li>
           		<li>The configuration of the event sources or destination sources for the receive and send instructions</li>
           	</ul>
-          </p>
           <p>
-          </p>For a service call, the configuration defines:
+          <p>For a service call, the configuration defines:
           </p>
-          <p>
           	<ul>
           		<li>The location of the service. Is it a local or a remote service (a web service for instance)?</li>
           		<li>The protocol to access the service (http for instance)</li>
@@ -328,7 +320,6 @@
           		<li>What is the returned type?</li>
           		<li>Optionally the programming language of the service</li>
           	</ul>          
-          </p>
           <p>Here is an example of a configuration for a service running on the local machine written in the JavaScript language:
           </p>
           <code>Application vendor1(){<br>
@@ -342,13 +333,11 @@
           <p>
           For an event source or a destination source, the configuration defines:
           </p>
-          <p>
           	<ul>
           		<li>The kind of sources or destinations. Is it a SQL database, a NoSQL database, a file, an Email…?</li>
           		<li>The data format for the content of the event</li>
           		<li>How and when events are triggered (the frequency at which files are read for example)?</li>
           	</ul>
-          </p>
           <p>
           Here is an example of a configuration where the files of a directory are used as source of events:
           </p>
@@ -363,7 +352,6 @@
           <p>
           The reference implementation of Orcha relies on an integration framework offering many configuration options. Here are the current list of these options:
           </p>
-          <p>
           	<ul>
           		<li>AMQP</li>
           		<li>Feed</li>
@@ -386,7 +374,6 @@
           		<li>Web Sockets</li>
           		<li>XMPP</li>
           	</ul>
-          </p>
           <p>However, the actual version of Orcha offers a few of these options, but it has been designed to facilitate the integration of the other options.
           </p>
           
@@ -409,30 +396,26 @@
           All the stakeholders of an Orcha project (business analysts, operations and developers) can use the same tool to write Orcha programs, their configurations and the associated services: an Integrated Development Environment (IDE). An IDE supporting the Groovy language must be chosen since the configuration language for Orcha programs is Groovy. Many open source IDE can be used like <a href="https://spring.io/tools/ggts">Eclipse</a>.
           </p>
           <p>
-          It is recommended to share a single Orcha project with all the stakeholders during the life cycle of the project. Usual practices in software development used in a DevOps approach are recommended:
+          It is recommended to share a single Orcha project with all the stakeholders during the life cycle of the project. Usual practices in software development used in a DevOps approach are recommended:</p>
           	<ul>
           		<li>Share the Orcha program, its different configurations and the associated services in a repository of code and use revision control systems like <a href="https://github.com/">github</a> to archive the different versions</li>
           	</ul>
-		
-		</p>
 		<p>The principle of revision control systems like <a href="https://en.wikipedia.org/wiki/Git">Git</a> is: a server centralizes all the programs and their configurations with all the histories of modifications. Then each stakeholder gets on his own machine a copy of the project or only the part of the project he/she is interested in.
 		</p>
 		<p>See the how-to tutorial to discover how to use these tools.
 		</p>
-		<p>Advanced practices from the DevOps approach may also be used for complex projects:
+		<p>Advanced practices from the DevOps approach may also be used for complex projects:</p>
 			<ul>
 			<li>Use the same environment for testing and production</li>
 			<li>Automate testing</li>
 			<li>...</li>
 			</ul>
-		</p>
-		<p>These tool will allow you to generate executable programs. Executable Orcha programs are:
+		<p>These tool will allow you to generate executable programs. Executable Orcha programs are:</p>
 			<ul>
 				<li>Portable: Java must be installed to run an Orcha program.</li>
 				<li>Lightweight: the weight of an Orcha program is few tens of Mo</li>
 				<li><a href="https://projects.spring.io/spring-boot/">Spring Boot</a> programs: the de facto open source standard for enterprise application in Java</li>
 			</ul>
-		</p>
             </div>  
       </div>
       

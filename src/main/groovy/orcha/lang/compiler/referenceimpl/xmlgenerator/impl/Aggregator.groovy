@@ -17,11 +17,42 @@ class Aggregator implements Transformer, QoS{
 		this.xmlSpringIntegration = xmlSpringIntegration;
 	}
 	
-	public void aggregate(InstructionNode instructionNode, String releaseExpression, String transformerExpression, boolean isMultipleArgumentsInExpression) {
+	public void aggregate(InstructionNode instructionNode, String releaseExpression, List<String> applicationsNames, String transformerExpression, boolean isMultipleArgumentsInExpression) {
 		
 		Element rootElement = xmlSpringIntegration.getRootElement()
 		
 		Namespace namespace = Namespace.getNamespace("int", "http://www.springframework.org/schema/integration")
+		
+		
+		boolean sameEvent = instructionNode.options.sameEvent
+		
+		// in the case of when "(codeToBenchmark1 terminates condition == -1) and (codeToBenchmark2 terminates condition == 1)"
+		// codeToBenchmark1 should be received first, then codeToBenchmark2. So a resequencer of messages is needed
+		
+		int sequenceSize = applicationsNames.size()
+		
+		if(sequenceSize > 1) {
+
+			Element resequencerElement = new Element("resequencer", namespace)
+			resequencerElement.setAttribute("id", "resequencer-"+instructionNode.inputName+"-id")
+			resequencerElement.setAttribute("input-channel", instructionNode.inputName)
+			resequencerElement.setAttribute("output-channel", instructionNode.inputName + "Resequencer")
+			resequencerElement.setAttribute("release-partial-sequences", "false")
+			resequencerElement.setAttribute("release-strategy-expression", "size()==" + sequenceSize)
+			
+			if(sameEvent == true){
+				
+				resequencerElement.setAttribute("correlation-strategy-expression", "headers['messageID']")
+						
+			} else {
+			
+				resequencerElement.setAttribute("correlation-strategy-expression", "0")
+											
+			}
+			
+			rootElement.addContent(resequencerElement)
+	
+		}
 		
 		Instruction instruction = instructionNode.instruction
 					 
@@ -31,11 +62,15 @@ class Aggregator implements Transformer, QoS{
 			instructionNode.options = new QualityOfServicesOptions(sameEvent: false)
 		}
 			
-		boolean sameEvent = instructionNode.options.sameEvent
-		
 		Element aggregatorElement = new Element("aggregator", namespace)
 		aggregatorElement.setAttribute("id", "aggregator-"+instructionNode.inputName+"-id")
-		aggregatorElement.setAttribute("input-channel", instructionNode.inputName)
+		
+		if(sequenceSize > 1) {
+			aggregatorElement.setAttribute("input-channel", instructionNode.inputName + "Resequencer")
+		} else {
+			aggregatorElement.setAttribute("input-channel", instructionNode.inputName)
+		}
+		
 		aggregatorElement.setAttribute("output-channel", instructionNode.inputName + "Transformer")
 		aggregatorElement.setAttribute("release-strategy-expression", releaseExpression)
 		

@@ -20,6 +20,7 @@ import orcha.lang.compiler.qualityOfService.QualityOfService
 import orcha.lang.compiler.qualityOfService.QualityOfServicesOptions
 import orcha.lang.compiler.referenceimpl.ExpressionParser
 import orcha.lang.compiler.referenceimpl.xmlgenerator.XmlGenerator
+import orcha.lang.compiler.visitor.OrchaCodeParser
 import orcha.lang.compiler.visitor.OrchaCodeVisitor
 import orcha.lang.configuration.ComposeEventAdapter
 import orcha.lang.configuration.ConfigurableProperties
@@ -506,8 +507,26 @@ class JDom2XmlGeneratorForSpringIntegration implements XmlGenerator{
 			// compute appli1
 			// when "appli1 fails"
 			boolean computeFails = (null != nodes.find { expressionParser.isComputeFailsInExpression(instructionNode, it.instruction.variable) })
-					
-			generateApplication(instructionNode, computeFails, failChannel, xmlSpringIntegration)
+			
+			int sequenceNumber
+			int sequenceSize
+			
+			nodes.each { whenNode ->	// when "(codeToBenchmark1 terminates condition == -1) and (codeToBenchmark2 terminates condition == 1)"
+										// codeToBenchmark1 should be received first, then codeToBenchmark2. So a resequencer of messages is needed
+				List<String> applicationsNames = expressionParser.getApplicationsNamesInExpression(whenNode.instruction.variable, graphOfInstructions)
+				
+				sequenceSize = applicationsNames.size()
+				
+				sequenceNumber = applicationsNames.findIndexOf{ it == instructionNode.instruction.springBean.name }
+				
+			}
+				
+			if(sequenceSize > 1) {
+				sequenceNumber++
+				generateApplication(instructionNode, sequenceNumber, sequenceSize, computeFails, failChannel, xmlSpringIntegration)
+			} else {
+				generateApplication(instructionNode, computeFails, failChannel, xmlSpringIntegration)
+			}			
 			
 		} else if(instruction.instruction == "when"){
 			
@@ -531,9 +550,10 @@ class JDom2XmlGeneratorForSpringIntegration implements XmlGenerator{
 					String releaseExpression = expressionParser.releaseExpression(orchaExpression, graphOfInstructions)
 					String transformerExpression = expressionParser.aggregatorTransformerExpression(orchaExpression, instructionNode, graphOfInstructions)
 					boolean isMultipleArgumentsInExpression = expressionParser.isMultipleArgumentsInExpression(orchaExpression, instructionNode, graphOfInstructions)
-					
+					List<String> applicationsNames = expressionParser.getApplicationsNamesInExpression(instructionNode.instruction.variable, graphOfInstructions)
+				
 					Aggregator aggregator = new Aggregator(xmlSpringIntegration)
-					aggregator.aggregate(instructionNode, releaseExpression, transformerExpression, isMultipleArgumentsInExpression)
+					aggregator.aggregate(instructionNode, releaseExpression, applicationsNames, transformerExpression, isMultipleArgumentsInExpression)
 	
 				} else {
 				
@@ -602,6 +622,27 @@ class JDom2XmlGeneratorForSpringIntegration implements XmlGenerator{
 			
 		} else {
 			throw new OrchaCompilationException(eventHandler.toString() + " not supported yet.")
+		}
+	}
+	
+	private void generateApplication(InstructionNode instructionNode, int sequenceNumber, int sequenceSize, boolean computeFails, String failChannel, Document xmlSpringIntegration){
+		
+		ServiceActivator serviceActivator = new ServiceActivator(xmlSpringIntegration)
+		
+		if(instructionNode.instruction.springBean.input.adapter instanceof JavaServiceAdapter){
+			
+			boolean isScript = false
+			serviceActivator.service(instructionNode, sequenceNumber, sequenceSize, computeFails, failChannel, isScript)
+			
+		} else if(instructionNode.instruction.springBean.input.adapter instanceof ScriptServiceAdapter){
+		
+			boolean isScript = true
+			serviceActivator.service(instructionNode, sequenceNumber, sequenceSize, computeFails, failChannel, isScript)
+			
+		} else if(instructionNode.instruction.springBean.input.adapter instanceof OrchaServiceAdapter){
+			
+			this.generateRedirectInputEventToSendEventHandler(instructionNode, xmlSpringIntegration)
+	
 		}
 	}
 	
