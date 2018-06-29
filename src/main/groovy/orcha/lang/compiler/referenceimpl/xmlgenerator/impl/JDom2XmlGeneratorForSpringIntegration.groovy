@@ -189,6 +189,10 @@ class JDom2XmlGeneratorForSpringIntegration implements XmlGenerator{
 					
 					// 2
 					int numberOfSameEvent = beforeWhen.findAll { instrucNode ->
+						
+						instrucNode.options != null &&
+						
+						
 					instrucNode.options.sameEvent == eventName }.size()
 							
 					if(numberOfSameEvent != numberOfBeforeWhen){
@@ -502,6 +506,10 @@ class JDom2XmlGeneratorForSpringIntegration implements XmlGenerator{
 			
 			// when nodes
 			List<InstructionNode> nodes = orchaCodeParser.findNextNode(instructionNode)
+			
+			if(nodes.size() > 1) {
+				generateRouterForEventHandlers(instructionNode, xmlSpringIntegration)
+			}
 			
 			// is a when node with a fails :
 			// compute appli1

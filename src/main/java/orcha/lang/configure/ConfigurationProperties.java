@@ -10,17 +10,17 @@ package orcha.lang.configure;
 @org.springframework.boot.context.properties.ConfigurationProperties(prefix = "driving")
 public class ConfigurationProperties {
 
-    public ConfigurationProperties.ComputesInSeriesOutputFile computesInSeriesOutputFile = new ComputesInSeriesOutputFile();
+    public ConfigurationProperties.TravelAgencyCustomer travelAgencyCustomer = new TravelAgencyCustomer();
 
-    public ConfigurationProperties.ComputesInSeriesOutputFile getComputesInSeriesOutputFile() {
-        return computesInSeriesOutputFile;
+    public ConfigurationProperties.TravelAgencyCustomer getTravelAgencyCustomer() {
+        return travelAgencyCustomer;
     }
 
-    public void setComputesInSeriesOutputFile(ConfigurationProperties.ComputesInSeriesOutputFile computesInSeriesOutputFile) {
-        this.computesInSeriesOutputFile = computesInSeriesOutputFile;
+    public void setTravelAgencyCustomer(ConfigurationProperties.TravelAgencyCustomer travelAgencyCustomer) {
+        this.travelAgencyCustomer = travelAgencyCustomer;
     }
 
-    public class ComputesInSeriesOutputFile {
+    public class TravelAgencyCustomer {
 
         public String directory;
         public String filename;

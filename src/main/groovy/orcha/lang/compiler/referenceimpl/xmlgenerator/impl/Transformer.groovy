@@ -82,7 +82,7 @@ trait Transformer implements Bean, QoS{
 		
 		transformer.addContent(beanElement)
 		
-		return transform
+		return transformer
 		
 	}
 	

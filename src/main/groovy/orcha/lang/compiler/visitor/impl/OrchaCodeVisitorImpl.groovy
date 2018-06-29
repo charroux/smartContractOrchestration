@@ -588,14 +588,6 @@ class OrchaCodeVisitorImpl extends OrchaCodeVisitor{
 				graphOfInstructions.add(instructionNode)
 			}
 			
-/*			String[] instructions = this.toStringGraphOfInstructions()
-			for(String s: instructions){
-				println s
-			}
-			
-			
-			println "----------------------------"*/
-
 			Iterator<InstructionNode> listOfNodes = graphOfInstructions.iterator()
 			
 			int lNumber = 1
@@ -624,20 +616,17 @@ class OrchaCodeVisitorImpl extends OrchaCodeVisitor{
 					
 			//		InstructionNode instructionAfterWhen = listOfNodes.next()
 			//		instructionNode.next = new InstructionNode(instruction: instructionAfterWhen.instruction, next: null)
+					
+				} else if(instructionNode.instruction.instruction == "compute"){
+			
+					def allWhenNodes = graphOfInstructions.findAll { it.instruction.instruction == "when" && expressionParser.getApplicationsNamesInExpression(it.instruction.variable, graphOfInstructions).contains(instructionNode.instruction.variable) }
+
+					println allWhenNodes.size()					
 				}
 				
 				lNumber++
 				
 			}
-
-	/*		println 'ddeeeeeeeeeeebbbbbbbbbbbbbbuuuuutttttttt'
-						
-			instructions = this.toStringGraphOfInstructions()
-			for(String s: instructions){
-				println s
-			}
-			
-			println 'ddeeeeeeeeeeebbbbbbbbbbbbbbuuuuutttttttt'*/
 			
 			def alreadyHandledNodes = []
 			
@@ -665,7 +654,6 @@ class OrchaCodeVisitorImpl extends OrchaCodeVisitor{
 				
 					alreadyHandledNodes.addAll(receivesWithSameEventHandler)
 					
-					//Instruction genericReceiveInstruction = new Instruction(instruction: "receive", variable: null, variableProperty: null, springBean: receivesWithSameEventHandler.getAt(0).instruction.springBean, withs: null, condition: null)
 					Instruction genericReceiveInstruction = this.getGenericReceiveInstruction(lineNumber, receivesWithSameEventHandler.getAt(0).instruction.springBean)
 					lineNumber++
 					
@@ -726,11 +714,6 @@ class OrchaCodeVisitorImpl extends OrchaCodeVisitor{
 					i++
 				}
 				
-/*				println "when node j = " + whenNode
-				whenNodesWithSameApplications.each {
-					println "when node j = " + it
-				}*/
-				
 				InstructionNode newRootNode
 				
 				if(whenNodesWithSameApplications.size() > 0){		// whenNode has other nodes with the same applications
@@ -739,30 +722,20 @@ class OrchaCodeVisitorImpl extends OrchaCodeVisitor{
 					whenNodesWithSameApplications.each{
 						alreadyHandledInstructions.add(it.instruction.id)
 					}
-					
-					//Instruction genericWhenInstruction = new Instruction(instruction: "when", variable: null, variableProperty: null, springBean: null, withs: null, condition: null)
-					Instruction genericWhenInstruction = this.getGenericWhenInstruction(lineNumber)
+
+										Instruction genericWhenInstruction = this.getGenericWhenInstruction(lineNumber)
 					lineNumber++
 					
 					newRootNode = new InstructionNode(instruction: genericWhenInstruction, next: null)
 
-					//List<InstructionNode> precedingNodes = this.findAllPrecedingNodes(whenNode)
-					
-					// add the generic when node (newRootNode) as an adjacent node to the related compute
-					
 					String[] applicationNames = expressionParser.getApplicationsNamesInExpression(whenNode.instruction.variable, graphOfInstructions)
 					
 					for(i=0; i<applications.length; i++){
 											
 						def precedingNodes = graphOfInstructions.find{ it.instruction.instruction=="compute" && it.instruction.variable==applications[i].name && applicationNames.contains(it.instruction.variable) }
 						
-						//println 'ok = ' + precedingNodes.size()
-						
 						precedingNodes.each { precedingNode ->
 							precedingNode.next = newRootNode
-							
-							//println 'precedingNode = ' + precedingNode
-							//println 'newRootNode = ' + newRootNode
 						}
 					}
 					
@@ -806,15 +779,10 @@ class OrchaCodeVisitorImpl extends OrchaCodeVisitor{
 				} else if(alreadyHandledInstructions.contains(whenNode.instruction.id)==false){	// when node has no other nodes with the same applications
 					
 					alreadyHandledInstructions.add(whenNode.instruction.id)
-					
-					//println 'whhhhennn : ' + whenNode
 
 					String[] applicationNames = expressionParser.getApplicationsNamesInExpression(whenNode.instruction.variable, graphOfInstructions)
-					
-					//println 'applicationNames : ' + applicationNames.length + ' ' + applicationNames[0]
-					
 
-					
+										
 					for(i=0; i<applications.length; i++){
 
 						// from the when instruction : find backward the related compute node having applications[i].name has variable
@@ -827,16 +795,10 @@ class OrchaCodeVisitorImpl extends OrchaCodeVisitor{
 						while(j>=0 && computedNode==false){
 							n = graphOfInstructions.get(j)
 							
-							//println 'found = ' + n
-							
 							computedNode = n.instruction.instruction=="compute" && n.instruction.variable==applications[i].name									
 							j--
 						}
-						
-						// put the when node has an adjacency node of compute
-						
-						//println 'node before when : ' + n
-						 
+							 
 						n.next = new InstructionNode(instruction: whenNode.instruction, next: null)
 						
 					}
@@ -847,8 +809,6 @@ class OrchaCodeVisitorImpl extends OrchaCodeVisitor{
 				// put the instruction next to when as an adjacency node
 				
 				def nodeAfterWhen = graphOfInstructions.find{ it.instruction.id == (whenNode.instruction.id+1) }
-				
-				//println 'nodeAfterWhen = ' + nodeAfterWhen
 				
 				whenNode.next = new InstructionNode(instruction: nodeAfterWhen.instruction, next: null)
 				
@@ -862,8 +822,7 @@ class OrchaCodeVisitorImpl extends OrchaCodeVisitor{
 					}
 					
 					if(whenNodesWithSameApplications.size() == 0){
-						
-						//Instruction genericWhenInstruction = new Instruction(instruction: "when", variable: null, variableProperty: null, springBean: null, withs: null, condition: null)
+				
 						Instruction genericWhenInstruction = this.getGenericWhenInstruction(lineNumber)
 						lineNumber++
 						
@@ -872,10 +831,7 @@ class OrchaCodeVisitorImpl extends OrchaCodeVisitor{
 						String[] applicationNames = expressionParser.getApplicationsNamesInExpression(whenNode.instruction.variable, graphOfInstructions)
 						
 						for(i=0; i<applications.length; i++){
-					
-							//def precedingNodes = graphOfInstructions.find{ it.instruction.instruction=="compute" && it.instruction.variable==applications[i].name }
-	
-							
+											
 							def precedingNodes = graphOfInstructions.find{ it.instruction.instruction=="compute" && it.instruction.variable==applications[i].name && applicationNames.contains(it.instruction.variable) }
 	
 							precedingNodes.each { precedingNode ->
@@ -883,11 +839,6 @@ class OrchaCodeVisitorImpl extends OrchaCodeVisitor{
 							}
 						}
 					
-/*						List<InstructionNode> precedingNodes = this.findAllPrecedingNodes(whenNode)
-						precedingNodes.each { precedingNode ->
-							precedingNode.next = newRootNode
-						}
-*/						
 						int index = 0;
 						while(graphOfInstructions.getAt(index)!=whenNode){
 							index++
@@ -928,13 +879,6 @@ class OrchaCodeVisitorImpl extends OrchaCodeVisitor{
 					}
 				}
 			}
-			
-/*			instructions = this.toStringGraphOfInstructions()
-			for(String s: instructions){
-				println s
-			}
-			
-			println 'ffffffffffffiiiiiiiiiiiiiiiiinnnnnnnnnnnnnnnnnnn'*/
 			
 			log.info 'Syntax analysis of the the Orcha program complete successfully'
 			
