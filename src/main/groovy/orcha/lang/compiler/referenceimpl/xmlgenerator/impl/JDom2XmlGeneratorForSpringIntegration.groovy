@@ -272,10 +272,33 @@ class JDom2XmlGeneratorForSpringIntegration implements XmlGenerator{
 			}
 		}
 		
+		InstructionNode whenNode
+		
 		nodes = orchaCodeVisitor.findAllComputeNodes()
 		nodes.each { node ->
+			
 			node.outputName = node.instruction.springBean.name + "Output"
+			
+			whenNode = node.next
+			while(whenNode != null) {
+
+				def orchaExpression = whenNode.instruction.variable
+				
+				List<String> applicationsNames = expressionParser.getApplicationsNamesInExpression(orchaExpression, graphOfInstructions)
+										
+				String aggregatorName = ""
+				for(String name: applicationsNames){
+					aggregatorName = aggregatorName + name
+				}
+										
+				whenNode.outputName = aggregatorName + "AggregatorInput"
+				//whenNode.inputName = node.outputName
+				whenNode = whenNode.next
+			}
+			
 		}
+		
+		
 		
 		nodes = orchaCodeVisitor.findAllWhenNodesWithDifferentApplicationsInExpression()
 		
@@ -343,7 +366,7 @@ class JDom2XmlGeneratorForSpringIntegration implements XmlGenerator{
 					node.inputName = rootNode.inputName
 					node.outputName = rootNode.inputName + "Route" + index
 	
-					InstructionNode whenNode = orchaCodeVisitor.findAdjacentNode(node)
+					whenNode = orchaCodeVisitor.findAdjacentNode(node)
 				
 					whenNode.inputName = node.outputName
 					whenNode.outputName = rootNode.outputName + "Route" + index
@@ -368,6 +391,7 @@ class JDom2XmlGeneratorForSpringIntegration implements XmlGenerator{
 			}
 		}
 		
+		
 		InstructionNode node
 		
 		nodes = orchaCodeVisitor.findAllNodes()
@@ -384,7 +408,7 @@ class JDom2XmlGeneratorForSpringIntegration implements XmlGenerator{
 						if(orchaExpression == null){
 							orchaExpression = node.next.instruction.variable
 						}
-						if(expressionParser.isComputeFailsInExpression(beforeWhenNode, orchaExpression) == false){
+						if(expressionParser.isComputeFailsInExpression(beforeWhenNode, orchaExpression) == false  && beforeWhenNode.next!=null && beforeWhenNode.next.next==null){
 							beforeWhenNode.outputName = node.inputName
 						}
 					}
@@ -507,9 +531,9 @@ class JDom2XmlGeneratorForSpringIntegration implements XmlGenerator{
 			// when nodes
 			List<InstructionNode> nodes = orchaCodeParser.findNextNode(instructionNode)
 			
-			if(nodes.size() > 1) {
+			/*if(nodes.size() > 1) {
 				generateRouterForEventHandlers(instructionNode, xmlSpringIntegration)
-			}
+			}*/
 			
 			// is a when node with a fails :
 			// compute appli1
@@ -534,7 +558,11 @@ class JDom2XmlGeneratorForSpringIntegration implements XmlGenerator{
 				generateApplication(instructionNode, sequenceNumber, sequenceSize, computeFails, failChannel, xmlSpringIntegration)
 			} else {
 				generateApplication(instructionNode, computeFails, failChannel, xmlSpringIntegration)
-			}			
+			}
+			
+			if(nodes.size() > 1) {
+				generateRouterForEventHandlers(instructionNode, xmlSpringIntegration)
+			}
 			
 		} else if(instruction.instruction == "when"){
 			

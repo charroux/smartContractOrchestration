@@ -114,6 +114,12 @@ class OrchaCodeVisitorImpl extends OrchaCodeVisitor{
 			node = graphOfInstructions.find { it.instruction == node.instruction }
 			node = graphOfInstructions.find { it.instruction == node.next.instruction }
 			nodes.add(  node )
+		}  else if(node.instruction.instruction=="compute" && node.next!=null){
+			node = graphOfInstructions.find { it.instruction == node.instruction }
+			while(node.next != null) {
+				nodes.add(  graphOfInstructions.find { it.instruction == node.next.instruction } )
+				node = node.next
+			}
 		} else {
 			node = this.findNextRawNode(node)
 			if(node != null){
@@ -619,9 +625,14 @@ class OrchaCodeVisitorImpl extends OrchaCodeVisitor{
 					
 				} else if(instructionNode.instruction.instruction == "compute"){
 			
-					def allWhenNodes = graphOfInstructions.findAll { it.instruction.instruction == "when" && expressionParser.getApplicationsNamesInExpression(it.instruction.variable, graphOfInstructions).contains(instructionNode.instruction.variable) }
+					/*def allWhenNodes = graphOfInstructions.findAll { it.instruction.instruction == "when" && expressionParser.getApplicationsNamesInExpression(it.instruction.variable, graphOfInstructions).contains(instructionNode.instruction.variable) }
 
-					println allWhenNodes.size()					
+					println allWhenNodes.size()	+ " => " + 	instructionNode
+					
+					allWhenNodes.each{
+						instructionNode.next = it
+						instructionNode = instructionNode.next
+					}*/
 				}
 				
 				lNumber++
@@ -723,7 +734,7 @@ class OrchaCodeVisitorImpl extends OrchaCodeVisitor{
 						alreadyHandledInstructions.add(it.instruction.id)
 					}
 
-										Instruction genericWhenInstruction = this.getGenericWhenInstruction(lineNumber)
+					Instruction genericWhenInstruction = this.getGenericWhenInstruction(lineNumber)
 					lineNumber++
 					
 					newRootNode = new InstructionNode(instruction: genericWhenInstruction, next: null)
@@ -761,7 +772,7 @@ class OrchaCodeVisitorImpl extends OrchaCodeVisitor{
 					newRootNode.next = newNode
 					newRootNode = newNode
 					
-					// add all the nodes with the same application as adjacancy node
+					// add all the nodes with the same application as adjacency node
 					
 					whenNodesWithSameApplications.each {
 						newNode = new InstructionNode(instruction: it.instruction, next: null)
@@ -798,7 +809,11 @@ class OrchaCodeVisitorImpl extends OrchaCodeVisitor{
 							computedNode = n.instruction.instruction=="compute" && n.instruction.variable==applications[i].name									
 							j--
 						}
-							 
+							
+						while(n.next != null) {
+							n = n.next
+						} 
+						
 						n.next = new InstructionNode(instruction: whenNode.instruction, next: null)
 						
 					}
@@ -893,6 +908,10 @@ class OrchaCodeVisitorImpl extends OrchaCodeVisitor{
 	
 	private Instruction getGenericWhenInstruction(int lineNumber){
 		return new Instruction(id: lineNumber, instruction: "when", variable: null, variableProperty: null, springBean: null, withs: null, condition: null)
+	}
+	
+	private Instruction getGenericComputeInstruction(int lineNumber){
+		return new Instruction(id: lineNumber, instruction: "compute", variable: null, variableProperty: null, springBean: null, withs: null, condition: null)
 	}
 		
 	/*@Override

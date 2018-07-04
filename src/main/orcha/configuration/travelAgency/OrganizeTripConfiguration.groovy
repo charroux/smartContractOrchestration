@@ -30,8 +30,8 @@ class OrganizeTripConfiguration {
 	@Bean
 	Application selectTrain(){
 		def program = new Application(name: "selectTrain", specifications: "Select a train.", description: "Select a train.", language: "groovy")
-		def javaAdapter = new JavaServiceAdapter(javaClass: 'configuration.travelAgency.TravelInfo', method:'select')
-		program.input = new Input(type: "java.util.List", adapter: javaAdapter)
+		def javaAdapter = new JavaServiceAdapter(javaClass: 'service.travelAgency.TrainSelection', method:'select')
+		program.input = new Input(type: "configuration.travelAgency.TravelInfo", adapter: javaAdapter)
 		program.output = new Output(type: "service.travelAgency.SelectedTrain", adapter: javaAdapter)
 		return program
 	}
