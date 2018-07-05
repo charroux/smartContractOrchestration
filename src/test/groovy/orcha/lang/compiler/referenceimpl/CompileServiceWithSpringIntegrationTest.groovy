@@ -1042,17 +1042,57 @@ class CompileServiceWithSpringIntegrationTest {
 		Document xmlSpringIntegration = builder.build(pathToXmlFile)
 		
 		XPathFactory xFactory = XPathFactory.instance()
-
-		/*
-		// <int:transformer id="transformer-serviceWithEventSourcingAfterServiceServiceAcivatorOutput-id" input-channel="serviceWithEventSourcingAfterServiceServiceAcivatorOutput" output-channel="serviceWithEventSourcingAfterServiceAggregatorInput" method="transform">
-		//		<int:request-handler-advice-chain>
-		//  		<ref bean="eventSourcingMongoDBAdvice" />
-		//		</int:request-handler-advice-chain>
+		
+		// <int:transformer id="transformer-selectTrainServiceAcivatorOutput-id" input-channel="selectTrainServiceAcivatorOutput" output-channel="selectTrainOutput" method="transform">
+		//		<bean class="orcha.lang.compiler.referenceimpl.xmlgenerator.impl.ObjectToApplicationTransformer">
+		//		<property name="application" ref="selectTrain" />
+		//		</bean>
 		// </int:transformer>
-		XPathExpression<Element> expr = xFactory.compile("//*[local-name() = 'transformer']/*[local-name() = 'request-handler-advice-chain']/*[local-name() = 'ref']", Filters.element())
+		XPathExpression<Element> expr = xFactory.compile("//*[local-name() = 'transformer']", Filters.element())
 		
 		List<Element> elements = expr.evaluate(xmlSpringIntegration)
-		Assert.assertTrue(elements.size() == 2)*/
+		Assert.assertTrue(elements.size() == 10)
+
+		Element element = elements.get(1)
+		
+		// <int:recipient-list-router id="router-selectTrainOutput-id" input-channel="selectTrainOutput">
+		//		<int:recipient channel="selectTrainAggregatorInput" />
+		//		<int:recipient channel="selectHotelselectTrainAggregatorInput" />
+		//	</int:recipient-list-router>
+		expr = xFactory.compile("//*[local-name() = 'recipient-list-router']", Filters.element())
+		elements =  expr.evaluate(xmlSpringIntegration)
+		Assert.assertTrue(elements.size() == 1)
+		 
+		Element element1 = elements.get(0)
+		
+		Assert.assertEquals(element.getAttribute("output-channel").getValue(), element1.getAttribute("input-channel").getValue())
+		
+		// <int:recipient-list-router id="router-selectTrainOutput-id" input-channel="selectTrainOutput">
+		//		<int:recipient channel="selectTrainAggregatorInput" />
+		//		<int:recipient channel="selectHotelselectTrainAggregatorInput" />
+		//	</int:recipient-list-router>
+		expr = xFactory.compile("//*[local-name() = 'recipient-list-router']/*[local-name() = 'recipient']", Filters.element())
+		elements =  expr.evaluate(xmlSpringIntegration)
+
+		element = elements.get(0)
+		element1 = elements.get(1)
+		
+		// <int:aggregator id="aggregator-selectTrainAggregatorInput-id" input-channel="selectTrainAggregatorInput" output-channel="selectTrainAggregatorInputTransformer" release-strategy-expression="size()==1 and ( ([0].payload instanceof T(orcha.lang.configuration.Application) and [0].payload.state==T(orcha.lang.configuration.State).TERMINATED) )" correlation-strategy-expression="headers['messageID']" />
+		expr = xFactory.compile("//*[local-name() = 'aggregator']", Filters.element())
+		elements =  expr.evaluate(xmlSpringIntegration)
+ 
+		Element element2 = elements.get(0)
+ 
+		Assert.assertEquals(element.getAttribute("channel").getValue(), element2.getAttribute("input-channel").getValue())
+		
+		// <int:resequencer id="resequencer-selectHotelselectTrainAggregatorInput-id" input-channel="selectHotelselectTrainAggregatorInput" output-channel="selectHotelselectTrainAggregatorInputResequencer" release-partial-sequences="false" release-strategy-expression="size()==2" correlation-strategy-expression="headers['messageID']" />
+		expr = xFactory.compile("//*[local-name() = 'resequencer']", Filters.element())
+   	 	elements =  expr.evaluate(xmlSpringIntegration)
+ 
+		element = elements.get(0)
+ 
+		Assert.assertEquals(element1.getAttribute("channel").getValue(), element.getAttribute("input-channel").getValue())
+		
 	}
 	
 }

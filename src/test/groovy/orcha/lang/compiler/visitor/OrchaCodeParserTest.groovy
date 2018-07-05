@@ -297,5 +297,40 @@ class OrchaCodeParserTest {
 
 	}
 
+	@Test
+	void orchaCodeParserOrchaBroadcastEvent(){
+		
+		String orchaProgram = "package source.travelAgency\n"+
+		"domain travelAgency\n"+
+		"description 'organize a trip for a costumer'\n"+
+		"title 'organize trip'\n"+
+		"author 'Ben C.'\n"+
+		"version '1.0'\n"+
+		"receive travelInfo from travelAgency\n"+								// instruction 1
+		"compute selectTrain with travelInfo.value\n"+							// instruction 2
+		"when 'selectTrain terminates'\n"+										// instruction 3
+		"compute selectHotel with selectTrain.result\n"+						// instruction 4
+		"when 'selectHotel terminates and selectTrain terminates'\n"+			// instruction 5
+		"compute selectTaxi with selectTrain.result, selectHotel.result\n"+		// instruction 6
+		"when 'selectTaxi terminates'\n"+										// instruction 7
+		"send selectTaxi.result to travelAgencyCustomer"						// instruction 8
+		
+		OrchaCodeVisitor orchaCodeVisitor = orchaCodeParser.parse(orchaProgram)
+		
+		def allComputeNodes = orchaCodeVisitor.findAllComputeNodes()
+		InstructionNode node = allComputeNodes.get(0)
+		Assert.assertTrue(node.instruction.instruction == 'compute')
+		Assert.assertTrue(node.instruction.id == 2)
+		
+		def nextNodes = orchaCodeVisitor.findNextNode(node)
+		Assert.assertTrue(nextNodes.size() == 2)
+		node = nextNodes.get(0)
+		Assert.assertTrue(node.instruction.instruction == 'when')
+		Assert.assertTrue(node.instruction.id == 3)
+		node = nextNodes.get(1)
+		Assert.assertTrue(node.instruction.instruction == 'when')
+		Assert.assertTrue(node.instruction.id == 5)
+		
+	}
 
 }
