@@ -147,8 +147,8 @@ class OrchaCodeParserTest {
 		
 		
 		nextNodes = orchaCodeVisitor.findNextNode(node)
-		Assert.assertTrue(nextNodes.size() == 2)
-		InstructionNode whenNode1 = nextNodes.get(0)
+		Assert.assertTrue(nextNodes.size() == 3)
+		InstructionNode whenNode1 = nextNodes.get(1)		// nextNodes.get(0) is a generic when node
 		Assert.assertTrue(whenNode1.instruction.instruction == 'when')
 		Assert.assertTrue(whenNode1.instruction.id == 3)
 		
@@ -159,7 +159,7 @@ class OrchaCodeParserTest {
 		Assert.assertTrue(precedingNode.instruction.id == 2)
 		
 		
-		InstructionNode whenNode2 = nextNodes.get(1)
+		InstructionNode whenNode2 = nextNodes.get(2)
 		Assert.assertTrue(whenNode2.instruction.instruction == 'when')
 		Assert.assertTrue(whenNode2.instruction.id == 5)
 		

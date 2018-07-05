@@ -14,7 +14,7 @@
     </int:header-enricher>
   </int:chain>
   <int:chain input-channel="computesInSeriesInputFile-OutputChannel" output-channel="firstProgramServiceAcivatorOutput" id="service-activator-chain-firstProgramChannel-id">
-    <int:service-activator id="service-activator-firstProgramChannel-id" expression="@program1.myMethod(payload)">
+    <int:service-activator id="service-activator-firstProgramChannel-id" expression="@program1Test.myMethod(payload)">
       <int:request-handler-advice-chain />
     </int:service-activator>
   </int:chain>
@@ -29,7 +29,7 @@
     <bean class="orcha.lang.compiler.referenceimpl.xmlgenerator.impl.ApplicationToObjectTransformer" />
   </int:transformer>
   <int:chain input-channel="firstProgramAggregatorOutputTransformer" output-channel="secondProgramServiceAcivatorOutput" id="service-activator-chain-secondProgramChannel-id">
-    <int:service-activator id="service-activator-secondProgramChannel-id" expression="@program2.myMethod(payload)">
+    <int:service-activator id="service-activator-secondProgramChannel-id" expression="@program2Test.myMethod(payload)">
       <int:request-handler-advice-chain />
     </int:service-activator>
   </int:chain>

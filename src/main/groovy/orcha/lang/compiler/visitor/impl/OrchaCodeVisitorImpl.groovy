@@ -14,6 +14,7 @@ import orcha.lang.compiler.referenceimpl.ExpressionParser;
 import orcha.lang.compiler.visitor.OrchaCodeVisitor
 import orcha.lang.compiler.visitor.OrchaComplianceException
 import orcha.lang.compiler.visitor.MyClassLoader
+import orcha.lang.compiler.visitor.OrchaCodeParser
 import orcha.lang.configuration.Application
 
 import org.codehaus.groovy.ast.ClassCodeVisitorSupport;
@@ -896,6 +897,11 @@ class OrchaCodeVisitorImpl extends OrchaCodeVisitor{
 			}
 			
 			log.info 'Syntax analysis of the the Orcha program complete successfully'
+			
+			
+			for(String s: this.toStringGraphOfInstructions()) {
+				println s
+			}
 			
 		}
 		

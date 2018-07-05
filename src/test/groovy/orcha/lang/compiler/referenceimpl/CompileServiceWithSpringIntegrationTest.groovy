@@ -1001,5 +1001,58 @@ class CompileServiceWithSpringIntegrationTest {
 		
 	}
 
+
+	@Test
+	void broadcastEvent() {
+
+		// the Orcha source program
 		
+		String orchaProgram = "package source.travelAgency\n"+
+			"domain travelAgency\n"+
+			"description 'organize a trip for a costumer'\n"+
+			"title 'organize trip'\n"+
+			"author 'Ben C.'\n"+
+			"version '1.0'\n"+
+			"receive travelInfo from travelAgency\n"+
+			"compute selectTrain with travelInfo.value\n"+
+			"when 'selectTrain terminates'\n"+
+			"compute selectHotel with selectTrain.result\n"+
+			"when 'selectHotel terminates and selectTrain terminates'\n"+
+			"compute selectTaxi with selectTrain.result, selectHotel.result\n"+
+			"when 'selectTaxi terminates'\n"+
+			"send selectTaxi.result to travelAgencyCustomer"
+		
+		// construct the graph of instructions for the Orcha programm
+		
+		OrchaCodeVisitor orchaCodeVisitor = orchaCodeParser.parse(orchaProgram)
+		
+		// generate an XML file (Spring integration configuration): this is the file to be tested
+		 
+		String path = "." + File.separator + "src" + File.separator + "test" + File.separator + "resources" + File.separator
+		File destinationDirectory = new File(path)
+		compile.compile(orchaCodeVisitor, destinationDirectory)
+		
+		String xmlSpringContextFileName = orchaCodeVisitor.getOrchaMetadata().getTitle() + ".xml"
+		String pathToXmlFile = destinationDirectory.getAbsolutePath() + File.separator + xmlSpringContextFileName
+		
+		// parse the XML file checking is correctness
+		
+		SAXBuilder builder = new SAXBuilder()
+		
+		Document xmlSpringIntegration = builder.build(pathToXmlFile)
+		
+		XPathFactory xFactory = XPathFactory.instance()
+
+		/*
+		// <int:transformer id="transformer-serviceWithEventSourcingAfterServiceServiceAcivatorOutput-id" input-channel="serviceWithEventSourcingAfterServiceServiceAcivatorOutput" output-channel="serviceWithEventSourcingAfterServiceAggregatorInput" method="transform">
+		//		<int:request-handler-advice-chain>
+		//  		<ref bean="eventSourcingMongoDBAdvice" />
+		//		</int:request-handler-advice-chain>
+		// </int:transformer>
+		XPathExpression<Element> expr = xFactory.compile("//*[local-name() = 'transformer']/*[local-name() = 'request-handler-advice-chain']/*[local-name() = 'ref']", Filters.element())
+		
+		List<Element> elements = expr.evaluate(xmlSpringIntegration)
+		Assert.assertTrue(elements.size() == 2)*/
+	}
+	
 }

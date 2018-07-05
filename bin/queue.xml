@@ -14,7 +14,7 @@
     </int:header-enricher>
   </int:chain>
   <int:chain input-channel="queueInputFile-OutputChannel" output-channel="serviceWithQueueServiceAcivatorOutput" id="service-activator-chain-serviceWithQueueChannel-id">
-    <int:service-activator id="service-activator-serviceWithQueueChannel-id" expression="@enQueuedService.myMethod(payload)">
+    <int:service-activator id="service-activator-serviceWithQueueChannel-id" expression="@enQueuedServiceTest.myMethod(payload)">
       <int:request-handler-advice-chain />
     </int:service-activator>
   </int:chain>
@@ -23,7 +23,7 @@
       <property name="application" ref="serviceWithQueue" />
     </bean>
   </int:transformer>
-  <int:aggregator id="aggregator-serviceWithQueueAggregatorInput-id" input-channel="serviceWithQueueAggregatorInput" output-channel="serviceWithQueueAggregatorInputTransformer" release-strategy-expression="size()==1 and ( ([0].payload instanceof T(orcha.lang.configuration.Application) AND [0].payload.state==T(orcha.lang.configuration.State).TERMINATED) )" correlation-strategy-expression="headers['messageID']" />
+  <int:aggregator id="aggregator-serviceWithQueueAggregatorInput-id" input-channel="serviceWithQueueAggregatorInput" output-channel="serviceWithQueueAggregatorInputTransformer" release-strategy-expression="size()==1 and ( ([0].payload instanceof T(orcha.lang.configuration.Application) and [0].payload.state==T(orcha.lang.configuration.State).TERMINATED) )" correlation-strategy-expression="headers['messageID']" />
   <int:transformer id="transformer-serviceWithQueueAggregatorInput-id" input-channel="serviceWithQueueAggregatorInputTransformer" output-channel="serviceWithQueueAggregatorInputAggregatorOutput" expression="payload.?[name=='serviceWithQueue']" />
   <int:transformer id="transformer-serviceWithQueueAggregatorInputAggregatorOutput-id" input-channel="serviceWithQueueAggregatorInputAggregatorOutput" output-channel="serviceWithQueueAggregatorOutputTransformer" method="transform">
     <bean class="orcha.lang.compiler.referenceimpl.xmlgenerator.impl.ApplicationToObjectTransformer" />
