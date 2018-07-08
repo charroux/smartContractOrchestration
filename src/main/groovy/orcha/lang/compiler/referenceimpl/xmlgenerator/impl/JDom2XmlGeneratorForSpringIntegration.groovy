@@ -499,7 +499,7 @@ class JDom2XmlGeneratorForSpringIntegration implements XmlGenerator{
 				generateReceiveEventHandler(instructionNode, xmlSpringIntegration)
 				
 				if(instructionNode.next.instruction.instruction == "receive"){
-					generateRouterForEventHandlers(instructionNode, xmlSpringIntegration)
+					generateRouterForEventHandlers(instructionNode, expressionParser, graphOfInstructions, xmlSpringIntegration)
 					
 					InstructionNode node = instructionNode.next
 					
@@ -531,10 +531,6 @@ class JDom2XmlGeneratorForSpringIntegration implements XmlGenerator{
 			// when nodes
 			List<InstructionNode> nodes = orchaCodeParser.findNextNode(instructionNode)
 			
-			/*if(nodes.size() > 1) {
-				generateRouterForEventHandlers(instructionNode, xmlSpringIntegration)
-			}*/
-			
 			// is a when node with a fails :
 			// compute appli1
 			// when "appli1 fails"
@@ -553,7 +549,7 @@ class JDom2XmlGeneratorForSpringIntegration implements XmlGenerator{
 				
 			}
 				
-			if(sequenceSize > 1) {
+			if(sequenceSize>1 && nodes.size()==1) {
 				sequenceNumber++
 				generateApplication(instructionNode, sequenceNumber, sequenceSize, computeFails, failChannel, xmlSpringIntegration)
 			} else {
@@ -561,7 +557,7 @@ class JDom2XmlGeneratorForSpringIntegration implements XmlGenerator{
 			}
 			
 			if(nodes.size() > 1) {
-				generateRouterForEventHandlers(instructionNode, xmlSpringIntegration)
+				generateRouterForEventHandlers(instructionNode, expressionParser, graphOfInstructions, xmlSpringIntegration)
 			}
 			
 		} else if(instruction.instruction == "when"){
@@ -723,9 +719,9 @@ class JDom2XmlGeneratorForSpringIntegration implements XmlGenerator{
 
 	}
 	
-	private void generateRouterForEventHandlers(InstructionNode instructionNode, Document xmlSpringIntegration){
+	private void generateRouterForEventHandlers(InstructionNode instructionNode, ExpressionParser expressionParser, List<InstructionNode> graphOfInstructions, Document xmlSpringIntegration){
 		
-		RouterForEventHandler routerForEventHandler = new RouterForEventHandler(xmlSpringIntegration)
+		RouterForEventHandler routerForEventHandler = new RouterForEventHandler(xmlSpringIntegration, expressionParser, graphOfInstructions)
 		routerForEventHandler.routerForEventHandler(instructionNode)
 	
 	}

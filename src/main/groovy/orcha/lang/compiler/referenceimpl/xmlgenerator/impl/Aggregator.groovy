@@ -32,7 +32,7 @@ class Aggregator implements Transformer, QoS{
 		int sequenceSize = applicationsNames.size()
 		
 		if(sequenceSize > 1) {
-
+			
 			Element resequencerElement = new Element("resequencer", namespace)
 			resequencerElement.setAttribute("id", "resequencer-"+instructionNode.inputName+"-id")
 			resequencerElement.setAttribute("input-channel", instructionNode.inputName)

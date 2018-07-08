@@ -1,19 +1,29 @@
 package orcha.lang.compiler.referenceimpl.xmlgenerator.impl
 
 import orcha.lang.compiler.qualityOfService.QueueOption
+import orcha.lang.compiler.referenceimpl.ExpressionParser
+
+import java.util.List
+
 import org.jdom2.Document
 import org.jdom2.Element
 import org.jdom2.Namespace
+import org.springframework.beans.factory.annotation.Autowired
+
 import orcha.lang.compiler.Instruction
 import orcha.lang.compiler.InstructionNode
 
-class RouterForEventHandler implements QoS{
+class RouterForEventHandler implements QoS, Chain, HeaderEnricher{
 	
+	List<InstructionNode> graphOfInstructions
+	ExpressionParser expressionParser
 	Document xmlSpringIntegration
 	
-	public RouterForEventHandler(Document xmlSpringIntegration) {
+	public RouterForEventHandler(Document xmlSpringIntegration, ExpressionParser expressionParser, List<InstructionNode> graphOfInstructions) {
 		super();
 		this.xmlSpringIntegration = xmlSpringIntegration;
+		this.expressionParser = expressionParser
+		this.graphOfInstructions = graphOfInstructions
 	}
 	
 	public void routerForEventHandler(InstructionNode instructionNode){
@@ -32,7 +42,7 @@ class RouterForEventHandler implements QoS{
 		rootElement.addContent(router)
 		
 		InstructionNode node = instructionNode.next
-		int i=0
+		//int i=0
 		boolean  defaultChannel = true
 				
 		while(node != null){
@@ -40,10 +50,28 @@ class RouterForEventHandler implements QoS{
 			Instruction nextInstruction = node.instruction
 					
 			String channelName = node.outputName						
-									
+			
 			Element recipient = new Element("recipient", namespace)
-			recipient.setAttribute("channel", channelName)
-					
+	
+			
+			List<String> applicationsNames = expressionParser.getApplicationsNamesInExpression(node.instruction.variable, graphOfInstructions)
+			
+			int sequenceSize = applicationsNames.size()
+			if(sequenceSize > 1) {
+				recipient.setAttribute("channel", channelName + "Sequence")
+				int sequenceNumber = applicationsNames.findIndexOf{ it == instructionNode.instruction.springBean.name }
+				sequenceNumber++
+				Element chain = chain("sequenceNumber-" + channelName + "-id", channelName + "Sequence", channelName)
+				Element header = headerEnricher("sequenceSize", sequenceSize.toString())
+				chain.addContent(header)
+				header = headerEnricher("sequenceNumber", sequenceNumber.toString())
+				chain.addContent(header)				
+				rootElement.addContent(chain)	
+			} else {
+				recipient.setAttribute("channel", channelName)
+			}
+			
+			
 			if(nextInstruction.condition != null){
 
 				String selectorExpression = nextInstruction.condition.replaceFirst(nextInstruction.variable,"payload")
@@ -54,9 +82,9 @@ class RouterForEventHandler implements QoS{
 			}
 					
 			router.addContent(recipient)
-					
+		
 			node = node.next
-			i++
+			//i++
 		}
 				
 		if(defaultChannel == true){
@@ -81,6 +109,8 @@ class RouterForEventHandler implements QoS{
 			node = node.next
 			
 		}
+		
+
 	
 	}
 

@@ -144,6 +144,19 @@
           <p>
           It is not possible to group many instructions in a block and trigger them together when an event occurs. For instance, it is not possible to write two computes when a single event occurs. You should use a subprogram instead : conceptually, a group of instructions is a sub activity (see subprogram).
           </p>
+          <h3>Broadcasting of messages, synchronisation on several events and transmission of several events to a service</h3>
+          <p>It is always possible to combine several events in a when instruction. In the following example, the when instruction waits for two events
+L’instruction compute qui suit le when peut recevoir en argument un ou tous les événements de l’instruction when. 
+
+
+when "(codeToBenchmark2 terminates condition == 1) and (codeToBenchmark1 terminates condition == -1)"
+
+
+
+Si plusieurs arguments sont transmis à un compute, il seront reçu dans un tableau Javascript, une List Java, etc. ordonné selon l’ordre des arguments du compute. 
+
+Considération architecturale : plus un service requiert en argument des événements, plus il a un couplage fort avec d’autres services qui lui transmettent ces évènements ou avec des événements provenant du monde réel. Or, un des buts des architectes guidées par les événements, style architectural prôné par Orcha, est d’avoir un couplage faible afin d’accroître la réutilisabilité des services, ainsi que leur isolation qui permet une meilleure gestion des bugs… Il convient donc face à un service recevant plusieurs événements de se poser la question de la redéfinition du programme Orcha. 
+          </p>
       </div>  
       </div>
      

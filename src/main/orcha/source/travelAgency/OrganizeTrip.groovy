@@ -13,7 +13,7 @@ when "selectTrain terminates"
 compute selectHotel with selectTrain.result
 
 when "selectHotel terminates and selectTrain terminates"
-compute selectTaxi with selectTrain.result, selectHotel.result
+compute selectTaxi with selectHotel.result, selectTrain.result
 
 when "selectTaxi terminates"
 send selectTaxi.result to travelAgencyCustomer

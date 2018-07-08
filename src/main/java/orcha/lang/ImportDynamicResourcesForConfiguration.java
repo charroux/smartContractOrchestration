@@ -9,8 +9,8 @@ import org.springframework.context.annotation.ImportResource;
  * 
  */
 @ImportResource({
-    "classpath:/organize trip.xml",
-    "classpath:/organize tripQoS.xml"
+    "classpath:/benchmarking services.xml",
+    "classpath:/benchmarking servicesQoS.xml"
 })
 public class ImportDynamicResourcesForConfiguration {
 
