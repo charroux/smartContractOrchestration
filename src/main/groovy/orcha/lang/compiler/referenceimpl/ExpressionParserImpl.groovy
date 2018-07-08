@@ -506,4 +506,21 @@ class ExpressionParserImpl implements ExpressionParser{
 		
 		return false
 	}
+
+	@Override
+	public int getNumberOfApplicationsInExpression(String expression, List<InstructionNode> graphOfInstructions) {
+		List<String> applicationsNames = this.getApplicationsNamesInExpression(expression, graphOfInstructions)
+		return applicationsNames.size()
+	}
+
+	@Override
+	public int getIndexOfApplicationInExpression(String expression, String applicationName, List<InstructionNode> graphOfInstructions) {
+		List<String> applicationsNames = this.getApplicationsNamesInExpression(expression, graphOfInstructions)
+		if(applicationsNames.size() == 0) {
+			return -1
+		}
+		int sequenceNumber = applicationsNames.findIndexOf{ it == applicationName }
+		sequenceNumber++
+		return sequenceNumber
+	}
 }

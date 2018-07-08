@@ -898,11 +898,6 @@ class OrchaCodeVisitorImpl extends OrchaCodeVisitor{
 			
 			log.info 'Syntax analysis of the the Orcha program complete successfully'
 			
-			
-			for(String s: this.toStringGraphOfInstructions()) {
-				println s
-			}
-			
 		}
 		
 		return graphOfInstructions
