@@ -23,9 +23,11 @@ class OrchaCodeParserImpl implements OrchaCodeParser{
 	ExpressionParser expressionParser
 	
 	@Override
-	OrchaCodeVisitor parse(String orchaProgram) throws OrchaCompilationException, OrchaConfigurationException{
+	public OrchaCodeVisitor parse(String orchaProgram) throws OrchaCompilationException, OrchaConfigurationException{
 
 		OrchaCodeVisitorImpl orchaCodeVisitor = new OrchaCodeVisitorImpl(orchaSourceProgram: orchaProgram, context: context, expressionParser: expressionParser)
+		
+		expressionParser.setOrchaCodeVisitor(orchaCodeVisitor)
 		
 		try{
 			

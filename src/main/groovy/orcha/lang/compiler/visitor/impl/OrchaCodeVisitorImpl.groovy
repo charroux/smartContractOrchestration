@@ -206,7 +206,7 @@ class OrchaCodeVisitorImpl extends OrchaCodeVisitor{
 	List<InstructionNode> findAllWhenNodesWithManyApplicationsInExpression(){		
 		return graphOfInstructions.findAll { 
 			it.instruction.instruction=="when" &&
-			(expressionParser.getApplicationsNamesInExpression(it.instruction.variable, graphOfInstructions).size() > 1)
+			(expressionParser.getApplicationsNamesInExpression(it.instruction.variable).size() > 1)
 		}
 	}
 	
@@ -335,7 +335,7 @@ class OrchaCodeVisitorImpl extends OrchaCodeVisitor{
 					orchaExpression = node.next.instruction.variable
 				}
 				
-				List<Application> applications = expressionParser.getApplicationsInExpression(orchaExpression, graphOfInstructions)
+				List<Application> applications = expressionParser.getApplicationsInExpression(orchaExpression)
 				
 				for(int i=0; i<applications.size(); i++){		// starting from the applications, look for the related compute (having program1 as variable)
 						
@@ -359,7 +359,7 @@ class OrchaCodeVisitorImpl extends OrchaCodeVisitor{
 				
 				if(previous.instruction.instruction=="when" && node.instruction.instruction=="when"){
 					
-					List<Application> applications = expressionParser.getApplicationsInExpression(node.instruction.variable, graphOfInstructions)
+					List<Application> applications = expressionParser.getApplicationsInExpression(node.instruction.variable)
 					
 					for(int i=0; i<applications.size(); i++){		// starting from the applications, look for the related compute (having program1 as variable)
 							
@@ -695,7 +695,7 @@ class OrchaCodeVisitorImpl extends OrchaCodeVisitor{
 		 
 			for(InstructionNode whenNode: allWhenNodes){
 				
-				Application[] applications = expressionParser.getApplicationsInExpression(whenNode.instruction.variable, graphOfInstructions)
+				Application[] applications = expressionParser.getApplicationsInExpression(whenNode.instruction.variable)
 				
 				// build a list of when nodes with the same applications in expression (whenNodesWithSameApplications) an a list of when nodes with fails in expression (whenNodesWithFailExpression)
 			
@@ -711,11 +711,11 @@ class OrchaCodeVisitorImpl extends OrchaCodeVisitor{
 					Application[] applicationsArray
 					
 					if(node!=whenNode && alreadyHandledInstructions.contains(node.instruction.id)==false){
-						applicationsArray = expressionParser.getApplicationsInExpression(node.instruction.variable, graphOfInstructions)
+						applicationsArray = expressionParser.getApplicationsInExpression(node.instruction.variable)
 						if(Arrays.equals(applications, applicationsArray)){					
 							whenNodesWithSameApplications.add(node)							
 						}
-						String[] applicationNames = expressionParser.getApplicationsNamesInExpression(node.instruction.variable, graphOfInstructions)
+						String[] applicationNames = expressionParser.getApplicationsNamesInExpression(node.instruction.variable)
 						applicationNames.each { appliName ->
 							InstructionNode n = graphOfInstructions.find { it.instruction.instruction=="when" && it.instruction.variable!=null && expressionParser.isComputeFailsInExpression(appliName, it.instruction.variable)}
 							if(n != null){
@@ -740,7 +740,7 @@ class OrchaCodeVisitorImpl extends OrchaCodeVisitor{
 					
 					newRootNode = new InstructionNode(instruction: genericWhenInstruction, next: null)
 
-					String[] applicationNames = expressionParser.getApplicationsNamesInExpression(whenNode.instruction.variable, graphOfInstructions)
+					String[] applicationNames = expressionParser.getApplicationsNamesInExpression(whenNode.instruction.variable)
 					
 					for(i=0; i<applications.length; i++){
 											
@@ -792,7 +792,7 @@ class OrchaCodeVisitorImpl extends OrchaCodeVisitor{
 					
 					alreadyHandledInstructions.add(whenNode.instruction.id)
 
-					String[] applicationNames = expressionParser.getApplicationsNamesInExpression(whenNode.instruction.variable, graphOfInstructions)
+					String[] applicationNames = expressionParser.getApplicationsNamesInExpression(whenNode.instruction.variable)
 
 										
 					for(i=0; i<applications.length; i++){
@@ -844,7 +844,7 @@ class OrchaCodeVisitorImpl extends OrchaCodeVisitor{
 						
 						newRootNode = new InstructionNode(instruction: genericWhenInstruction, next: null)
 						
-						String[] applicationNames = expressionParser.getApplicationsNamesInExpression(whenNode.instruction.variable, graphOfInstructions)
+						String[] applicationNames = expressionParser.getApplicationsNamesInExpression(whenNode.instruction.variable)
 						
 						for(i=0; i<applications.length; i++){
 											
@@ -870,7 +870,7 @@ class OrchaCodeVisitorImpl extends OrchaCodeVisitor{
 						newNode.options = new QualityOfServicesOptions()
 					}
 					
-					if(expressionParser.isFailExpression(newNode, graphOfInstructions) == true){
+					if(expressionParser.isFailExpression(newNode) == true){
 						newNode.options.failTest = true
 					} else {
 						newNode.options.failTest = false
@@ -885,7 +885,7 @@ class OrchaCodeVisitorImpl extends OrchaCodeVisitor{
 						if(newNode.options == null){							// a receive node
 							newNode.options = new QualityOfServicesOptions()
 						}
-						if(expressionParser.isFailExpression(newNode, graphOfInstructions) == true){
+						if(expressionParser.isFailExpression(newNode) == true){
 							newNode.options.failTest = true
 						} else {
 							newNode.options.failTest = false

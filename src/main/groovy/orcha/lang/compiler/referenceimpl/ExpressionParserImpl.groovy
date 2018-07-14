@@ -14,12 +14,22 @@ import org.springframework.expression.spel.SpelMessage
 
 class ExpressionParserImpl implements ExpressionParser{
 	
+	OrchaCodeVisitor orchaCodeVisitor
+	
+	public OrchaCodeVisitor getOrchaCodeVisitor() {
+		return orchaCodeVisitor;
+	}
+
+	public void setOrchaCodeVisitor(OrchaCodeVisitor orchaCodeVisitor) {
+		this.orchaCodeVisitor = orchaCodeVisitor;
+	}
+
 	@Override
-	public String failChannel(InstructionNode computeNode, OrchaCodeVisitor orchaCodeParser){
+	public String failChannel(InstructionNode computeNode){
 		if(computeNode.instruction.instruction != "compute"){
 			return null
 		}
-		List<InstructionNode> nextNodes = orchaCodeParser.findNextNode(computeNode)
+		List<InstructionNode> nextNodes = orchaCodeVisitor.findNextNode(computeNode)
 		InstructionNode whenFailNode = nextNodes.find { this.isComputeFailsInExpression(computeNode, it.instruction.variable) == true }
 		if(whenFailNode != null){
 			String applicationName = computeNode.instruction.springBean.name
@@ -28,7 +38,7 @@ class ExpressionParserImpl implements ExpressionParser{
 		return null
 	}
 
-	@Override
+	/*@Override
 	public String failChannel(InstructionNode whenNode, List<InstructionNode> graphOfInstructions){
 		boolean fails = this.isFailExpression(whenNode, graphOfInstructions)
 		if(fails == false){
@@ -40,10 +50,11 @@ class ExpressionParserImpl implements ExpressionParser{
 			return null
 		}
 		return "error-channel-"+applicationNames[0]
-	}
+	}*/
 
 	@Override
-	public String failedServiceName(InstructionNode whenNode, List<InstructionNode> graphOfInstructions){
+	public String failedServiceName(InstructionNode whenNode){
+		List<InstructionNode> graphOfInstructions = orchaCodeVisitor.findAllNodes()
 		boolean fails = this.isFailExpression(whenNode, graphOfInstructions)
 		if(fails == false){
 			return null
@@ -159,18 +170,18 @@ class ExpressionParserImpl implements ExpressionParser{
 	}
 	
 	@Override
-	public String releaseExpression(String expression, List<InstructionNode> graphOfInstructions) {
+	public String releaseExpression(String expression) {
 		
-		List<String> applicationsNamesInExpression = this.getApplicationsNamesInExpression(expression, graphOfInstructions)
+		List<String> applicationsNamesInExpression = this.getApplicationsNamesInExpression(expression)
 		
 		return this.releaseSpringLanguageExpression(expression, applicationsNamesInExpression)
 		
 	}
 	
 	@Override
-	public String aggregatorTransformerExpression(String expression, InstructionNode instructionNode, List<InstructionNode> graphOfInstructions) {
+	public String aggregatorTransformerExpression(String expression, InstructionNode instructionNode) {
 		
-		List<String> applicationsNamesInExpression = this.getApplicationsNamesInExpression(expression, graphOfInstructions)
+		List<String> applicationsNamesInExpression = this.getApplicationsNamesInExpression(expression)
 		
 		String transformerExpression = "payload.?["
 		
@@ -212,9 +223,9 @@ class ExpressionParserImpl implements ExpressionParser{
 	}
 
 	@Override
-	public boolean isMultipleArgumentsInExpression(String expression, InstructionNode instructionNode, List<InstructionNode> graphOfInstructions) {
+	public boolean isMultipleArgumentsInExpression(String expression, InstructionNode instructionNode) {
 		
-		List<String> applicationsNamesInExpression = this.getApplicationsNamesInExpression(expression, graphOfInstructions)
+		List<String> applicationsNamesInExpression = this.getApplicationsNamesInExpression(expression)
 		int manyWith = 0
 		
 		String nextInstruction
@@ -313,16 +324,19 @@ class ExpressionParserImpl implements ExpressionParser{
 		
 	}
 	
-	public List<String> getApplicationsNamesInExpression(String expression, List<InstructionNode> graphOfInstructions){
+	public List<String> getApplicationsNamesInExpression(String expression){
 		def applicationsNames = []
-		def applications = this.getApplicationsInExpression(expression, graphOfInstructions)
+		def applications = this.getApplicationsInExpression(expression)
 		applications.each{
 			applicationsNames.add(it.name)
 		}
 		return applicationsNames	
 	}
 	
-	public List<Application> getApplicationsInExpression(String expression, List<InstructionNode> graphOfInstructions){
+	public List<Application> getApplicationsInExpression(String expression){
+		
+		List<InstructionNode> graphOfInstructions = orchaCodeVisitor.findAllNodes()
+		
 		def applications = []
 		String[] elements = expression.split(" ")
 		Application application
@@ -347,7 +361,10 @@ class ExpressionParserImpl implements ExpressionParser{
 		return applications
 	}
 
-	public List<Application> getTerminatedApplicationsInExpression(String expression, List<InstructionNode> graphOfInstructions){
+	public List<Application> getTerminatedApplicationsInExpression(String expression){
+		
+		List<InstructionNode> graphOfInstructions = orchaCodeVisitor.findAllNodes()
+		
 		def applications = []
 		String[] elements = expression.split(" ")
 		Application application
@@ -377,9 +394,9 @@ class ExpressionParserImpl implements ExpressionParser{
 		return applications
 	}
 
-	public List<String> getTerminatedApplicationsNamesInExpression(String expression, List<InstructionNode> graphOfInstructions){
+	public List<String> getTerminatedApplicationsNamesInExpression(String expression){
 		def applicationsNames = []
-		def applications = this.getTerminatedApplicationsInExpression(expression, graphOfInstructions)
+		def applications = this.getTerminatedApplicationsInExpression(expression)
 		applications.each{
 			applicationsNames.add(it.name)
 		}
@@ -475,7 +492,7 @@ class ExpressionParserImpl implements ExpressionParser{
 		}
 	}
 	
-	public boolean isFailExpression(InstructionNode instructionNode, List<InstructionNode> graphOfInstructions){
+	public boolean isFailExpression(InstructionNode instructionNode){
 		
 		if(instructionNode.options != null){
 			if(instructionNode.options.failTest == true){
@@ -484,7 +501,7 @@ class ExpressionParserImpl implements ExpressionParser{
 		}
 		
 		String orchaExpression = instructionNode.instruction.variable
-		List<String> applicationNames = getApplicationsNamesInExpression(orchaExpression, graphOfInstructions)
+		List<String> applicationNames = getApplicationsNamesInExpression(orchaExpression)
 		if(applicationNames.size() != 1){
 			return false
 		}
@@ -508,14 +525,14 @@ class ExpressionParserImpl implements ExpressionParser{
 	}
 
 	@Override
-	public int getNumberOfApplicationsInExpression(String expression, List<InstructionNode> graphOfInstructions) {
-		List<String> applicationsNames = this.getApplicationsNamesInExpression(expression, graphOfInstructions)
+	public int getNumberOfApplicationsInExpression(String expression) {
+		List<String> applicationsNames = this.getApplicationsNamesInExpression(expression)
 		return applicationsNames.size()
 	}
 
 	@Override
-	public int getIndexOfApplicationInExpression(String expression, String applicationName, List<InstructionNode> graphOfInstructions) {
-		List<String> applicationsNames = this.getApplicationsNamesInExpression(expression, graphOfInstructions)
+	public int getIndexOfApplicationInExpression(String expression, String applicationName) {
+		List<String> applicationsNames = this.getApplicationsNamesInExpression(expression)
 		if(applicationsNames.size() == 0) {
 			return -1
 		}
@@ -523,4 +540,6 @@ class ExpressionParserImpl implements ExpressionParser{
 		sequenceNumber++
 		return sequenceNumber
 	}
+
+	
 }

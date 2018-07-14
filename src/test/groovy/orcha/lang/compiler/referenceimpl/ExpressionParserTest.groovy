@@ -59,29 +59,31 @@ class ExpressionParserTest {
 		
 		OrchaCodeVisitor orchaCodeVisitor = orchaCodeParser.parse(orchaProgram)
 		
+		expressionParser.setOrchaCodeVisitor(orchaCodeVisitor)
+		
 		List<Instruction> graphOfInstructions = orchaCodeVisitor.findAllNodes()
 		
-		int number = expressionParser.getNumberOfApplicationsInExpression("(codeToBenchmark2 terminates condition == 1) and (codeToBenchmark1 terminates condition == -1)", graphOfInstructions)
+		int number = expressionParser.getNumberOfApplicationsInExpression("(codeToBenchmark2 terminates condition == 1) and (codeToBenchmark1 terminates condition == -1)")
 		
 		Assert.assertTrue(number == 2)
 		
-		number = expressionParser.getNumberOfApplicationsInExpression("azerty", graphOfInstructions)
+		number = expressionParser.getNumberOfApplicationsInExpression("azerty")
 		
 		Assert.assertTrue(number == 0)
 		
-		int index = expressionParser.getIndexOfApplicationInExpression("(codeToBenchmark2 terminates condition == 1) and (codeToBenchmark1 terminates condition == -1)", "codeToBenchmark2", graphOfInstructions)
+		int index = expressionParser.getIndexOfApplicationInExpression("(codeToBenchmark2 terminates condition == 1) and (codeToBenchmark1 terminates condition == -1)", "codeToBenchmark2")
 		
 		Assert.assertTrue(index == 1)
 		
-		index = expressionParser.getIndexOfApplicationInExpression("(codeToBenchmark2 terminates condition == 1) and (codeToBenchmark1 terminates condition == -1)", "codeToBenchmark1", graphOfInstructions)
+		index = expressionParser.getIndexOfApplicationInExpression("(codeToBenchmark2 terminates condition == 1) and (codeToBenchmark1 terminates condition == -1)", "codeToBenchmark1")
 		
 		Assert.assertTrue(index == 2)
 		
-		index = expressionParser.getIndexOfApplicationInExpression("(codeToBenchmark2 terminates condition == 1) and (codeToBenchmark1 terminates condition == -1)", "azerty", graphOfInstructions)
+		index = expressionParser.getIndexOfApplicationInExpression("(codeToBenchmark2 terminates condition == 1) and (codeToBenchmark1 terminates condition == -1)", "azerty")
 		
 		Assert.assertTrue(index == 0)
 		
-		index = expressionParser.getIndexOfApplicationInExpression("azerty", "codeToBenchmark1", graphOfInstructions)
+		index = expressionParser.getIndexOfApplicationInExpression("azerty", "codeToBenchmark1")
 		
 		Assert.assertTrue(index == -1)
 		

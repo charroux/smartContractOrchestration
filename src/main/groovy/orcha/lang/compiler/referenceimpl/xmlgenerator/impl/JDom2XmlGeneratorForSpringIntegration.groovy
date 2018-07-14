@@ -284,7 +284,7 @@ class JDom2XmlGeneratorForSpringIntegration implements XmlGenerator{
 
 				def orchaExpression = whenNode.instruction.variable
 				
-				List<String> applicationsNames = expressionParser.getApplicationsNamesInExpression(orchaExpression, graphOfInstructions)
+				List<String> applicationsNames = expressionParser.getApplicationsNamesInExpression(orchaExpression)
 										
 				String aggregatorName = ""
 				for(String name: applicationsNames){
@@ -306,7 +306,7 @@ class JDom2XmlGeneratorForSpringIntegration implements XmlGenerator{
 			
 			def orchaExpression = node.instruction.variable
 			
-			List<String> applicationsNames = expressionParser.getApplicationsNamesInExpression(orchaExpression, graphOfInstructions)
+			List<String> applicationsNames = expressionParser.getApplicationsNamesInExpression(orchaExpression)
 									
 			String aggregatorName = ""
 			for(String name: applicationsNames){
@@ -335,7 +335,7 @@ class JDom2XmlGeneratorForSpringIntegration implements XmlGenerator{
 			
 			String orchaExpressionForNode = node.instruction.variable
 			
-			List<String> applicationsNames = expressionParser.getApplicationsNamesInExpression(orchaExpressionForNode, graphOfInstructions)
+			List<String> applicationsNames = expressionParser.getApplicationsNamesInExpression(orchaExpressionForNode)
 	
 			String aggregatorName = ""
 			for(String name: applicationsNames){
@@ -353,7 +353,7 @@ class JDom2XmlGeneratorForSpringIntegration implements XmlGenerator{
 					
 				if(expressionParser.isFailExpression(node, orchaCodeVisitor.findAllNodes()) == true){
 					
-					String failChannel = expressionParser.failChannel(node, graphOfInstructions)
+					String failChannel = expressionParser.failChannel(node)
 					failChannel = failChannel  + "-output"
 					
 					List<InstructionNode> nextNodes = orchaCodeVisitor.findNextNode(node)
@@ -488,7 +488,7 @@ class JDom2XmlGeneratorForSpringIntegration implements XmlGenerator{
 	
 	private void generateXMLForInstruction(InstructionNode instructionNode, OrchaCodeVisitor orchaCodeParser, List<Instruction>alreadyDoneInstructions, Document xmlSpringIntegration){
 		
-		List<Instruction> graphOfInstructions = orchaCodeParser.findAllNodes()
+		//List<Instruction> graphOfInstructions = orchaCodeParser.findAllNodes()
 		
 		Instruction instruction = instructionNode.instruction
 			
@@ -499,7 +499,7 @@ class JDom2XmlGeneratorForSpringIntegration implements XmlGenerator{
 				generateReceiveEventHandler(instructionNode, xmlSpringIntegration)
 				
 				if(instructionNode.next.instruction.instruction == "receive"){
-					generateRouterForEventHandlers(instructionNode, expressionParser, graphOfInstructions, xmlSpringIntegration)
+					generateRouterForEventHandlers(instructionNode, expressionParser, xmlSpringIntegration)
 					
 					InstructionNode node = instructionNode.next
 					
@@ -526,7 +526,7 @@ class JDom2XmlGeneratorForSpringIntegration implements XmlGenerator{
 			
 		}else if(instruction.instruction == "compute"){
 		
-			String failChannel = expressionParser.failChannel(instructionNode, orchaCodeParser)
+			String failChannel = expressionParser.failChannel(instructionNode)
 			
 			// when nodes
 			List<InstructionNode> nodes = orchaCodeParser.findNextNode(instructionNode)
@@ -541,7 +541,7 @@ class JDom2XmlGeneratorForSpringIntegration implements XmlGenerator{
 			
 			nodes.each { whenNode ->	// when "(codeToBenchmark1 terminates condition == -1) and (codeToBenchmark2 terminates condition == 1)"
 										// codeToBenchmark1 should be received first, then codeToBenchmark2. So a resequencer of messages is needed
-				List<String> applicationsNames = expressionParser.getApplicationsNamesInExpression(whenNode.instruction.variable, graphOfInstructions)
+				List<String> applicationsNames = expressionParser.getApplicationsNamesInExpression(whenNode.instruction.variable)
 				
 				sequenceSize = applicationsNames.size()
 				
@@ -557,7 +557,7 @@ class JDom2XmlGeneratorForSpringIntegration implements XmlGenerator{
 			}
 			
 			if(nodes.size() > 1) {
-				generateRouterForEventHandlers(instructionNode, expressionParser, graphOfInstructions, xmlSpringIntegration)
+				generateRouterForEventHandlers(instructionNode, expressionParser, xmlSpringIntegration)
 			}
 			
 		} else if(instruction.instruction == "when"){
@@ -579,10 +579,10 @@ class JDom2XmlGeneratorForSpringIntegration implements XmlGenerator{
 				
 				if(precedingNodes.size()>0 && expressionParser.isComputeFailsInExpression(precedingNodes.getAt(0), orchaExpression)==false){
 
-					String releaseExpression = expressionParser.releaseExpression(orchaExpression, graphOfInstructions)
-					String transformerExpression = expressionParser.aggregatorTransformerExpression(orchaExpression, instructionNode, graphOfInstructions)
-					boolean isMultipleArgumentsInExpression = expressionParser.isMultipleArgumentsInExpression(orchaExpression, instructionNode, graphOfInstructions)
-					List<String> applicationsNames = expressionParser.getApplicationsNamesInExpression(instructionNode.instruction.variable, graphOfInstructions)
+					String releaseExpression = expressionParser.releaseExpression(orchaExpression)
+					String transformerExpression = expressionParser.aggregatorTransformerExpression(orchaExpression, instructionNode)
+					boolean isMultipleArgumentsInExpression = expressionParser.isMultipleArgumentsInExpression(orchaExpression, instructionNode)
+					List<String> applicationsNames = expressionParser.getApplicationsNamesInExpression(instructionNode.instruction.variable)
 				
 					Aggregator aggregator = new Aggregator(xmlSpringIntegration)
 					aggregator.aggregate(instructionNode, releaseExpression, applicationsNames, transformerExpression, isMultipleArgumentsInExpression)
@@ -607,8 +607,8 @@ class JDom2XmlGeneratorForSpringIntegration implements XmlGenerator{
 									}
 								}
 												
-								String failedServiceName = expressionParser.failedServiceName(instructionNode, graphOfInstructions)
-								String failChannel = expressionParser.failChannel(instructionNode, graphOfInstructions)
+								String failedServiceName = expressionParser.failedServiceName(instructionNode)
+								String failChannel = expressionParser.failChannel(instructionNode)
 								
 								Fail fail = new Fail(xmlSpringIntegration)
 								fail.fail(instructionNode, failedServiceName, failChannel, errorExpression)
@@ -719,9 +719,9 @@ class JDom2XmlGeneratorForSpringIntegration implements XmlGenerator{
 
 	}
 	
-	private void generateRouterForEventHandlers(InstructionNode instructionNode, ExpressionParser expressionParser, List<InstructionNode> graphOfInstructions, Document xmlSpringIntegration){
+	private void generateRouterForEventHandlers(InstructionNode instructionNode, ExpressionParser expressionParser, Document xmlSpringIntegration){
 		
-		RouterForEventHandler routerForEventHandler = new RouterForEventHandler(xmlSpringIntegration, expressionParser, graphOfInstructions)
+		RouterForEventHandler routerForEventHandler = new RouterForEventHandler(xmlSpringIntegration, expressionParser)
 		routerForEventHandler.routerForEventHandler(instructionNode)
 	
 	}

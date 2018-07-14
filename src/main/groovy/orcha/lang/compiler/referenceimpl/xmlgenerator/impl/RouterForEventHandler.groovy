@@ -15,15 +15,13 @@ import orcha.lang.compiler.InstructionNode
 
 class RouterForEventHandler implements QoS, Chain, HeaderEnricher{
 	
-	List<InstructionNode> graphOfInstructions
 	ExpressionParser expressionParser
 	Document xmlSpringIntegration
 	
-	public RouterForEventHandler(Document xmlSpringIntegration, ExpressionParser expressionParser, List<InstructionNode> graphOfInstructions) {
+	public RouterForEventHandler(Document xmlSpringIntegration, ExpressionParser expressionParser) {
 		super();
 		this.xmlSpringIntegration = xmlSpringIntegration;
 		this.expressionParser = expressionParser
-		this.graphOfInstructions = graphOfInstructions
 	}
 	
 	public void routerForEventHandler(InstructionNode instructionNode){
@@ -54,7 +52,7 @@ class RouterForEventHandler implements QoS, Chain, HeaderEnricher{
 			Element recipient = new Element("recipient", namespace)
 	
 			
-			List<String> applicationsNames = expressionParser.getApplicationsNamesInExpression(node.instruction.variable, graphOfInstructions)
+			List<String> applicationsNames = expressionParser.getApplicationsNamesInExpression(node.instruction.variable)
 			
 			int sequenceSize = applicationsNames.size()
 			if(sequenceSize > 1) {
