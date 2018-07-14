@@ -536,21 +536,17 @@ class JDom2XmlGeneratorForSpringIntegration implements XmlGenerator{
 			// when "appli1 fails"
 			boolean computeFails = (null != nodes.find { expressionParser.isComputeFailsInExpression(instructionNode, it.instruction.variable) })
 			
-			int sequenceNumber
 			int sequenceSize
+			int sequenceNumber
 			
 			nodes.each { whenNode ->	// when "(codeToBenchmark1 terminates condition == -1) and (codeToBenchmark2 terminates condition == 1)"
-										// codeToBenchmark1 should be received first, then codeToBenchmark2. So a resequencer of messages is needed
-				List<String> applicationsNames = expressionParser.getApplicationsNamesInExpression(whenNode.instruction.variable)
-				
-				sequenceSize = applicationsNames.size()
-				
-				sequenceNumber = applicationsNames.findIndexOf{ it == instructionNode.instruction.springBean.name }
+				// codeToBenchmark1 should be received first, then codeToBenchmark2. So a resequencer of messages is needed
+				sequenceSize = expressionParser.getNumberOfApplicationsInExpression(whenNode.instruction.variable)
+				sequenceNumber = expressionParser.getIndexOfApplicationInExpression(whenNode.instruction.variable, instructionNode.instruction.springBean.name)
 				
 			}
-				
+
 			if(sequenceSize>1 && nodes.size()==1) {
-				sequenceNumber++
 				generateApplication(instructionNode, sequenceNumber, sequenceSize, computeFails, failChannel, xmlSpringIntegration)
 			} else {
 				generateApplication(instructionNode, computeFails, failChannel, xmlSpringIntegration)

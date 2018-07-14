@@ -51,14 +51,13 @@ class RouterForEventHandler implements QoS, Chain, HeaderEnricher{
 			
 			Element recipient = new Element("recipient", namespace)
 	
+			int sequenceSize = expressionParser.getNumberOfApplicationsInExpression(node.instruction.variable)
 			
-			List<String> applicationsNames = expressionParser.getApplicationsNamesInExpression(node.instruction.variable)
-			
-			int sequenceSize = applicationsNames.size()
 			if(sequenceSize > 1) {
+
 				recipient.setAttribute("channel", channelName + "Sequence")
-				int sequenceNumber = applicationsNames.findIndexOf{ it == instructionNode.instruction.springBean.name }
-				sequenceNumber++
+				
+				int sequenceNumber = expressionParser.getIndexOfApplicationInExpression(node.instruction.variable, instructionNode.instruction.springBean.name)
 				Element chain = chain("sequenceNumber-" + channelName + "-id", channelName + "Sequence", channelName)
 				Element header = headerEnricher("sequenceSize", sequenceSize.toString())
 				chain.addContent(header)
