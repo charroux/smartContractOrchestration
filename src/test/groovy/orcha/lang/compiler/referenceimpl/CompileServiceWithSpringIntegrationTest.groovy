@@ -1121,14 +1121,33 @@ class CompileServiceWithSpringIntegrationTest {
  
 		Assert.assertEquals(element.getAttribute("channel").getValue(), element2.getAttribute("input-channel").getValue())
 		
-		/*// <int:resequencer id="resequencer-selectHotelselectTrainAggregatorInput-id" input-channel="selectHotelselectTrainAggregatorInput" output-channel="selectHotelselectTrainAggregatorInputResequencer" release-partial-sequences="false" release-strategy-expression="size()==2" correlation-strategy-expression="headers['messageID']" />
+		// <int:chain input-channel="selectHotelselectTrainAggregatorInputSequence" output-channel="selectHotelselectTrainAggregatorInput" id="sequenceNumber-selectHotelselectTrainAggregatorInput-id">
+		expr = xFactory.compile("//*[local-name() = 'chain']", Filters.element())
+		elements =  expr.evaluate(xmlSpringIntegration)
+		
+		Element element3 = elements.get(2)
+		
+		// <int:resequencer id="resequencer-selectHotelselectTrainAggregatorInput-id" input-channel="selectHotelselectTrainAggregatorInput" output-channel="selectHotelselectTrainAggregatorInputResequencer" release-partial-sequences="false" release-strategy-expression="size()==2" correlation-strategy-expression="headers['messageID']" />
 		expr = xFactory.compile("//*[local-name() = 'resequencer']", Filters.element())
    	 	elements =  expr.evaluate(xmlSpringIntegration)
  
 		element = elements.get(0)
- 
-		Assert.assertEquals(element1.getAttribute("channel").getValue(), element.getAttribute("input-channel").getValue())
-		*/
+		Assert.assertEquals(element.getAttribute("release-strategy-expression").getValue(), "size()==2")
+		
+		Assert.assertEquals(element.getAttribute("input-channel").getValue(), element3.getAttribute("output-channel").getValue())
+		
+		// <int:transformer id="transformer-selectHotelServiceAcivatorOutput-id" input-channel="selectHotelServiceAcivatorOutput" output-channel="selectHotelselectTrainAggregatorInput" method="transform">
+		//		<bean class="orcha.lang.compiler.referenceimpl.xmlgenerator.impl.ObjectToApplicationTransformer">
+		//  		<property name="application" ref="selectHotel" />
+		//		</bean>
+		// </int:transformer>
+		expr = xFactory.compile("//*[local-name() = 'transformer']", Filters.element())
+		elements =  expr.evaluate(xmlSpringIntegration)
+
+		element = elements.get(4)
+		Assert.assertEquals(element.getAttribute("output-channel").getValue(), element3.getAttribute("output-channel").getValue())
+		
+		
 	}
 	
 }
