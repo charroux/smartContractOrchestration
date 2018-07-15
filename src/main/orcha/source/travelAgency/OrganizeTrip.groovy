@@ -10,10 +10,10 @@ receive travelInfo from travelAgency
 compute selectTrain with travelInfo.value
 
 when "selectTrain terminates"
-compute selectHotel with selectTrain.result
+compute selectHotel with selectTrain.value
 
 when "selectHotel terminates and selectTrain terminates"
-compute selectTaxi with selectHotel.result, selectTrain.result
+compute selectTaxi with selectHotel.value, selectTrain.value
 
 when "selectTaxi terminates"
 send selectTaxi.result to travelAgencyCustomer

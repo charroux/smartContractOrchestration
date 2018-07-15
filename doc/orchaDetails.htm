@@ -144,19 +144,60 @@
           <p>
           It is not possible to group many instructions in a block and trigger them together when an event occurs. For instance, it is not possible to write two computes when a single event occurs. You should use a subprogram instead : conceptually, a group of instructions is a sub activity (see subprogram).
           </p>
-          <h3>Broadcasting of messages, synchronisation on several events and transmission of several events to a service</h3>
-          <p>It is always possible to combine several events in a when instruction. In the following example, the when instruction waits for two events
-L’instruction compute qui suit le when peut recevoir en argument un ou tous les événements de l’instruction when. 
-
-
-when "(codeToBenchmark2 terminates condition == 1) and (codeToBenchmark1 terminates condition == -1)"
-
-
-
-Si plusieurs arguments sont transmis à un compute, il seront reçu dans un tableau Javascript, une List Java, etc. ordonné selon l’ordre des arguments du compute. 
-
-Considération architecturale : plus un service requiert en argument des événements, plus il a un couplage fort avec d’autres services qui lui transmettent ces évènements ou avec des événements provenant du monde réel. Or, un des buts des architectes guidées par les événements, style architectural prôné par Orcha, est d’avoir un couplage faible afin d’accroître la réutilisabilité des services, ainsi que leur isolation qui permet une meilleure gestion des bugs… Il convient donc face à un service recevant plusieurs événements de se poser la question de la redéfinition du programme Orcha. 
-          </p>
+          
+          
+          <h3 id="broadcasting">Broadcasting of messages, synchronisation on several events and transmission of several events to a service</h3>
+          <p>It is always possible to combine several events in a when instruction. In the following example, the when instruction waits for two events:
+		</p>
+		<code>
+		when "(codeToBenchmark2 terminates condition == 1) and (codeToBenchmark1 terminates condition == -1)"<br>
+		</code>
+		<p>The following compute instruction can use any events:
+		</p> 
+		<code>
+		compute X with codeToBenchmark2.value, codeToBenchmark1.value<br>
+		</code>
+		<p>or
+		</p>
+		<code>
+		compute X with codeToBenchmark2.value<br>
+		</code>
+		<p>If several events are sent to a compute, they are received in a Javascript array, a Java List... (depending on the language used to implement the service)
+		ordered according to the ORDER OF THE EVENTS IN THE WHEN INSTRUCTION. For example, whatever the order of the events in the compute instruction:
+		</p>
+		<code>
+		compute selectTaxi with selectHotel.value, selectTrain.value<br>
+		</code>
+		<p>
+		or
+		</p>
+		<code>
+		compute selectTaxi with selectTrain.value, selectHotel.value<br>
+		</code>
+		<p>They will be received in the order defined in the when instruction:
+		</p>
+		<code>
+		when "selectHotel terminates and selectTrain terminates"<br>
+		</code>
+		<p>
+		selectHotel will the the first element of the received array, selectTrain the second.
+		</p>
+		<p>Why? Because several events used in a when requires a resequencing of messages, and a different order in the compute would imply another resequencing which is time consuming.
+		</p>
+		<p>
+		Architectural consideration: the more a service requires events as arguments, the more it is coupled with services that sends those events.
+		But one of the main advantage of architecture driven by events, advocate by Orcha, is the low coupling. It increases the reusability of services, a better dedugging... 
+        </p>
+        
+        <p>
+        The result of a compute can be broadcasted to many when instructions. In the following example, the result of compute selecTrain is sent to two when instruction:
+        </p>
+        <code>
+       compute selectTrain with travelInfo.value<br><br>
+        when "selectTrain terminates"<br>
+        ...<br>
+        when "selectHotel terminates and selectTrain terminates"<br>
+        </code>
       </div>  
       </div>
      
