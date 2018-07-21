@@ -100,7 +100,7 @@ class ExpressionParserImpl implements ExpressionParser{
 			expression = expression.substring(index)
 			expression = expression.trim()							// "terminates and b terminates"
 			if(expression.startsWith("terminates")){
-				releaseExpression = releaseExpression + " ([" + i + "].payload instanceof T(orcha.lang.configuration.Application) and [" + i + "].payload.state==T(orcha.lang.configuration.State).TERMINATED) "
+				releaseExpression = releaseExpression + " (messages[" + i + "].payload instanceof T(orcha.lang.configuration.Application) and messages[" + i + "].payload.state==T(orcha.lang.configuration.State).TERMINATED) "
 				
 				index = expression.indexOf("terminates") + "terminates".length()
 				if(index >= expression.length()){
@@ -139,9 +139,9 @@ class ExpressionParserImpl implements ExpressionParser{
 					String condition
 					
 					if(leftOperatorInExpression == true){
-						condition = "[" + i + "].payload.output.value." + expression.substring(0, endOfConditionIndex) + " "
+						condition = "messages[" + i + "].payload.output.value." + expression.substring(0, endOfConditionIndex) + " "
 					} else {
-						condition = "[" + i + "].payload.output.value" + expression.substring(0, endOfConditionIndex) + " "
+						condition = "messages[" + i + "].payload.output.value" + expression.substring(0, endOfConditionIndex) + " "
 					}
 					
 					
