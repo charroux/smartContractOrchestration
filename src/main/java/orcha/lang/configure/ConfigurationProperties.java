@@ -10,17 +10,17 @@ package orcha.lang.configure;
 @org.springframework.boot.context.properties.ConfigurationProperties(prefix = "driving")
 public class ConfigurationProperties {
 
-    public ConfigurationProperties.TravelAgencyCustomer travelAgencyCustomer = new TravelAgencyCustomer();
+    public ConfigurationProperties.Delivery delivery = new Delivery();
 
-    public ConfigurationProperties.TravelAgencyCustomer getTravelAgencyCustomer() {
-        return travelAgencyCustomer;
+    public ConfigurationProperties.Delivery getDelivery() {
+        return delivery;
     }
 
-    public void setTravelAgencyCustomer(ConfigurationProperties.TravelAgencyCustomer travelAgencyCustomer) {
-        this.travelAgencyCustomer = travelAgencyCustomer;
+    public void setDelivery(ConfigurationProperties.Delivery delivery) {
+        this.delivery = delivery;
     }
 
-    public class TravelAgencyCustomer {
+    public class Delivery {
 
         public String directory;
         public String filename;

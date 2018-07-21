@@ -18,7 +18,7 @@ package orcha.lang.compiler.referenceimpl.util;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+//import org.apache.log4j.Logger;
 import org.springframework.integration.annotation.Transformer;
 
 /**
@@ -31,7 +31,7 @@ import org.springframework.integration.annotation.Transformer;
  */
 public class EmailTransformer {
 
-	private static final Logger LOGGER = Logger.getLogger(EmailTransformer.class);
+	//private static final Logger LOGGER = Logger.getLogger(EmailTransformer.class);
 
 	@Transformer
 	public List<EmailFragment> transformit(javax.mail.Message mailMessage) {
@@ -40,9 +40,9 @@ public class EmailTransformer {
 
 		EmailParserUtils.handleMessage(null, mailMessage, emailFragments);
 
-		if (LOGGER.isInfoEnabled()) {
+		/*if (LOGGER.isInfoEnabled()) {
 			LOGGER.info(String.format("Email contains %s fragments.", emailFragments.size()));
-		}
+		}*/
 
 		return emailFragments;
 	}

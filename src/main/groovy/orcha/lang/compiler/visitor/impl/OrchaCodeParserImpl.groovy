@@ -2,6 +2,8 @@ package orcha.lang.compiler.visitor.impl
 
 import java.io.File
 
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.ApplicationContext
 
@@ -13,8 +15,10 @@ import orcha.lang.compiler.visitor.MyClassLoader
 import orcha.lang.compiler.visitor.OrchaCodeParser
 import orcha.lang.compiler.visitor.OrchaCodeVisitor
 
-@Slf4j
+//@Slf4j
 class OrchaCodeParserImpl implements OrchaCodeParser{
+	
+	private static Logger log = LoggerFactory.getLogger(OrchaCodeVisitorImpl.class);
 	
 	@Autowired
 	ApplicationContext context

@@ -84,6 +84,7 @@
           <code>send event to destination<br>
           </code>
           <p>Here again event is a variable and destination must be configured.</p>
+          
           <h3>Activities are triggered by events</h3>
           <p>Activities are triggered by events using a compute instruction:</p>
           <code>compute makeSomething with event.value<br>
@@ -99,6 +100,7 @@
           </p>
           <code>when “makeSomething terminates”<br>
           </code>
+          
           <h3>Orcha is business oriented</h3>
           <p>Putting all together we can write our first Orcha program:</p>
           <code>receive event from source<br>
@@ -112,6 +114,89 @@
 			when “scanLuggage terminates”<br>
 			send scanLuggage.result to authority<br>        
           </code>
+
+          <p>
+          Apart the <a href="#language">instructions set</a> (compute, receive, from, send, to, condition, when), every terms in an Orcha program, are defined by the user (or programmatically) and should be domain/business oriented.
+          </p>
+          <p>In the instructions below, advertising, advertiser and recognitionAlgorithm are defined by the user:
+          </p>
+          <code>
+          	receive advertising from advertiser
+			receive recognitionAlgorithm from security<br>
+          </code>
+          <p>The content of an event is accessible using dot value:
+          </p>
+          <code>compute someThing with advertising.value<br>
+          </code>
+          <p>In the case of a structured event, it is also possible to go deeper into this event. For example:
+          </p>
+          <code>compute someThing with advertising.value.author.name<br>
+          </code>
+          <p>Or simply:
+          </p>
+          <code>compute someThing with advertising.author.name<br>
+          </code>
+          <p>Where advertising contains the Json structure:
+          </p>
+          <code>
+          {“author”:<br>
+    		{“name”:”...”}<br>
+			}<br>          
+          </code>
+			
+      </div>  	
+      </div>
+      
+      <div class="row">
+      <div class="col-md-12">
+          <h2 id="specifications">Specifications of the Orcha language</h2>
+          
+          <h3 id="language">Instructions set</h3>
+          <p>The Orcha language defines a minimal set of instructions for the description of any human activities. In that sense, Orcha is a <i>first language</i>. As a Proto-language in the area of Information Technology, Orcha language is also common to human beings and machines.</p>
+          <p>The instructions set is composed of:</p>
+          
+          <table style="width:100%">
+   		    <col width="50%">
+   		    <col width="50%">  
+          	<tr>
+			    <th>Instruction</th>
+			    <th>Description</th>		
+			</tr>
+			<tr>
+			    <td>receive &lt;event&gt; from &lt;source event handler&gt; [condition &lt;expression&gt;]</td>
+			    <td>asynchronous waiting for an <a href="#event">event triggering</a> an activity. The event comes from the real world (a device for instance), an external service (an application) or is an event sent within an Orcha program by a send instruction. from is the source of the event. condition filters the events to be received according to the <a href="#expressionLanguage">Orcha expression language</a></td>		
+			</tr>
+			<tr>
+			    <td>compute &lt;activity&gt; [with &lt;event&gt;.value [,&lt;event&gt;.value, ...]]</td>
+			    <td>processing of an activity (asynchronous service call i.e. application call). with (optional): information or data needed to process an activity (the arguments list separated by commas)</td>		
+			</tr>
+			<tr>
+			    <td>when "Orcha expression"</td>
+			    <td>waits for the completion of an activity (asynchronous synchronization point for events and/or services (see <a href="#expressionLanguage">Orcha expression language</a>))</td>		
+			</tr>
+			<tr>
+			    <td>send &lt;event&gt;.result to &lt;destination event handler&gt;</td>
+			    <td>sends an event to the real world (a device), an external services or an Orcha program.to : the destination of an event to be sent</td>		
+			</tr>
+          </table><br>
+          
+          <h3 id="expressionLanguage">The Orcha expression language</h3>
+          <p>Orcha uses an expression language in when clauses:
+          </p>
+          <code>when "(&lt;codeToBenchmark1&gt; terminates|fails condition &lt;expression&gt;) [logicalOperator (...)]"<br>
+          </code>
+           <p>Logical operators:</p>
+          	<ul>
+          		<li>and</li>
+          		<li>or</li>
+          		<li>...</li>
+          	</ul>
+          <p>expression is written in <a href="https://docs.spring.io/spring/docs/4.3.10.RELEASE/spring-framework-reference/html/expressions.html">Spring Expression Language</a></p>
+          <p>Example:</p>
+          <code>when "(codeToBenchmark1 terminates condition == -1) and (codeToBenchmark2 terminates condition == 1)"<br>
+          </code>        
+      
+      
           <h3>Events can contain applications</h3>			  
           <p>While events bring information or data to an Orcha program, it can also describes a service. Consider the following example where recognitionAlgorithm is a service:
           </p>
@@ -197,60 +282,24 @@
         when "selectTrain terminates"<br>
         ...<br>
         when "selectHotel terminates and selectTrain terminates"<br>
-        </code>
-      </div>  
-      </div>
-     
-     <div class="row">
-      <div class="col-md-12">
-          <h2 id="language">The Orcha language</h2>
-          <p>The Orcha language defines a minimal set of instructions for the description of any human activities. In that sense, Orcha is a <i>first language</i>. As a Proto-language in the area of Information Technology, Orcha language is also common to human beings and machines.</p>
-          <p>The instructions set is composed of:</p>
-          <ul>
-          	<li>receive : asynchronous waiting for an <a href="#event">event triggering</a> an activity. The event comes from the real world (a device for instance), an external service (an application) or is an event sent within an Orcha program by a send instruction</li>
-          	<li>from : the source of an event received by the receive instruction</li>
-          	<li>condition (optional) : when used with a receive, filters the events to be received, can also be used in an <a href="#expressionLanguage">Orcha expression</a></li>
-          	<li>compute : processing of an activity (asynchronous service call i.e. application call)</li>
-          	<li>with (optional) : information or data needed to process an activity (the arguments list of a service call separated by commas)</li>
-          	<li>when : waits for the completion of an activity (asynchronous synchronization point for events and/or services (see <a href="#expressionLanguage">Orcha expression language</a>))</li>
-          	<li>send : sends an event to the real world (a device), an external services or an Orcha program</li>
-          	<li>to : the destination of an event to be sent</li>
-          </ul>
-      </div>  
-      </div>
-      
-      <div class="row">
-      <div class="col-md-12">
-          <h2 id="businessAdaptation">Adaptation to a domain/business</h2>
-          <p>
-          Apart the instructions set (compute, receive, from, send, to, condition, when), every terms in an Orcha program, are defined by the user (or programmatically) and should be domain/business oriented.
-          </p>
-          <p>In the instructions below, advertising, advertiser and recognitionAlgorithm are defined by the user:
-          </p>
-          <code>
-          	receive advertising from advertiser
-			receive recognitionAlgorithm from security<br>
-          </code>
-          <p>The content of an event is accessible using dot value:
-          </p>
-          <code>compute someThing with advertising.value<br>
-          </code>
-          <p>In the case of a structured event, it is also possible to go deeper into this event. For example:
-          </p>
-          <code>compute someThing with advertising.value.author.name<br>
-          </code>
-          <p>Or simply:
-          </p>
-          <code>compute someThing with advertising.author.name<br>
-          </code>
-          <p>Where advertising contains the Json structure:
-          </p>
-          <code>
-          {“author”:<br>
-    		{“name”:”...”}<br>
-			}<br>          
-          </code>
+        </code>      
+        
+        <h3>Events conversion of format</h3>
+		<p>
+Par défaut Orcha peut lire (avec une instruction receive) et lire (avec une instruction send) du Json provenant de fichiers ou de bases de données qui supportent Json comme MongoDb. Dans ce cas, un service écrit en Javascript pourra manipuler directement le Json, un service écrit en Java aura recours automatiquement au convertisseur Jackson (https://github.com/FasterXML/Jackson). Il suffira dans ce cas de préciser que le type requis est le type Mime application/json dans la configuration du programme Orcha pour que la traduction Json <-> Javascript ou Json <-> Java se fasse automatiquement. 
 
+Cependant, si un service reçoit en argument un événement d’un type différent de celui qu’il attend, Orcha va chercher automatiquement si un convertisseur de format existe. 
+
+L’exemple suivant est celui d’un service recevant un événement qui utilise une date au format jj/mm/aaaa :
+
+alors que la date est reçue sous forme d’une chaîne de caractères :
+
+Dans ce cas, Orcha va chercher si un convertisseur existe, et l'appeler automatiquement. 
+
+Un convertisseur est une classe Java (écrite en Groovy dans l'exemple ci-dessous) qui est annotée avec, et qui dispose d'une méthode appelée convert recevant en argument le type à convertir et retournant un résultat du type converti. 
+	</p>
+        
+          
           <h3 id="activityAddition">Dynamically addition of activities</h3>
           <p>Once an activity has been defined with the Orcha language, and the related activity is in process (the Orcha program is running), it is still possible to enhance the activity by the addition of others activities with no others instruction but the existing Orcha instructions set.</p>
           <p>An activity to be added is described as usual by Orcha instructions beginning by a receive:</p>
@@ -301,22 +350,6 @@
           		<li>Enhance the reusability of Orcha subprograms that can be integrated into many main programs</li>
           		<li>Modelize high level business/domain activities in main program hiding low level details in subprograms</li>
           </ul>
-      </div>  
-      </div>
-           
-      <div class="row">
-      <div class="col-md-12">
-          <h2 id="expressionLanguage">The Orcha expression language</h2>
-          <p>Orcha uses an expression language in when clauses:
-          </p>
-          <code>when "(codeToBenchmark1 terminates condition == -1) and (codeToBenchmark2 terminates condition == 1)"<br>
-          </code>
-           <p>Supported operators:</p>
-          	<ul>
-          		<li>and</li>
-          		<li>or</li>
-          	</ul>
-          
       </div>  
       </div>
       

@@ -16,7 +16,8 @@ import orcha.lang.compiler.visitor.OrchaComplianceException
 import orcha.lang.compiler.visitor.MyClassLoader
 import orcha.lang.compiler.visitor.OrchaCodeParser
 import orcha.lang.configuration.Application
-
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.codehaus.groovy.ast.ClassCodeVisitorSupport;
 import org.codehaus.groovy.ast.Variable;
 import org.codehaus.groovy.ast.expr.ArgumentListExpression;
@@ -37,7 +38,7 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.core.type.filter.AnnotationTypeFilter
 import org.springframework.stereotype.Service
 
-import groovy.util.logging.Slf4j
+//import groovy.util.logging.Slf4j
 
 /**
  * 
@@ -45,8 +46,10 @@ import groovy.util.logging.Slf4j
  * @author Ben C.
  *
  */
-@Slf4j
+//@Slf4j
 class OrchaCodeVisitorImpl extends OrchaCodeVisitor{
+	
+	private static Logger log = LoggerFactory.getLogger(OrchaCodeVisitorImpl.class);
 	
 	String orchaSourceProgram
 	

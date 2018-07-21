@@ -15,7 +15,7 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.ParseException;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Logger;
+//import org.apache.log4j.Logger;
 import org.springframework.util.Assert;
 
 /**
@@ -27,7 +27,7 @@ import org.springframework.util.Assert;
  */
 public final class EmailParserUtils {
 
-	private static final Logger LOGGER = Logger.getLogger(EmailParserUtils.class);
+	//private static final Logger LOGGER = Logger.getLogger(EmailParserUtils.class);
 
 	/** Prevent instantiation. */
 	private EmailParserUtils() {
@@ -118,9 +118,9 @@ public final class EmailParserUtils {
 		try {
 			count = multipart.getCount();
 
-			if (LOGGER.isInfoEnabled()) {
+			/*if (LOGGER.isInfoEnabled()) {
 				LOGGER.info(String.format("Number of enclosed BodyPart objects: %s.", count));
-			}
+			}*/
 
 		}
 		catch (MessagingException e) {
@@ -159,14 +159,14 @@ public final class EmailParserUtils {
 				throw new IllegalStateException("Unable to retrieve body part meta data.", e);
 			}
 
-			if (LOGGER.isInfoEnabled()) {
-				LOGGER.info(String.format("BodyPart - Content Type: '%s', filename: '%s', disposition: '%s', subject: '%s'",
-							 new Object[]{contentType, filename, disposition, subject}));
-			}
-
-			if (Part.ATTACHMENT.equalsIgnoreCase(disposition)) {
-				LOGGER.info(String.format("Handdling attachment '%s', type: '%s'", filename, contentType));
-			}
+//			if (LOGGER.isInfoEnabled()) {
+//				LOGGER.info(String.format("BodyPart - Content Type: '%s', filename: '%s', disposition: '%s', subject: '%s'",
+//							 new Object[]{contentType, filename, disposition, subject}));
+//			}
+//
+//			if (Part.ATTACHMENT.equalsIgnoreCase(disposition)) {
+//				LOGGER.info(String.format("Handdling attachment '%s', type: '%s'", filename, contentType));
+//			}
 
 			final Object content;
 
@@ -184,7 +184,7 @@ public final class EmailParserUtils {
 
 				if (Part.ATTACHMENT.equalsIgnoreCase(disposition)) {
 					emailFragments.add(new EmailFragment(directory, i + "-" + filename, content));
-					LOGGER.info(String.format("Handdling attachment '%s', type: '%s'", filename, contentType));
+					//LOGGER.info(String.format("Handdling attachment '%s', type: '%s'", filename, contentType));
 				}
 				else {
 
