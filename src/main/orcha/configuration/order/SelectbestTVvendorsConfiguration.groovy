@@ -15,7 +15,7 @@ import org.springframework.context.annotation.Configuration;
  * Delete it to generate a new one (any added configuration will be discarded)
  * 
  */
-@Configuration
+
 @Slf4j
 public class SelectbestTVvendorsConfiguration
     extends BenchmarkingVendorsConfiguration

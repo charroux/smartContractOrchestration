@@ -9,6 +9,7 @@ import orcha.lang.configuration.EventHandler
 import orcha.lang.configuration.Input
 import orcha.lang.configuration.InputFileAdapter
 import orcha.lang.configuration.JavaServiceAdapter
+import orcha.lang.configuration.MessagingMiddlewareAdapter
 import orcha.lang.configuration.Output
 import orcha.lang.configuration.OutputFileAdapter
 import service.GroovyCodeToBenchmark1
@@ -22,8 +23,8 @@ class OrchaServiceConfiguration {
 	@Bean
 	EventHandler orchaProgram(){
 		def eventHandler = new EventHandler(name: "orchaProgram")
-		def fileAdapter = new InputFileAdapter(directory: 'data/input', filenamePattern: "orchaProgram.txt")
-		eventHandler.input = new Input(mimeType: "text/plain", type: "java.lang.Integer", adapter: fileAdapter)
+		def middlewareAdapter = new MessagingMiddlewareAdapter()
+		eventHandler.input = new Input(mimeType: "text/plain", type: "java.lang.Integer", adapter: middlewareAdapter)
 		return eventHandler
 	}
 	

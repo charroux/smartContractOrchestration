@@ -31,6 +31,7 @@ import orcha.lang.configuration.InputFileAdapter
 import orcha.lang.configuration.JavaServiceAdapter
 import orcha.lang.configuration.MailReceiverAdapter
 import orcha.lang.configuration.MailSenderAdapter
+import orcha.lang.configuration.MessagingMiddlewareAdapter
 import orcha.lang.configuration.OrchaServiceAdapter
 import orcha.lang.configuration.OutputFileAdapter
 import orcha.lang.configuration.ScriptServiceAdapter
@@ -497,7 +498,8 @@ class JDom2XmlGeneratorForSpringIntegration implements XmlGenerator{
 			
 			if( alreadyDoneInstructions.contains(instruction) == false){
 
-				generateReceiveEventHandler(instructionNode, xmlSpringIntegration)
+				String title = orchaCodeParser.getOrchaMetadata().getTitle()
+				generateReceiveEventHandler(instructionNode, xmlSpringIntegration, title)
 				
 				if(instructionNode.next.instruction.instruction == "receive"){
 					generateRouterForEventHandlers(instructionNode, expressionParser, xmlSpringIntegration)
@@ -624,7 +626,7 @@ class JDom2XmlGeneratorForSpringIntegration implements XmlGenerator{
 
 	}
 	
-	private void generateReceiveEventHandler(InstructionNode instructionNode, Document xmlSpringIntegration){
+	private void generateReceiveEventHandler(InstructionNode instructionNode, Document xmlSpringIntegration, String title){
 		
 		def EventHandler eventHandler = instructionNode.instruction.springBean
 		InboundChannelAdapter inboundChannelAdapter = new InboundChannelAdapter(xmlSpringIntegration)
@@ -648,6 +650,10 @@ class JDom2XmlGeneratorForSpringIntegration implements XmlGenerator{
 		} else if(eventHandler.input!=null && eventHandler.input.adapter instanceof ComposeEventAdapter){
 		
 			throw new OrchaCompilationException(eventHandler.toString() + " not supported yet.")
+			
+		} else if(eventHandler.input!=null && eventHandler.input.adapter instanceof MessagingMiddlewareAdapter){
+		
+			inboundChannelAdapter.messagingMiddleware(instructionNode, title)
 			
 		} else {
 			throw new OrchaCompilationException(eventHandler.toString() + " not supported yet.")

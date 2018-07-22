@@ -9,8 +9,8 @@ import org.springframework.context.annotation.ImportResource;
  * 
  */
 @ImportResource({
-    "classpath:/prepare order.xml",
-    "classpath:/prepare orderQoS.xml"
+    "classpath:/Orcha service.xml",
+    "classpath:/Orcha serviceQoS.xml"
 })
 public class ImportDynamicResourcesForConfiguration {
 

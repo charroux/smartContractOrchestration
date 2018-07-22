@@ -5,7 +5,7 @@
   <bean id="errorUnwrapper" class="orcha.lang.compiler.referenceimpl.xmlgenerator.impl.ErrorUnwrapper" />
   <int:channel id="recoveryChannel" />
   <int:transformer input-channel="recoveryChannel" output-channel="loggingChannel" expression="'Failure after many attemps for the message :' + payload.failedMessage.payload" />
-  <!-- <int:poller fixed-delay="1000" default="true" />
+  <int:poller fixed-delay="1000" default="true" />
   <int-file:inbound-channel-adapter id="file-customer-InputChannel-id" directory="data/input" channel="customer-InputChannel" prevent-duplicates="true" filename-pattern="orderToPrepare.json" />
   <int-file:file-to-string-transformer input-channel="customer-InputChannel" output-channel="customer-InputChannelTransformer" delete-files="false" />
   <int:chain input-channel="customer-InputChannelTransformer" output-channel="customer-OutputChannel">
@@ -14,20 +14,7 @@
       <int:header name="messageID" expression="headers['id'].toString()" />
     </int:header-enricher>
   </int:chain>
- -->  
- 
-  <int:gateway id="cafeService"
-         service-interface="orcha.lang.Cafe"
-         default-request-channel="customer-InputChannelTransformer"/>
-         
-   <int:chain input-channel="customer-InputChannelTransformer" output-channel="customer-OutputChannel">
-    <int:header-enricher>
-      <int:header name="messageID" expression="headers['id'].toString()" />
-    </int:header-enricher>
-  </int:chain>
-  
-  
-   <int:chain input-channel="customer-OutputChannel" output-channel="prepareOrderServiceAcivatorOutput" id="service-activator-chain-prepareOrderChannel-id">
+  <int:chain input-channel="customer-OutputChannel" output-channel="prepareOrderServiceAcivatorOutput" id="service-activator-chain-prepareOrderChannel-id">
     <int:service-activator id="service-activator-prepareOrderChannel-id" expression="@orderPreparation.prepare(payload)">
       <int:request-handler-advice-chain>
         <bean class="org.springframework.integration.handler.advice.RequestHandlerCircuitBreakerAdvice">

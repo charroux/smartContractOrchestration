@@ -29,6 +29,7 @@ enum BidirectionalAdapter{
 	WebService,
 	JavaApplication,
 	ScriptingApplication,
+	MessagingMiddleware,
 	OrchaApplication
 }
 
@@ -143,6 +144,19 @@ class JavaServiceAdapter extends ConfigurableProperties{
 class ScriptServiceAdapter extends ConfigurableProperties{
 	def adapter = BidirectionalAdapter.ScriptingApplication
 	def file
+}
+
+/**
+ * Allow to receive or sent an event to a message broker.
+ * @author Ben C.
+ *
+ */
+@ToString
+@EqualsAndHashCode
+class MessagingMiddlewareAdapter extends ConfigurableProperties{
+	
+	def adapter = BidirectionalAdapter.MessagingMiddleware
+
 }
 
 @ToString
