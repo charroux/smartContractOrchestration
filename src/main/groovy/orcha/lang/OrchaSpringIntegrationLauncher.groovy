@@ -4,7 +4,7 @@ import org.springframework.context.annotation.ImportResourceimport org.springfr
 /** *  * Orcha xml spring context are loaded dynamically from the auo generated class ImportDynamicResources *  * @author Ben C. * */
 @Configuration
 @EnableAutoConfiguration
-@ComponentScan(basePackages=["configuration","generated"])@Slf4j
+@ComponentScan(basePackages=["configuration","orcha.lang.generated"])@Slf4j
 class OrchaSpringIntegrationLauncher{ 		@Bean	OrchaSession orchaSession(){		return new OrchaSession()	}		public static void main(String[] args) {		try{			System.setProperty(AbstractEnvironment.ACTIVE_PROFILES_PROPERTY_NAME, "default");	// restoring the String http default port to 8080 (application.properties)			SpringApplication application = new SpringApplication(OrchaSpringIntegrationLauncher.class)			application.run(args)		} catch(org.springframework.beans.factory.BeanCreationException e){			log.error("Configuration error into the configuration file: " + e.getRootCause(), e)		} catch(org.springframework.integration.transformer.MessageTransformationException e){			log.error(e.getLocalizedMessage(), e)		}			}
 
 }
