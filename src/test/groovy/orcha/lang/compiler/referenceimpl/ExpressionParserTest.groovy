@@ -30,14 +30,14 @@ class ExpressionParserTest {
 		def applicationsNamesInExpression = ['codeToBenchmark1', 'codeToBenchmark2']
 		String springExpression = expressionParser.releaseSpringLanguageExpression(expression, applicationsNamesInExpression)
 		
-		Assert.assertEquals(springExpression, "size()==2 and ( ( ([0].payload instanceof T(orcha.lang.configuration.Application) and [0].payload.state==T(orcha.lang.configuration.State).TERMINATED) and [0].payload.output.value== -1 ) and ( ([1].payload instanceof T(orcha.lang.configuration.Application) and [1].payload.state==T(orcha.lang.configuration.State).TERMINATED) and [1].payload.output.value== 1 ) )")
+		Assert.assertEquals(springExpression, "size()==2 and ( ( (messages[0].payload instanceof T(orcha.lang.configuration.Application) and messages[0].payload.state==T(orcha.lang.configuration.State).TERMINATED) and messages[0].payload.output.value== -1 ) and ( (messages[1].payload instanceof T(orcha.lang.configuration.Application) and messages[1].payload.state==T(orcha.lang.configuration.State).TERMINATED) and messages[1].payload.output.value== 1 ) )")
 		
 		
 		expression = "(codeToBenchmark1 terminates condition == -1) or (codeToBenchmark2 terminates condition == 1)"
 		
 		springExpression = expressionParser.releaseSpringLanguageExpression(expression, applicationsNamesInExpression)
 		
-		Assert.assertEquals(springExpression, "size()==2 and ( ( ([0].payload instanceof T(orcha.lang.configuration.Application) and [0].payload.state==T(orcha.lang.configuration.State).TERMINATED) and [0].payload.output.value== -1 ) or ( ([1].payload instanceof T(orcha.lang.configuration.Application) and [1].payload.state==T(orcha.lang.configuration.State).TERMINATED) and [1].payload.output.value== 1 ) )")
+		Assert.assertEquals(springExpression, "size()==2 and ( ( (messages[0].payload instanceof T(orcha.lang.configuration.Application) and messages[0].payload.state==T(orcha.lang.configuration.State).TERMINATED) and messages[0].payload.output.value== -1 ) or ( (messages[1].payload instanceof T(orcha.lang.configuration.Application) and messages[1].payload.state==T(orcha.lang.configuration.State).TERMINATED) and messages[1].payload.output.value== 1 ) )")
 		
 	}
 	

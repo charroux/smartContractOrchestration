@@ -459,7 +459,7 @@ class CompileServiceWithSpringIntegrationTest {
 		Assert.assertTrue(element.getAttribute("release-strategy-expression").getValue().contains("size()=="+size))
 		int i = 0
 		while (i!=size) {
-			Assert.assertTrue(element.getAttribute("release-strategy-expression").getValue().contains("([" + i + "].payload instanceof T(orcha.lang.configuration.Application) and [" + i + "].payload.state==T(orcha.lang.configuration.State).TERMINATED) and [" + i + "].payload.output.value=="))
+			Assert.assertTrue(element.getAttribute("release-strategy-expression").getValue().contains("(messages[" + i + "].payload instanceof T(orcha.lang.configuration.Application) and messages[" + i + "].payload.state==T(orcha.lang.configuration.State).TERMINATED) and messages[" + i + "].payload.output.value=="))
 			i++
 		}
 		

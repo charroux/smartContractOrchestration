@@ -3,7 +3,7 @@ package configuration
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import orcha.lang.configuration.OutputFileAdapter.WritingMode
-
+import orcha.lang.generated.OutputStreamHandler
 import orcha.lang.configuration.Application
 import orcha.lang.configuration.EventHandler
 import orcha.lang.configuration.Input
@@ -51,6 +51,5 @@ class OrchaServiceConfiguration {
 		eventHandler.output = new Output(mimeType: "text/plain", type: "java.lang.String", adapter: fileAdapter)
 		return eventHandler
 	}
-
 
 }
