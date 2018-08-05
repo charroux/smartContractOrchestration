@@ -747,6 +747,10 @@ class JDom2XmlGeneratorForSpringIntegration implements XmlGenerator{
 				
 			throw new OrchaCompilationException(eventHandler.toString() + " not supported yet.")
 			
+		} else if(eventHandler.output.adapter instanceof MessagingMiddlewareAdapter){
+		
+			outboundChannelAdapter.messagingMiddleware(instructionNode)
+			
 		} else {
 			throw new OrchaCompilationException(eventHandler.toString() + " not supported yet.")
 		}

@@ -3,7 +3,6 @@ package configuration
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import orcha.lang.configuration.OutputFileAdapter.WritingMode
-import orcha.lang.generated.OutputStreamHandler
 import orcha.lang.configuration.Application
 import orcha.lang.configuration.EventHandler
 import orcha.lang.configuration.Input
@@ -19,10 +18,9 @@ import service.OrchaGroovyService
 @Configuration
 class OrchaServiceConfiguration {
 	
-	
 	@Bean
-	EventHandler orchaProgram(){
-		def eventHandler = new EventHandler(name: "orchaProgram")
+	EventHandler orchaProgramSource(){
+		def eventHandler = new EventHandler(name: "orchaProgramSource")
 		def middlewareAdapter = new MessagingMiddlewareAdapter()
 		eventHandler.input = new Input(mimeType: "text/plain", type: "java.lang.Integer", adapter: middlewareAdapter)
 		return eventHandler
@@ -43,13 +41,13 @@ class OrchaServiceConfiguration {
 		code1Application.output = code1Output
 		return code1Application
 	}
-		
+	
 	@Bean
-	EventHandler orchaServiceOutputFile(){
-		def eventHandler = new EventHandler(name: "orchaServiceOutputFile")
-		def fileAdapter = new OutputFileAdapter(directory: 'data/output', createDirectory: true, filename:'orchaServiceOutputFile.txt', appendNewLine: true, writingMode: WritingMode.REPLACE)
-		eventHandler.output = new Output(mimeType: "text/plain", type: "java.lang.String", adapter: fileAdapter)
+	EventHandler orchaProgramDestination(){
+		def eventHandler = new EventHandler(name: "orchaProgramDestination")
+		def middlewareAdapter = new MessagingMiddlewareAdapter()
+		eventHandler.output = new Output(mimeType: "text/plain", type: "java.lang.Integer", adapter: middlewareAdapter)
 		return eventHandler
 	}
-
+	
 }
