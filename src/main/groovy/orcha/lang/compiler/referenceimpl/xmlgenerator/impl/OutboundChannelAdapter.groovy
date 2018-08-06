@@ -335,6 +335,28 @@ class OutboundChannelAdapter implements Chain, Transformer{
 		
 		log.info 'Generation of the stream handler binary class for sending an event to a messaging middleware: ' + fichier + ' complete successfully'
 		
+		fichier = "." + File.separator + "src" + File.separator + "main" + File.separator + "resources" + File.separator + "application.properties"
+		
+		log.info 'Adding the output binding destination ' + instruction.springBean.name + ' to: ' + fichier
+		
+		new File(fichier) << '''
+
+# Auto generation of the output destination to the messaging middleware. Do not delete this line:
+spring.cloud.stream.bindings.output.destination=''' + instruction.springBean.name 
+		
+		log.info 'Adding the output binding destination ' + instruction.springBean.name + ' to: ' + fichier + ' complete successfully'
+
+		fichier = "." + File.separator + "bin" + File.separator + "main" + File.separator + "application.properties"
+
+		log.info 'Adding the output binding destination ' + instruction.springBean.name + ' to: ' + fichier
+		
+		new File(fichier) << '''
+
+# Auto generation of the output destination to the messaging middleware. Do not delete this line:
+spring.cloud.stream.bindings.output.destination=''' + instruction.springBean.name 
+		
+		log.info 'Adding the output binding destination ' + instruction.springBean.name + ' to: ' + fichier + ' complete successfully'
+
 		/*
 		log.info 'Generation of the stream handler binary file for receiving event from a messaging middleware: ' + fichier
 		

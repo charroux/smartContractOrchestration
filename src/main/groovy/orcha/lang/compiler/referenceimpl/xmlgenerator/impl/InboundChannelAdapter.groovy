@@ -368,6 +368,28 @@ class InboundChannelAdapter implements Poller, Chain, HeaderEnricher, Filter, Tr
 
 		log.info 'Generation of the stream handler binary file for receiving event from a messaging middleware: ' + fichier + ' complete successfully.'
 		
+		fichier = "." + File.separator + "src" + File.separator + "main" + File.separator + "resources" + File.separator + "application.properties"
+		
+		log.info 'Adding the input binding destination ' + instruction.springBean.name + ' to: ' + fichier
+		
+		new File(fichier) << '''
+
+# Auto generation of the input destination to the messaging middleware. Do not delete this line:
+spring.cloud.stream.bindings.input.destination=''' + instruction.springBean.name 
+		
+		log.info 'Adding the input binding destination ' + instruction.springBean.name + ' to: ' + fichier + ' complete successfully'
+
+		fichier = "." + File.separator + "bin" + File.separator + "main" + File.separator + "application.properties"
+		
+		log.info 'Adding the input binding destination ' + instruction.springBean.name + ' to: ' + fichier
+		
+		new File(fichier) << '''
+
+# Auto generation of the input destination to the messaging middleware. Do not delete this line:
+spring.cloud.stream.bindings.input.destination=''' + instruction.springBean.name 
+		
+		log.info 'Adding the input binding destination ' + instruction.springBean.name + ' to: ' + fichier + ' complete successfully'
+
 	}
 			
 	public void http(InstructionNode instructionNode) {
