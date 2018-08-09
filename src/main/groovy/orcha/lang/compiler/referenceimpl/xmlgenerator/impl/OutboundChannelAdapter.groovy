@@ -342,7 +342,7 @@ class OutboundChannelAdapter implements Chain, Transformer{
 		new File(fichier) << '''
 
 # Auto generation of the output destination to the messaging middleware. Do not delete this line:
-spring.cloud.stream.bindings.output.destination=''' + instruction.springBean.name 
+spring.cloud.stream.bindings.output.destination=''' + instruction.springBean.name
 		
 		log.info 'Adding the output binding destination ' + instruction.springBean.name + ' to: ' + fichier + ' complete successfully'
 

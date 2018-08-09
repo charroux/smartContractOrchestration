@@ -14,7 +14,9 @@ import com.sun.codemodel.writer.FileCodeWriter
 
 import groovy.util.logging.Slf4j
 
+import com.jayway.jsonpath.internal.function.ParamType
 import com.sun.codemodel.ClassType
+import com.sun.codemodel.JAnnotationUse
 import com.sun.codemodel.JBlock
 import com.sun.codemodel.JClass
 import orcha.lang.compiler.Instruction
@@ -133,9 +135,6 @@ class InboundChannelAdapter implements Poller, Chain, HeaderEnricher, Filter, Tr
 				condition = "payload." + condition
 			}
 			
-			
-			//condition = condition.replaceFirst(instructionNode.instruction.variable, "payload")
-			
 			Element conditionFilter = filter(condition)
 			chain.addContent(conditionFilter)
 		}
@@ -173,8 +172,9 @@ class InboundChannelAdapter implements Poller, Chain, HeaderEnricher, Filter, Tr
 		def id = "headers['id'].toString()"
 		Element messageIDEnricher = headerEnricher("messageID", id)
 		chain.addContent(messageIDEnricher)
-					
-		if(instructionNode.next.instruction.instruction!="receive" && instructionNode.instruction.condition!=null){
+		
+		if(instruction.condition!=null){
+			
 			String condition = instructionNode.instruction.condition
 			
 			condition = condition.trim()
@@ -224,9 +224,7 @@ class InboundChannelAdapter implements Poller, Chain, HeaderEnricher, Filter, Tr
 		
 		String t = gateWayClassName.replaceAll('\\.', "/")
 		
-		
 		paramType = paramType.replaceAll('\\.', "/")
-		
 		paramType = "(L" + paramType + ";)V"
 		
 		ClassWriter cw = new ClassWriter(0);
@@ -283,8 +281,9 @@ class InboundChannelAdapter implements Poller, Chain, HeaderEnricher, Filter, Tr
 		paramClass = Class.forName(paramType)
 		nameParam = method.param(paramClass, "event");
 		
-		method.annotate(codeModel.ref(org.springframework.cloud.stream.annotation.StreamListener.class)).param("value", Sink.INPUT)
-		
+		JAnnotationUse annotation = method.annotate(codeModel.ref(org.springframework.cloud.stream.annotation.StreamListener.class))
+		annotation.param("value", Sink.INPUT)
+			
 		JBlock body = method.body()
 		
 		Class gateWayClass = Class.forName(gateWayClassName)
@@ -338,8 +337,11 @@ class InboundChannelAdapter implements Poller, Chain, HeaderEnricher, Filter, Tr
 		mv.visitInsn(Opcodes.RETURN);
 		mv.visitMaxs(1, 1);
 		mv.visitEnd();
+		
+		paramType = paramType.replaceAll('\\.', "/")
+		paramType = "(L" + paramType + ";)V"
 			
-		mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "handle", "(Ljava/lang/Integer;)V", null, null);
+		mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "handle", paramType, null, null);
 		
 		av0 = mv.visitAnnotation("Lorg/springframework/cloud/stream/annotation/StreamListener;", true);
 		av0.visit("value", "input");
@@ -354,7 +356,7 @@ class InboundChannelAdapter implements Poller, Chain, HeaderEnricher, Filter, Tr
 		mv.visitVarInsn(Opcodes.ASTORE, 2);
 		mv.visitVarInsn(Opcodes.ALOAD, 2);
 		mv.visitVarInsn(Opcodes.ALOAD, 1);
-		mv.visitMethodInsn(Opcodes.INVOKEINTERFACE, t, "call", "(Ljava/lang/Integer;)V", true);
+		mv.visitMethodInsn(Opcodes.INVOKEINTERFACE, t, "call", paramType, true);
 		mv.visitInsn(Opcodes.RETURN);
 		mv.visitMaxs(2, 3);
 		mv.visitEnd();

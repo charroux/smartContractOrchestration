@@ -1,4 +1,4 @@
-package configuration
+package configuration.orchaService
 
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -13,7 +13,7 @@ import orcha.lang.configuration.Output
 import orcha.lang.configuration.OutputFileAdapter
 import service.GroovyCodeToBenchmark1
 import service.GroovyCodeToBenchmark2
-import service.OrchaGroovyService
+import service.orchaService.OrchaGroovyService
 
 @Configuration
 class OrchaServiceConfiguration {
@@ -22,7 +22,7 @@ class OrchaServiceConfiguration {
 	EventHandler orchaProgramSource(){
 		def eventHandler = new EventHandler(name: "orchaProgramSource")
 		def middlewareAdapter = new MessagingMiddlewareAdapter()
-		eventHandler.input = new Input(mimeType: "text/plain", type: "java.lang.Integer", adapter: middlewareAdapter)
+		eventHandler.input = new Input(mimeType: "application/json", type: "service.orchaService.Product", adapter: middlewareAdapter)
 		return eventHandler
 	}
 	
@@ -34,10 +34,10 @@ class OrchaServiceConfiguration {
 	@Bean
 	Application orchaService(){
 		def code1Application = new Application(name: "orchaService", language: "Groovy")
-		def groovyCode1Adapter = new JavaServiceAdapter(javaClass: 'service.OrchaGroovyService', method:'method')
-		def code1Input = new Input(type: "java.lang.Integer", adapter: groovyCode1Adapter)
+		def groovyCode1Adapter = new JavaServiceAdapter(javaClass: 'service.orchaService.OrchaGroovyService', method:'method')
+		def code1Input = new Input(type: "service.orchaService.Product", adapter: groovyCode1Adapter)
 		code1Application.input = code1Input
-		def code1Output = new Output(type: "java.lang.Integer", adapter: groovyCode1Adapter)
+		def code1Output = new Output(type: "service.orchaService.Order", adapter: groovyCode1Adapter)
 		code1Application.output = code1Output
 		return code1Application
 	}
@@ -46,7 +46,7 @@ class OrchaServiceConfiguration {
 	EventHandler orchaProgramDestination(){
 		def eventHandler = new EventHandler(name: "orchaProgramDestination")
 		def middlewareAdapter = new MessagingMiddlewareAdapter()
-		eventHandler.output = new Output(mimeType: "text/plain", type: "java.lang.Integer", adapter: middlewareAdapter)
+		eventHandler.output = new Output(mimeType: "application/json", type: "service.orchaService.Order", adapter: middlewareAdapter)
 		return eventHandler
 	}
 	
