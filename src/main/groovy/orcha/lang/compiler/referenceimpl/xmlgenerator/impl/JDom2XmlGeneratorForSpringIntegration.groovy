@@ -629,7 +629,14 @@ class JDom2XmlGeneratorForSpringIntegration implements XmlGenerator{
 	private void generateReceiveEventHandler(InstructionNode instructionNode, Document xmlSpringIntegration, String title){
 		
 		def EventHandler eventHandler = instructionNode.instruction.springBean
-		InboundChannelAdapter inboundChannelAdapter = new InboundChannelAdapter(xmlSpringIntegration)
+		
+		String filteringExpression = null
+		
+		if(instructionNode.instruction.condition != null) {
+			filteringExpression = expressionParser.filteringExpression(instructionNode.instruction.condition)
+		}
+		
+		InboundChannelAdapter inboundChannelAdapter = new InboundChannelAdapter(xmlSpringIntegration, filteringExpression)
 		
 		if(eventHandler.input!=null && eventHandler.input.adapter instanceof HttpAdapter){
 				

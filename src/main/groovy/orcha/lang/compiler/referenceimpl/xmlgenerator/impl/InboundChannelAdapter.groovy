@@ -14,7 +14,6 @@ import com.sun.codemodel.writer.FileCodeWriter
 
 import groovy.util.logging.Slf4j
 
-import com.jayway.jsonpath.internal.function.ParamType
 import com.sun.codemodel.ClassType
 import com.sun.codemodel.JAnnotationUse
 import com.sun.codemodel.JBlock
@@ -53,10 +52,14 @@ import org.springframework.cloud.stream.messaging.Sink
 class InboundChannelAdapter implements Poller, Chain, HeaderEnricher, Filter, Transformer {
 	
 	Document xmlSpringIntegration
+	String filteringExpression
 	
-	public InboundChannelAdapter(Document xmlSpringIntegration) {
+	public InboundChannelAdapter(Document xmlSpringIntegration, String filteringExpression) {
 		super();
-		this.xmlSpringIntegration = xmlSpringIntegration;
+		this.xmlSpringIntegration = xmlSpringIntegration
+		this.filteringExpression = filteringExpression
+		
+		println filteringExpression
 	}
 	
 	private Element addDefaultPoller(InstructionNode instructionNode) {
@@ -124,7 +127,12 @@ class InboundChannelAdapter implements Poller, Chain, HeaderEnricher, Filter, Tr
 		Element messageIDEnricher = headerEnricher("messageID", id)
 		chain.addContent(messageIDEnricher)
 			
-		if(instructionNode.next.instruction.instruction!="receive" && instructionNode.instruction.condition!=null){
+		if(filteringExpression != null) {
+			Element conditionFilter = filter(filteringExpression)
+			chain.addContent(conditionFilter)
+		}
+		
+		/*if(instructionNode.next.instruction.instruction!="receive" && instructionNode.instruction.condition!=null){
 			String condition = instructionNode.instruction.condition
 			
 			condition = condition.trim()
@@ -135,9 +143,8 @@ class InboundChannelAdapter implements Poller, Chain, HeaderEnricher, Filter, Tr
 				condition = "payload." + condition
 			}
 			
-			Element conditionFilter = filter(condition)
-			chain.addContent(conditionFilter)
-		}
+			
+		}*/
 				
 	}
 
@@ -173,7 +180,12 @@ class InboundChannelAdapter implements Poller, Chain, HeaderEnricher, Filter, Tr
 		Element messageIDEnricher = headerEnricher("messageID", id)
 		chain.addContent(messageIDEnricher)
 		
-		if(instruction.condition!=null){
+		if(filteringExpression != null) {
+			Element conditionFilter = filter(filteringExpression)
+			chain.addContent(conditionFilter)
+		}
+		
+		/*ùif(instruction.condition!=null){
 			
 			String condition = instructionNode.instruction.condition
 			
@@ -187,7 +199,7 @@ class InboundChannelAdapter implements Poller, Chain, HeaderEnricher, Filter, Tr
 			
 			Element conditionFilter = filter(condition)
 			chain.addContent(conditionFilter)
-		}
+		}*/
 		
 		// generate gateway interface source code
 		

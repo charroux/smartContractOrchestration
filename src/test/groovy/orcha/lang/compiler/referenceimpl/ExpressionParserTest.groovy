@@ -88,5 +88,14 @@ class ExpressionParserTest {
 		Assert.assertTrue(index == -1)
 		
 	}
+	
+	@Test
+	void filterExpression() {
+		
+		ExpressionParserImpl expressionParser = new ExpressionParserImpl()
+		String filterExpression = expressionParser.filteringExpression("[(specification == 'TV' or order.price == 30) and == 0] and == 5")
+		Assert.assertEquals(filterExpression, "[(payload.specification == 'TV' or payload.order.price == 30) and payload == 0] and payload == 5")
+		
+	}
 
 }

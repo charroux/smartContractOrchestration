@@ -66,6 +66,88 @@ class ExpressionParserImpl implements ExpressionParser{
 		}
 		return applicationNames[0]
 	}
+
+	/**
+	 * Add payload before variable.
+	 * Exp. : 
+	 * 		[(specification == 'TV' or order.price == 30) and == 0] and == 5
+	 * becomes :
+	 *		[(payload.specification == 'TV' or payload.order.price == 30) and payload == 0] and payload == 5 
+	 */
+	@Override
+	public String filteringExpression(String expression) {
+		
+		String tmp = expression.trim()
+		String filterExpression = expression
+		int indexOfVariable = 0
+		
+		while(tmp.isEmpty() == false) {
+
+			//skip [, ( and white space
+			int index = 0
+			while(tmp.getAt(index).equals("(") || tmp.getAt(index).equals("[")) {
+				index++
+			}
+			
+			tmp = tmp.substring(index).trim()
+			
+			indexOfVariable = indexOfVariable + index
+			
+			// if tmp = '== value' => no . to add after payload: tmp = payload == value
+			// if tmp = 'x == value' => add . after payload: tmp = payload.x == value
+			if(tmp.startsWith("==") || tmp.startsWith("<=") || tmp.startsWith(">=")) {
+				// find variable after an operator
+				//tmp = tmp.substring(2).trim()
+				filterExpression = filterExpression.substring(0, indexOfVariable) + "payload " + filterExpression.substring(indexOfVariable)
+				indexOfVariable = indexOfVariable + 8
+			} else if(tmp.startsWith("<") || tmp.startsWith(">")){
+				// find variable after an operator
+				//tmp = tmp.substring(1).trim()
+			} else {
+				filterExpression = filterExpression.substring(0, indexOfVariable) + "payload." + filterExpression.substring(indexOfVariable)
+				indexOfVariable = indexOfVariable + 8
+			}
+			
+			// look for next variable (after an and)
+			int indexOfAnd = tmp.indexOf(" and ")
+			int indexOfOr = tmp.indexOf(" or ")
+			int indexOfNot = tmp.indexOf(" not ")
+			
+			if(indexOfAnd == -1) {
+				indexOfAnd = Integer.MAX_VALUE
+			}
+			if(indexOfOr == -1) {
+				indexOfOr = Integer.MAX_VALUE
+			}
+			if(indexOfNot == -1) {
+				indexOfNot = Integer.MAX_VALUE
+			}
+			
+			if(indexOfAnd < indexOfOr){
+				if(indexOfAnd < indexOfNot){	// min indexOfAnd
+					tmp = tmp.substring(indexOfAnd+5).trim()
+					indexOfVariable = indexOfVariable + indexOfAnd + 5
+				} else { 						// min indexOfNot
+					tmp = tmp.substring(indexOfNot+5).trim()
+					indexOfVariable = indexOfVariable + indexOfNot + 5
+				}
+			} else {	// min indexOfOr or (indexOfAnd=Integer.MAX_VALUE and indexOfOr=Integer.MAX_VALUE) 
+				if(indexOfOr < indexOfNot){	// min indexOfOr
+					tmp = tmp.substring(indexOfOr+4).trim()
+					indexOfVariable = indexOfVariable + indexOfOr + 4
+				} else if(indexOfNot != Integer.MAX_VALUE){ 		// min indexOfNot
+					tmp = tmp.substring(indexOfNot+5).trim()
+					indexOfVariable = indexOfVariable + indexOfNot + 5
+				} else {
+					tmp = tmp.substring(tmp.length())
+				}
+			}
+		
+		}
+		
+		return filterExpression
+			
+	}
 	
 	private String releaseSpringLanguageExpression(String expression, List<String> applicationsNamesInExpression) {
 		
