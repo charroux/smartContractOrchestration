@@ -549,10 +549,13 @@ class JDom2XmlGeneratorForSpringIntegration implements XmlGenerator{
 				
 			}
 
+			String title = orchaCodeParser.getOrchaMetadata().getTitle()
+			
 			if(sequenceSize>1 && nodes.size()==1) {
-				generateApplication(instructionNode, sequenceNumber, sequenceSize, computeFails, failChannel, xmlSpringIntegration)
+				generateApplication(instructionNode, title, sequenceNumber, sequenceSize, computeFails, failChannel, xmlSpringIntegration)
 			} else {
-				generateApplication(instructionNode, computeFails, failChannel, xmlSpringIntegration)
+				
+				generateApplication(instructionNode, title, computeFails, failChannel, xmlSpringIntegration)
 			}
 			
 			if(nodes.size() > 1) {
@@ -667,7 +670,7 @@ class JDom2XmlGeneratorForSpringIntegration implements XmlGenerator{
 		}
 	}
 	
-	private void generateApplication(InstructionNode instructionNode, int sequenceNumber, int sequenceSize, boolean computeFails, String failChannel, Document xmlSpringIntegration){
+	private void generateApplication(InstructionNode instructionNode, String title, int sequenceNumber, int sequenceSize, boolean computeFails, String failChannel, Document xmlSpringIntegration){
 		
 		ServiceActivator serviceActivator = new ServiceActivator(xmlSpringIntegration)
 		
@@ -684,11 +687,12 @@ class JDom2XmlGeneratorForSpringIntegration implements XmlGenerator{
 		} else if(instructionNode.instruction.springBean.input.adapter instanceof OrchaServiceAdapter){
 			
 			this.generateRedirectInputEventToSendEventHandler(instructionNode, xmlSpringIntegration)
+			this.generateRedirectOutputEventToReceiveEventHandler(instructionNode, title,  xmlSpringIntegration)
 	
 		}
 	}
 	
-	private void generateApplication(InstructionNode instructionNode, boolean computeFails, String failChannel, Document xmlSpringIntegration){
+	private void generateApplication(InstructionNode instructionNode, String title, boolean computeFails, String failChannel, Document xmlSpringIntegration){
 		
 		ServiceActivator serviceActivator = new ServiceActivator(xmlSpringIntegration)
 		
@@ -705,7 +709,8 @@ class JDom2XmlGeneratorForSpringIntegration implements XmlGenerator{
 		} else if(instructionNode.instruction.springBean.input.adapter instanceof OrchaServiceAdapter){
 			
 			this.generateRedirectInputEventToSendEventHandler(instructionNode, xmlSpringIntegration)
-	
+			this.generateRedirectOutputEventToReceiveEventHandler(instructionNode, title, xmlSpringIntegration)
+			
 		}
 		
 /*		if(instructionNode.instruction.springBean.input.adapter instanceof MailSenderAdapter){
@@ -769,23 +774,57 @@ class JDom2XmlGeneratorForSpringIntegration implements XmlGenerator{
 		
 		OrchaServiceAdapter orchaServiceAdapter = instructionNode.instruction.springBean.input.adapter
 		
-		def adapter = orchaServiceAdapter.input.input.adapter
-		
-		if(adapter instanceof DatabaseAdapter){
+		if(orchaServiceAdapter instanceof DatabaseAdapter){
 			
-			throw new OrchaCompilationException(adapter.toString() + " not supported yet.")
+			throw new OrchaCompilationException(orchaServiceAdapter.toString() + " not supported yet.")
 			
-		} else if(adapter instanceof InputFileAdapter){
+		} else if(orchaServiceAdapter instanceof InputFileAdapter){
 			
 			outboundChannelAdapter.file(instructionNode, orchaServiceAdapter.input)
 			
-		} else if(adapter instanceof MailSenderAdapter){
+		} else if(orchaServiceAdapter instanceof OrchaServiceAdapter){
+			
+			outboundChannelAdapter.messagingMiddleware(instructionNode)
+			
+		} else if(orchaServiceAdapter instanceof MailSenderAdapter){
 				
-			throw new OrchaCompilationException(adapter.toString() + " not supported yet.")
+			throw new OrchaCompilationException(orchaServiceAdapter.toString() + " not supported yet.")
 			
 		} else {
-			throw new OrchaCompilationException(adapter.toString() + " not supported yet.")
+			throw new OrchaCompilationException(orchaServiceAdapter.toString() + " not supported yet.")
 		}
 	}
-	
+
+	private void generateRedirectOutputEventToReceiveEventHandler(InstructionNode instructionNode, String title, Document xmlSpringIntegration){
+		
+		String filteringExpression = null
+		
+		if(instructionNode.instruction.condition != null) {
+			filteringExpression = expressionParser.filteringExpression(instructionNode.instruction.condition)
+		}
+		InboundChannelAdapter inboundChannelAdapter = new InboundChannelAdapter(xmlSpringIntegration, filteringExpression)
+		
+		OrchaServiceAdapter orchaServiceAdapter = instructionNode.instruction.springBean.output.adapter
+		
+		if(orchaServiceAdapter instanceof DatabaseAdapter){
+			
+			throw new OrchaCompilationException(orchaServiceAdapter.toString() + " not supported yet.")
+			
+		} else if(orchaServiceAdapter instanceof InputFileAdapter){
+			
+			inboundChannelAdapter.file(instructionNode)
+			
+		} else if(orchaServiceAdapter instanceof OrchaServiceAdapter){
+			
+			inboundChannelAdapter.messagingMiddleware(instructionNode, title)
+			
+		} else if(orchaServiceAdapter instanceof MailSenderAdapter){
+				
+			throw new OrchaCompilationException(orchaServiceAdapter.toString() + " not supported yet.")
+			
+		} else {
+			throw new OrchaCompilationException(orchaServiceAdapter.toString() + " not supported yet.")
+		}
+	}
+
 }

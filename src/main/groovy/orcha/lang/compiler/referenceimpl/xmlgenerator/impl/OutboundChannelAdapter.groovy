@@ -238,11 +238,18 @@ class OutboundChannelAdapter implements Chain, Transformer{
 		element.setAttribute("id", inputChannel)
 		rootElement.addContent(element)
 		
-		String[] typeAndSubtype = instruction.springBean.output.mimeType.split("/");
-		if(typeAndSubtype.length != 2){
-			throw new OrchaCompilationException("Unknown Mime Type:" + instruction.springBean.output.mimeType)
+		if(instruction.springBean instanceof Application && instruction.springBean.language.equalsIgnoreCase("Orcha")) {
+			String mimeType = instruction.springBean.input.mimeType
+			if(mimeType!=null && mimeType.split("/").length != 2){
+				throw new OrchaCompilationException("Unknown Mime Type:" + instruction.springBean.input.mimeType)
+			}
+		} else {
+			String mimeType = instruction.springBean.output.mimeType
+			if(mimeType!=null && mimeType.split("/").length != 2){
+				throw new OrchaCompilationException("Unknown Mime Type:" + instruction.springBean.output.mimeType)
+			}
 		}
-					
+						
 		String streamHandlerClassName = "orcha.lang.generated.OutputStreamHandler"
 		String s = "." + File.separator + "src" + File.separator + "main" + File.separator + "java"
 		String path = s + File.separator + streamHandlerClassName + ".java"
@@ -357,65 +364,6 @@ spring.cloud.stream.bindings.output.destination=''' + instruction.springBean.nam
 		
 		log.info 'Adding the output binding destination ' + instruction.springBean.name + ' to: ' + fichier + ' complete successfully'
 
-		/*
-		log.info 'Generation of the stream handler binary file for receiving event from a messaging middleware: ' + fichier
-		
-		cw = new ClassWriter(0);
-		
-		cw.visit(52, Opcodes.ACC_PUBLIC + Opcodes.ACC_SUPER, tt, null, "java/lang/Object", null);
-		
-		av0 = cw.visitAnnotation("Lorg/springframework/cloud/stream/annotation/EnableBinding;", true);
-		
-		AnnotationVisitor av1 = av0.visitArray("value");
-		av1.visit(null, Type.getType("Lorg/springframework/cloud/stream/messaging/Sink;"));
-		av1.visitEnd();
-		
-		av0.visitEnd();
-		
-		fv = cw.visitField(Opcodes.ACC_PRIVATE, "context", "Lorg/springframework/context/ApplicationContext;", null, null);
-		
-		av0 = fv.visitAnnotation("Lorg/springframework/beans/factory/annotation/Autowired;", true);
-		av0.visitEnd();
-		
-		fv.visitEnd();
-		
-		mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "<init>", "()V", null, null);
-		mv.visitCode();
-		mv.visitVarInsn(Opcodes.ALOAD, 0);
-		mv.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/Object", "<init>", "()V", false);
-		mv.visitInsn(Opcodes.RETURN);
-		mv.visitMaxs(1, 1);
-		mv.visitEnd();
-			
-		mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "handle", "(Ljava/lang/Integer;)V", null, null);
-		
-		av0 = mv.visitAnnotation("Lorg/springframework/cloud/stream/annotation/StreamListener;", true);
-		av0.visit("value", "input");
-		av0.visitEnd();
-		
-		mv.visitCode();
-		mv.visitVarInsn(Opcodes.ALOAD, 0);
-		mv.visitFieldInsn(Opcodes.GETFIELD, tt, "context", "Lorg/springframework/context/ApplicationContext;");
-		mv.visitLdcInsn(Type.getType("L" + t + ";"));
-		mv.visitMethodInsn(Opcodes.INVOKEINTERFACE, "org/springframework/context/ApplicationContext", "getBean", "(Ljava/lang/Class;)Ljava/lang/Object;", true);
-		mv.visitTypeInsn(Opcodes.CHECKCAST, t);
-		mv.visitVarInsn(Opcodes.ASTORE, 2);
-		mv.visitVarInsn(Opcodes.ALOAD, 2);
-		mv.visitVarInsn(Opcodes.ALOAD, 1);
-		mv.visitMethodInsn(Opcodes.INVOKEINTERFACE, t, "call", "(Ljava/lang/Integer;)V", true);
-		mv.visitInsn(Opcodes.RETURN);
-		mv.visitMaxs(2, 3);
-		mv.visitEnd();
-		
-		bytes = cw.toByteArray()
-						
-		file = new File(fichier);
-		fos = new FileOutputStream(file);
-		fos.write(bytes);
-		fos.close();
-
-		log.info 'Generation of the stream handler binary file for receiving event from a messaging middleware: ' + fichier + ' complete successfully.'
-		*/
 	}
 
 }
