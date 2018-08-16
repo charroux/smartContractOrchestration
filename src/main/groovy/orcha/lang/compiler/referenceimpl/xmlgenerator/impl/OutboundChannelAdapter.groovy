@@ -344,6 +344,45 @@ class OutboundChannelAdapter implements Chain, Transformer{
 		
 		fichier = "." + File.separator + "src" + File.separator + "main" + File.separator + "resources" + File.separator + "application.properties"
 		
+		def lines = []
+		
+		new File(fichier).eachLine {
+			line -> if(line.startsWith("spring.cloud.stream.bindings.output.destination")==false && line.startsWith("# Auto generation of the output")==false && line.equals("")==false) lines.add(line)
+		}
+		
+		new File(fichier).delete()
+		
+		new File(fichier).withWriter('utf-8') { writer ->
+			lines.each{
+				writer.writeLine(it)
+			}
+		}
+		
+		log.info 'Adding the output binding destination ' + instruction.springBean.name + ' to: ' + fichier
+		
+		new File(fichier) << '''
+
+# Auto generation of the output destination to the messaging middleware. Do not delete this line:
+spring.cloud.stream.bindings.output.destination=''' + instruction.springBean.name
+		
+		log.info 'Adding the input binding destination ' + instruction.springBean.name + ' to: ' + fichier + ' complete successfully'
+
+		def src = new File(fichier)
+		
+		fichier = "." + File.separator + "bin" + File.separator + "main" + File.separator + "application.properties"
+		
+		log.info 'Adding the output binding destination ' + instruction.springBean.name + ' to: ' + fichier
+		
+		def dst = new File(fichier)
+		dst.delete()
+		
+		dst << src.text
+
+		log.info 'Adding the output binding destination ' + instruction.springBean.name + ' to: ' + fichier + ' complete successfully'
+		
+		
+		/*
+		
 		log.info 'Adding the output binding destination ' + instruction.springBean.name + ' to: ' + fichier
 		
 		new File(fichier) << '''
@@ -363,7 +402,7 @@ spring.cloud.stream.bindings.output.destination=''' + instruction.springBean.nam
 spring.cloud.stream.bindings.output.destination=''' + instruction.springBean.name 
 		
 		log.info 'Adding the output binding destination ' + instruction.springBean.name + ' to: ' + fichier + ' complete successfully'
-
+*/
 	}
 
 }

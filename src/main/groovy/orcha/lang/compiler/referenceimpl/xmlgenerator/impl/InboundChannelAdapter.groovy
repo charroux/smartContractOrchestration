@@ -414,6 +414,20 @@ class InboundChannelAdapter implements Poller, Chain, HeaderEnricher, Filter, Tr
 			destinationName = instruction.springBean.name
 		}
 		
+		def lines = []
+		
+		new File(fichier).eachLine {
+			line -> if(line.startsWith("spring.cloud.stream.bindings.input.destination")==false && line.startsWith("# Auto generation of the input")==false && line.equals("")==false) lines.add(line)
+		}
+		
+		new File(fichier).delete()
+		
+		new File(fichier).withWriter('utf-8') { writer ->
+			lines.each{
+				writer.writeLine(it)
+			}
+		}
+		
 		log.info 'Adding the input binding destination ' + destinationName + ' to: ' + fichier
 		
 		new File(fichier) << '''
@@ -423,15 +437,24 @@ spring.cloud.stream.bindings.input.destination=''' + destinationName
 		
 		log.info 'Adding the input binding destination ' + destinationName + ' to: ' + fichier + ' complete successfully'
 
+		def src = new File(fichier)
+		
 		fichier = "." + File.separator + "bin" + File.separator + "main" + File.separator + "application.properties"
 		
 		log.info 'Adding the input binding destination ' + destinationName + ' to: ' + fichier
+		
+		def dst = new File(fichier)
+		dst.delete()
+		
+		dst << src.text
+		
+		/*
 		
 		new File(fichier) << '''
 
 # Auto generation of the input destination to the messaging middleware. Do not delete this line:
 spring.cloud.stream.bindings.input.destination=''' + destinationName 
-		
+*/		
 		log.info 'Adding the input binding destination ' + destinationName + ' to: ' + fichier + ' complete successfully'
 
 	}
