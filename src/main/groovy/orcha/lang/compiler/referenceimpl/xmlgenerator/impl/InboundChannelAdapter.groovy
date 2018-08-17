@@ -302,6 +302,10 @@ class InboundChannelAdapter implements Poller, Chain, HeaderEnricher, Filter, Tr
 		JFieldVar contextField = streamHandlerClass.field(JMod.PRIVATE, org.springframework.context.ApplicationContext.class, "context")
 		contextField.annotate(codeModel.ref(Autowired.class))
 		
+		JFieldVar loggerField = streamHandlerClass.field(JMod.PRIVATE | JMod.FINAL | JMod.STATIC, org.slf4j.Logger.class, "log");
+		JClass loggerFactoryClass = codeModel.ref("org.slf4j.LoggerFactory");
+		loggerField.init(loggerFactoryClass.staticInvoke("getLogger").arg(streamHandlerClass.dotclass()))
+		
 		method = streamHandlerClass.method(JMod.PUBLIC, streamHandlerClass.owner().VOID, "handle")
 	
 		if(instruction.springBean instanceof Application) {
@@ -317,6 +321,10 @@ class InboundChannelAdapter implements Poller, Chain, HeaderEnricher, Filter, Tr
 		annotation.param("value", Sink.INPUT)
 			
 		JBlock body = method.body()
+		
+		JExpression argu = JExpr.lit("Receiving message from the messaging middleware: ")
+		argu = argu.plus(nameParam)
+		body.add(JExpr.invoke(loggerField, "info").arg(argu))
 		
 		Class gateWayClass = Class.forName(gateWayClassName)
 		
@@ -362,6 +370,18 @@ class InboundChannelAdapter implements Poller, Chain, HeaderEnricher, Filter, Tr
 		
 		fv.visitEnd();
 		
+		fv = cw.visitField(Opcodes.ACC_PRIVATE + Opcodes.ACC_FINAL + Opcodes.ACC_STATIC, "log", "Lorg/slf4j/Logger;", null, null);
+		fv.visitEnd();
+		
+		mv = cw.visitMethod(Opcodes.ACC_STATIC, "<clinit>", "()V", null, null);
+		mv.visitCode();
+		mv.visitLdcInsn(Type.getType("Lorcha/lang/generated/StreamHandler;"));
+		mv.visitMethodInsn(Opcodes.INVOKESTATIC, "org/slf4j/LoggerFactory", "getLogger", "(Ljava/lang/Class;)Lorg/slf4j/Logger;", false);
+		mv.visitFieldInsn(Opcodes.PUTSTATIC, "orcha/lang/generated/StreamHandler", "log", "Lorg/slf4j/Logger;");
+		mv.visitInsn(Opcodes.RETURN);
+		mv.visitMaxs(1, 0);
+		mv.visitEnd();
+		
 		mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "<init>", "()V", null, null);
 		mv.visitCode();
 		mv.visitVarInsn(Opcodes.ALOAD, 0);
@@ -380,6 +400,32 @@ class InboundChannelAdapter implements Poller, Chain, HeaderEnricher, Filter, Tr
 		av0.visitEnd();
 		
 		mv.visitCode();
+		mv.visitFieldInsn(Opcodes.GETSTATIC, "orcha/lang/generated/StreamHandler", "log", "Lorg/slf4j/Logger;");
+		mv.visitTypeInsn(Opcodes.NEW, "java/lang/StringBuilder");
+		mv.visitInsn(Opcodes.DUP);
+		mv.visitLdcInsn("Receiving message from the messaging middleware: ");
+		mv.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/StringBuilder", "<init>", "(Ljava/lang/String;)V", false);
+		mv.visitVarInsn(Opcodes.ALOAD, 1);
+		mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(Ljava/lang/Object;)Ljava/lang/StringBuilder;", false);
+		mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/StringBuilder", "toString", "()Ljava/lang/String;", false);
+		mv.visitMethodInsn(Opcodes.INVOKEINTERFACE, "org/slf4j/Logger", "info", "(Ljava/lang/String;)V", true);
+		mv.visitVarInsn(Opcodes.ALOAD, 0);
+		mv.visitFieldInsn(Opcodes.GETFIELD, "orcha/lang/generated/StreamHandler", "context", "Lorg/springframework/context/ApplicationContext;");
+		mv.visitLdcInsn(Type.getType("L" + t + ";"));
+		//mv.visitLdcInsn(Type.getType("Lorcha/lang/generated/OrchaparitioningGateway;"));
+		mv.visitMethodInsn(Opcodes.INVOKEINTERFACE, "org/springframework/context/ApplicationContext", "getBean", "(Ljava/lang/Class;)Ljava/lang/Object;", true);
+		//mv.visitTypeInsn(Opcodes.CHECKCAST, "orcha/lang/generated/OrchaparitioningGateway");
+		mv.visitTypeInsn(Opcodes.CHECKCAST, t);
+		mv.visitVarInsn(Opcodes.ASTORE, 2);
+		mv.visitVarInsn(Opcodes.ALOAD, 2);
+		mv.visitVarInsn(Opcodes.ALOAD, 1);
+		//mv.visitMethodInsn(Opcodes.INVOKEINTERFACE, "orcha/lang/generated/OrchaparitioningGateway", "call", "(Lservice/orchaPartitioning/BankingTransaction;)V", true);
+		mv.visitMethodInsn(Opcodes.INVOKEINTERFACE, t, "call", paramType, true);
+		mv.visitInsn(Opcodes.RETURN);
+		mv.visitMaxs(4, 3);
+		mv.visitEnd();
+		
+		/*mv.visitCode();
 		mv.visitVarInsn(Opcodes.ALOAD, 0);
 		mv.visitFieldInsn(Opcodes.GETFIELD, tt, "context", "Lorg/springframework/context/ApplicationContext;");
 		mv.visitLdcInsn(Type.getType("L" + t + ";"));
@@ -391,7 +437,7 @@ class InboundChannelAdapter implements Poller, Chain, HeaderEnricher, Filter, Tr
 		mv.visitMethodInsn(Opcodes.INVOKEINTERFACE, t, "call", paramType, true);
 		mv.visitInsn(Opcodes.RETURN);
 		mv.visitMaxs(2, 3);
-		mv.visitEnd();
+		mv.visitEnd();*/
 		
 		bytes = cw.toByteArray()
 						
