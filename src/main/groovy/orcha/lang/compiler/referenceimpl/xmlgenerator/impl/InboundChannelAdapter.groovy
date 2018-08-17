@@ -172,9 +172,9 @@ class InboundChannelAdapter implements Poller, Chain, HeaderEnricher, Filter, Tr
 		rootElement.addContent(gateway)
 		
 		if(instruction.springBean instanceof Application && instruction.springBean.language.equalsIgnoreCase("Orcha")) {
-			String mimeType = instruction.springBean.output.mimeType
+			String mimeType = instruction.springBean.output.adapter.inputEventHandler.input.mimeType
 			if(mimeType!=null && mimeType.split("/").length != 2){
-				throw new OrchaCompilationException("Unknown Mime Type:" + instruction.springBean.output.mimeType)
+				throw new OrchaCompilationException("Unknown Mime Type:" + mimeType)
 			}
 		} else {
 			String mimeType = instruction.springBean.input.mimeType
@@ -192,8 +192,6 @@ class InboundChannelAdapter implements Poller, Chain, HeaderEnricher, Filter, Tr
 		}
 		
 		rootElement.addContent(c)
-					
-		//MediaType mediaType = new  MediaType(typeAndSubtype[0], typeAndSubtype[1])
 								
 		def id = "headers['id'].toString()"
 		Element messageIDEnricher = headerEnricher("messageID", id)
@@ -228,7 +226,7 @@ class InboundChannelAdapter implements Poller, Chain, HeaderEnricher, Filter, Tr
 		String paramType
 		
 		if(instruction.springBean instanceof Application) {
-			paramType = instruction.springBean.output.type
+			paramType = instruction.springBean.output.adapter.inputEventHandler.input.type
 		} else {
 			paramType = instruction.springBean.input.type
 		}
@@ -307,7 +305,7 @@ class InboundChannelAdapter implements Poller, Chain, HeaderEnricher, Filter, Tr
 		method = streamHandlerClass.method(JMod.PUBLIC, streamHandlerClass.owner().VOID, "handle")
 	
 		if(instruction.springBean instanceof Application) {
-			paramType = instruction.springBean.output.type
+			paramType = instruction.springBean.output.adapter.inputEventHandler.input.type
 		} else {
 			paramType = instruction.springBean.input.type
 		}
@@ -409,7 +407,7 @@ class InboundChannelAdapter implements Poller, Chain, HeaderEnricher, Filter, Tr
 		String destinationName
 		
 		if(instruction.springBean instanceof Application) {
-			destinationName = instruction.springBean.name + "Return"
+			destinationName = instruction.springBean.output.adapter.inputEventHandler.name
 		} else {
 			destinationName = instruction.springBean.name
 		}

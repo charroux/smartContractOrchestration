@@ -8,11 +8,11 @@ import orcha.lang.configuration.EventHandler
 import orcha.lang.configuration.Input
 import orcha.lang.configuration.InputFileAdapter
 import orcha.lang.configuration.JavaServiceAdapter
+import orcha.lang.configuration.MessagingMiddlewareAdapter
 import orcha.lang.configuration.OrchaServiceAdapter
 import orcha.lang.configuration.Output
 import orcha.lang.configuration.OutputFileAdapter
 import orcha.lang.configuration.OutputFileAdapter.WritingMode
-import service.orchaPartitioning.OrchaBankingService1
 import service.orchaPartitioning.OrchaBankingService2
 import service.orchaService.OrchaGroovyService
 
@@ -34,20 +34,25 @@ class OrchaPartitioningConfiguration {
 		eventHandler.output = new Output(mimeType: "application/json", type: "service.orchaPartitioning.BankingTransaction", adapter: outputFileAdapter)
 		return eventHandler
 	}
-
-	@Bean
-	OrchaBankingService1 orchaBankingService1(){
-		return new OrchaBankingService1()
-	}
 	
 	@Bean
 	Application processOrderBank1(){
+		
 		def application = new Application(name: "processOrderBank1", language: "Orcha")
-		def adapter = new OrchaServiceAdapter()
-		def codeInput = new Input(type: "service.orchaPartitioning.Order", adapter: adapter)
-		application.input = codeInput
-		def codeOutput = new Output(type: "service.orchaPartitioning.BankingTransaction", adapter: adapter)
-		application.output = codeOutput
+		
+		def orchaServiceAdapter = new OrchaServiceAdapter()
+		
+		application.input = new Input(type: "service.orchaPartitioning.Order", adapter: orchaServiceAdapter)
+		application.output = new Output(type: "service.orchaPartitioning.BankingTransaction", adapter: orchaServiceAdapter)
+			
+		def inputEventHandler = new EventHandler(name: "bankingTransaction")
+		inputEventHandler.input = new Input(mimeType: "application/json", type: "service.orchaPartitioning.BankingTransaction", adapter: new MessagingMiddlewareAdapter())
+		orchaServiceAdapter.inputEventHandler = inputEventHandler
+		
+		def outputEventHandler = new EventHandler(name: "bankingOrder")
+		outputEventHandler.output = new Output(mimeType: "application/json", type: "service.orchaPartitioning.Order", adapter: new MessagingMiddlewareAdapter())
+		orchaServiceAdapter.outputEventHandler = outputEventHandler
+		
 		return application
 	}
 

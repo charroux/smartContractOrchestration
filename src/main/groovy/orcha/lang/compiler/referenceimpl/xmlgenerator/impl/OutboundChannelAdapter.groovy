@@ -239,9 +239,9 @@ class OutboundChannelAdapter implements Chain, Transformer{
 		rootElement.addContent(element)
 		
 		if(instruction.springBean instanceof Application && instruction.springBean.language.equalsIgnoreCase("Orcha")) {
-			String mimeType = instruction.springBean.input.mimeType
+			String mimeType = instruction.springBean.input.adapter.outputEventHandler.output.mimeType
 			if(mimeType!=null && mimeType.split("/").length != 2){
-				throw new OrchaCompilationException("Unknown Mime Type:" + instruction.springBean.input.mimeType)
+				throw new OrchaCompilationException("Unknown Mime Type:" + mimeType)
 			}
 		} else {
 			String mimeType = instruction.springBean.output.mimeType
@@ -343,6 +343,14 @@ class OutboundChannelAdapter implements Chain, Transformer{
 		log.info 'Generation of the stream handler binary class for sending an event to a messaging middleware: ' + fichier + ' complete successfully'
 		
 		fichier = "." + File.separator + "src" + File.separator + "main" + File.separator + "resources" + File.separator + "application.properties"
+
+		String destinationName
+		
+		if(instruction.springBean instanceof Application) {
+			destinationName = instruction.springBean.input.adapter.outputEventHandler.name
+		} else {
+			destinationName = instruction.springBean.name
+		}
 		
 		def lines = []
 		
@@ -358,27 +366,27 @@ class OutboundChannelAdapter implements Chain, Transformer{
 			}
 		}
 		
-		log.info 'Adding the output binding destination ' + instruction.springBean.name + ' to: ' + fichier
+		log.info 'Adding the output binding destination ' + destinationName + ' to: ' + fichier
 		
 		new File(fichier) << '''
 
 # Auto generation of the output destination to the messaging middleware. Do not delete this line:
-spring.cloud.stream.bindings.output.destination=''' + instruction.springBean.name
+spring.cloud.stream.bindings.output.destination=''' + destinationName
 		
-		log.info 'Adding the input binding destination ' + instruction.springBean.name + ' to: ' + fichier + ' complete successfully'
+		log.info 'Adding the input binding destination ' + destinationName + ' to: ' + fichier + ' complete successfully'
 
 		def src = new File(fichier)
 		
 		fichier = "." + File.separator + "bin" + File.separator + "main" + File.separator + "application.properties"
 		
-		log.info 'Adding the output binding destination ' + instruction.springBean.name + ' to: ' + fichier
+		log.info 'Adding the output binding destination ' + destinationName + ' to: ' + fichier
 		
 		def dst = new File(fichier)
 		dst.delete()
 		
 		dst << src.text
 
-		log.info 'Adding the output binding destination ' + instruction.springBean.name + ' to: ' + fichier + ' complete successfully'
+		log.info 'Adding the output binding destination ' + destinationName + ' to: ' + fichier + ' complete successfully'
 		
 		
 		/*

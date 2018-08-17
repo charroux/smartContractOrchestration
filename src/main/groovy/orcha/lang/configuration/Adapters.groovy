@@ -163,8 +163,8 @@ class MessagingMiddlewareAdapter extends ConfigurableProperties{
 @EqualsAndHashCode
 class OrchaServiceAdapter extends ConfigurableProperties{
 	def adapter = BidirectionalAdapter.OrchaApplication
-	EventHandler input
-	EventHandler output
+	EventHandler inputEventHandler	// event for service response					// a registry should be used to discover the handler dynamically
+	EventHandler outputEventHandler	// event for service calling					// a registry should be used to discover the handler dynamically
 }
 
 @EqualsAndHashCode

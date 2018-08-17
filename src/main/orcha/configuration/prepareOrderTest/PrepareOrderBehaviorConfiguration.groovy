@@ -38,7 +38,7 @@ class PrepareOrderBehaviorConfiguration {
 	@Bean
 	Application prepareAnOrder(){
 		def program = new Application(name: "prepareAnOrder", specifications: "Prepare an order for a customer.", description: "Add an address for the delivery to an order.", language: "Orcha")
-		def orchaAdapter = new OrchaServiceAdapter(input: customer, output: delivery)
+		def orchaAdapter = new OrchaServiceAdapter(outputEventHandler: customer, inputEventHandler: delivery)
 		program.input = new Input(adapter: orchaAdapter)
 		program.output = new Output(adapter: orchaAdapter)
 		return program
