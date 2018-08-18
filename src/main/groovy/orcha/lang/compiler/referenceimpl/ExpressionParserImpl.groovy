@@ -95,7 +95,7 @@ class ExpressionParserImpl implements ExpressionParser{
 			
 			// if tmp = '== value' => no . to add after payload: tmp = payload == value
 			// if tmp = 'x == value' => add . after payload: tmp = payload.x == value
-			if(tmp.startsWith("==") || tmp.startsWith("<=") || tmp.startsWith(">=")) {
+			if(tmp.startsWith("==") || tmp.startsWith("<=") || tmp.startsWith(">=") || tmp.startsWith("!=")) {
 				// find variable after an operator
 				//tmp = tmp.substring(2).trim()
 				filterExpression = filterExpression.substring(0, indexOfVariable) + "payload " + filterExpression.substring(indexOfVariable)

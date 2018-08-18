@@ -295,9 +295,9 @@ class CompileServiceWithSpringIntegrationTest {
 		
 		String orchaProgram = 	"title 'benchmarking services'\n" +
 		"description 'Read a tesxt file, dispatch its content to two services, then launch the two services and wait until the two services complete. Write the result to a service into a file.'\n" +
-		"receive event from benchmarkingInputFile\n" +
+		"receive event from benchmarkingInputFile condition '!=0'\n" +
 		"compute codeToBenchmark1 with event.value\n" +
-		"receive event from benchmarkingInputFile\n" +
+		"receive event from benchmarkingInputFile condition '!=0'\n" +
 		"compute codeToBenchmark2 with event.value\n" +
 		"when '(codeToBenchmark2 terminates condition == 1) and (codeToBenchmark1 terminates condition == -1)'\n" +
 		"send codeToBenchmark1.result to benchmarkingOutputFile"
@@ -348,6 +348,7 @@ class CompileServiceWithSpringIntegrationTest {
 		
 		// <int:chain output-channel="benchmarkingInputFile-OutputChannel">
 		// <int:recipient-list-router input-channel="benchmarkingInputFile-OutputChannel">
+		// 		<int:recipient channel="benchmarkingInputFile-OutputChannelRoute1" selector-expression="payload !=0" />
 
 		 expr2 = xFactory.compile("//*[local-name() = 'recipient-list-router']", Filters.element())
 		 elements2 = expr2.evaluate(xmlSpringIntegration)
@@ -355,6 +356,13 @@ class CompileServiceWithSpringIntegrationTest {
 		 element2 = elements2.get(0)
 		 
 		 Assert.assertEquals(element.getAttribute("output-channel").getValue(), element2.getAttribute("input-channel").getValue())
+		 
+		 expr2 = xFactory.compile("//*[local-name() = 'recipient']", Filters.element())
+		 elements2 = expr2.evaluate(xmlSpringIntegration)
+		 Assert.assertTrue(elements2.size() == 3)
+		 element2 = elements2.get(0)
+		 
+		 Assert.assertEquals(element2.getAttribute("selector-expression").getValue(), "payload !=0")
 		 
 		 // <int:chain input-channel="benchmarkingInputFile-OutputChannelRoute1" output-channel="codeToBenchmark1ServiceAcivatorOutput" id="service-activator-chain-codeToBenchmark1Channel-id">
 		 //  <int:header-enricher>

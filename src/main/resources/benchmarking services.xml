@@ -14,8 +14,9 @@
     </int:header-enricher>
   </int:chain>
   <int:recipient-list-router id="router-benchmarkingInputFile-OutputChannel-id" input-channel="benchmarkingInputFile-OutputChannel">
-    <int:recipient channel="benchmarkingInputFile-OutputChannelRoute1" />
-    <int:recipient channel="benchmarkingInputFile-OutputChannelRoute2" />
+    <int:recipient channel="benchmarkingInputFile-OutputChannelRoute1" selector-expression="payload !=0" />
+    <int:recipient channel="benchmarkingInputFile-OutputChannelRoute2" selector-expression="payload != 0" />
+    <int:recipient channel="loggingChannel" />
   </int:recipient-list-router>
   <int:chain input-channel="benchmarkingInputFile-OutputChannelRoute1" output-channel="codeToBenchmark1ServiceAcivatorOutput" id="service-activator-chain-codeToBenchmark1Channel-id">
     <int:header-enricher>

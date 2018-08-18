@@ -2,6 +2,7 @@ package orcha.lang.compiler.referenceimpl.xmlgenerator.impl
 
 import orcha.lang.compiler.qualityOfService.QueueOption
 import orcha.lang.compiler.referenceimpl.ExpressionParser
+import orcha.lang.compiler.visitor.OrchaCodeParser
 
 import java.util.List
 
@@ -71,7 +72,7 @@ class RouterForEventHandler implements QoS, Chain, HeaderEnricher{
 			
 			if(nextInstruction.condition != null){
 
-				String selectorExpression = nextInstruction.condition.replaceFirst(nextInstruction.variable,"payload")
+				String selectorExpression =  expressionParser.filteringExpression(nextInstruction.condition)
 				recipient.setAttribute("selector-expression", selectorExpression)
 												
 			} else {

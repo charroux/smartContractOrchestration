@@ -96,6 +96,10 @@ class ExpressionParserTest {
 		String filterExpression = expressionParser.filteringExpression("[(specification == 'TV' or order.price == 30) and == 0] and == 5")
 		Assert.assertEquals(filterExpression, "[(payload.specification == 'TV' or payload.order.price == 30) and payload == 0] and payload == 5")
 		
+		expressionParser = new ExpressionParserImpl()
+		filterExpression = expressionParser.filteringExpression("!=0")
+		Assert.assertEquals(filterExpression, "payload !=0")
+		
 	}
 
 }
