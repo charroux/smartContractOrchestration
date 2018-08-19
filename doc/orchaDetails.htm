@@ -192,6 +192,9 @@
           		<li>not</li>
           	</ul>
           <p>expression is written in <a href="https://docs.spring.io/spring/docs/4.3.10.RELEASE/spring-framework-reference/html/expressions.html">Spring Expression Language</a></p>
+          
+          <p>Expression are also used for filtering events in a receive instruction.</p>
+          
           <p>Examples:</p>
           <code>when "(codeToBenchmark1 terminates condition == -1) and (codeToBenchmark2 terminates condition == 1)"<br>
           receive event from orchaProgramSource condition "(specification == 'TV' or order.price <= 30) and order.account==true)"
@@ -326,7 +329,7 @@ Un convertisseur est une classe Java (écrite en Groovy dans l'exemple ci-dessou
           </code>
           <p>Where y is configured to use the message broker.</p>
           
-          <h3 id="subprogram">Orcha subprogram</h3>
+          <h3 id="subprogram">Orcha subprograms</h3>
           
           <p>When an activity is composed of several activities, subprograms can be used: one per sub activity.
           </p>
@@ -334,7 +337,7 @@ Un convertisseur est une classe Java (écrite en Groovy dans l'exemple ci-dessou
           </p>
           <code>compute subProgram with something<br>
           </code>
-          <p>subProgram is an Orcha subprogram receiving the event something in one or many receive instructions. The following example has two receive instructions:
+          <p>subProgram can be coded in Orcha. The following example has two receive instructions so the input event will be dispatched:
           </p>
           <code>
           receive event from mainProgram<br>
@@ -344,34 +347,179 @@ Un convertisseur est une classe Java (écrite en Groovy dans l'exemple ci-dessou
 			receive event from mainProgram<br>
 			…<br>          
           </code>
-          <p>Unlike procedural programming where subprograms are sometimes used to improve the readability, Orcha subprograms are used to:
+          <p>Unlike procedural programming where subprograms are used to improve the readability, Orcha subprograms are used to:
           </p>
           <ul>
-          		<li>Improve performance and reliability because subprograms are loosely coupled components that can be processed in different processes or machines</li>
-          		<li>Enhance the reusability of Orcha subprograms that can be integrated into many main programs</li>
-          		<li>Modelize high level business/domain activities in main program hiding low level details in subprograms</li>
+          		<li>Improve performance and reliability because subprograms are loosely coupled components that can be processed in different processes or machines</li>		 
+          		<li>Model high level business/domain activities in main program hiding low level details in subprograms</li>
           </ul>
+          <p>Orcha programs and subprograms use adapters to communicate. 
+			Many adapters can be used such as files for testing or debugging purpose.
+		  </p>
+		  <p>The next Orcha program:</p>
+		  <code>receive order from bankCustomer<br><br></code>
+		  <p>can use the following file adapter:</p>
+		  <code>
+		  	@Bean<br>
+			EventHandler bankCustomer(){<br>
+			EventHandler eventHandler = new EventHandler(name: "bankCustomer")<br>
+			def inputFileAdapter = new InputFileAdapter(directory: 'data/input', filenamePattern: "bankOrder.json")<br>
+			eventHandler.input = new Input(mimeType: "application/json", type: "service.orchaPartitioning.Order", adapter: inputFileAdapter)<br>
+			return eventHandler<br>
+			}<br>
+		  </code>
+		  
+		  <h4>Messaging middlewares</h4>
+		  
+		  <p> 
+			Nevertheless a messaging middleware is a best solution for communication between Orcha programs since it is reliable and secured. 
+			Many communication modes are also available using middlewares: one to one, one to many and many to many.
+			Orcha communication modes follow a publish-subscribe model, where data is broadcast through shared topics.
+			The publish-subscribe communication model lets new applications be added to the topology without disruption of the existing flow. 
+		  </p>
+		  <p>In order to replace the file adapter with a messaging middleware one, just use the following configuration:
+		  </p>
+		  <code>
+		  @Bean<br>
+		EventHandler bankCustomer(){<br>
+		def eventHandler = new EventHandler(name: "bankCustomer")<br>
+		def middlewareAdapter = new MessagingMiddlewareAdapter()<br>
+		eventHandler.input = new Input(mimeType: "application/json", type: "service.orchaPartitioning.Order", adapter: middlewareAdapter)<br>
+		return eventHandler<br>
+		}<br><br>
+		  </code>
+		  
+		  <h4>Message partitioning</h4>
+		  
+		  <p>	
+			Furthermore partitioning of messages is also feasible. 
+			Partitioning means routing a message to different Orcha programs according to the message content, or properties.
+			It ensure that data identified by common characteristics are processed by the same Orcha program.  
+			The following example, where two Orcha programs are called (processOrderBank1 and processOrderBank2), uses two partitions. 
+		  </p>
+		  
+		  <code>
+		  	receive order from bankCustomer condition "bank == 'BANK1'"<br>
+			compute processOrderBank1 with order.value<br>
+			...<br>
+			receive order from bankCustomer condition "bank == 'BANK2'"<br>
+			compute processOrderBank2 with order.value<br><br>
+		  </code>
+		  <p>
+			Orcha is configured out of the box with RabbitMQ, but Apache Kafka can be used. 
+			Just install RabitMQ, start it, and it will be available as soon as an Orcha program is configured with the messaging middleware adapter. 
+          </p>
+         
+          <h4>Consumer groups</h4>
+		  
+          <p>
+		It is also possible to scale up by creating multiple instances of a same Orcha subprogram. 
+		When doing so, different instances of an application are placed in a competing consumer relationship, where only one of the instances is expected to handle a given message.
+		</p>
+        
+      	<h4>Combination of Orcha subprograms and local services</h4>
+      	  
+          <p>You can combine Orcha subprograms with local services written in Java (or Java variation such as Groovy) or Javascript.
+          Consider the following Orcha program:
+          </p>
+          
+          <code>
+		  	receive order from bankCustomer condition "bank == 'BANK1'"<br>
+			compute processOrderBank1 with order.value<br>
+			...<br>
+			receive order from bankCustomer condition "bank == 'BANK2'"<br>
+			compute processOrderBank2 with order.value<br>
+			...<br>
+			receive order from bankCustomer condition "bank == 'BANK3'"<br>
+			compute processOrderBank3 with order.value<br><br>
+		  </code>
+         
+         <p>The two first computes can be Orcha programs while the last one can be a local service. 
+         Here is an example of a Javascript configuration for processOrderBank3:</p>
+
+		<code>
+		@Bean<br>
+		Application processOrderBank3(){<br>
+		def jsApp = new Application(name: "processOrderBank3", language: "js"")<br>
+		def scriptAdapter = new ScriptServiceAdapter(file: 'file:src/main/service/processOrderBank3.js')<br>
+		jsApp.input = new Input(type: "service.orchaPartitioning.Order", adapter: scriptAdapter)<br>
+		return jsApp<br>
+		}<br><br>
+		</code>         
+		
+          <h3 id="subprogram">Microservices with HTTP</h3>
+          
+          <p>
+          Each Orcha program is a microservice. 
+          </p>
+          
+          <p>
+          With Orcha it is very easy to build a microservice gateway. Consider again the Orcha program:
+          </p>
+          
+          <code>
+		  	receive order from bankCustomer condition "bank == 'BANK1'"<br>
+			compute processOrderBank1 with order.value<br>
+			...<br>
+			receive order from bankCustomer condition "bank == 'BANK2'"<br>
+			compute processOrderBank2 with order.value<br>
+			...<br>
+			receive order from bankCustomer condition "bank == 'BANK3'"<br>
+			compute processOrderBank3 with order.value<br><br>
+		  </code>
+		  
+		  <p>This program can receive the input event via a Rest Web Service. In that case the configuration for the bankCustomer event can be:</p>
+		  
+		  <code>
+		  @Bean<br>
+		EventHandler bankCustomer(){<br>
+		EventHandler eventHandler = new EventHandler(name: "bankCustomer")<br>
+		def httpAdapter = new HttpAdapter(url: '/remoteCustomerOverHttp', method: HttpAdapter.Method.POST)<br>
+		eventHandler.input = new Input(mimeType: "application/json", type: "service.orchaPartitioning.Order", adapter: httpAdapter)<br>
+		return eventHandler<br>
+		}<br><br>
+		  </code>
+		  
+		  <h3>Auto persistence of messages</h3>
+		  
+		  <p>
+		  Without any change in an Orcha program all the messages (input events, output events, input of services, output of services) can be persist. 
+		  Orcha comes out of the box with three kind of message stores:
+		  </p>
+		  
+		  <ul>
+		  <li>MondoDB</li>
+		  <li>Redis</li>
+		  <li>SQL Databases</li>
+		  </ul>
+		  
+		  
+		<p>Store an input argument as instance of a service in MongoDB can be declared by configuration:</p>
+		
+		<code>
+		@EventSourcing(messageStore=MessageStore.mongoDB, joinPoint=JoinPoint.before, eventName="order received")<br>
+		class BankingApplication extends Application{<br>
+		}<br><br>
+		</code>
+		
+		<p>
+		Where the class BankingApplication is used in a service configuration:
+		</p>
+		
+		<code>
+		@Bean<br>
+		Application processOrderBank1(){<br>
+		def application = new BankingApplication(name: "processOrderBank1", language: "...")<br>
+		...<br>
+		}<br><br>
+		</code>	
+			
+		<p>
+		  Persistence is convenient for logging, traceability and it leaves the Orcha send instruction for a business purpose like sending a result to another service via a messaging middleware for instance.
+		</p>
+		      
       </div>  
       </div>
-      
-      <div class="row">
-      <div class="col-md-12">
-          <h2 id="expressionServicesComparison">Comparison of services with the Orcha language</h2>
-          
-          <p>Comparison of services can be easily achieved in Orcha. The following program receives an order from a customer and compare two TV vendors:
-          </p>
-          <code>receive order from customer condition "order.product.specification == 'TV'"<br>
-          compute vendor1 with order.value<br><br>
-          receive order from customer condition "order.product.specification == 'TV'"<br>
-          compute vendor2 with order.value<br><br>
-          when "(vendor1 terminates) and (vendor2 terminates)"<br>
-          compute selectBestVendor with vendor1.result, vendor2.result<br>
-          when  "selectBestVendor terminates condition price &lt; 1000"<br>
-		  send selectBestVendor.result to seller<br>
-          </code>
-          
-      </div>  
-      </div>      
       
       <div class="row">
       <div class="col-md-12">
@@ -508,7 +656,7 @@ Un convertisseur est une classe Java (écrite en Groovy dans l'exemple ci-dessou
       </div>
       
       <footer>
-        <p>© OLab-Dynamics 2016
+        <p>© OLab-Dynamics 2018
         <img src="./orcha_files/olab-logos.png" class="img-responsive" alt="Responsive image">
         </p>
       </footer>
