@@ -106,7 +106,8 @@ class OrchaCodeVisitorImpl extends OrchaCodeVisitor{
 		
 		//InstructionNode n
 		
-		if(node.instruction.instruction=="receive" && node.next!=null && node.next.instruction.instruction=="receive"){
+		//if(node.instruction.instruction=="receive" && node.next!=null && node.next.instruction.instruction=="receive"){
+		if(node.instruction.instruction=="receive"){
 			node = graphOfInstructions.find { it.instruction == node.instruction }
 			node = graphOfInstructions.find { it.instruction == node.next.instruction }
 			nodes.add(  node )
@@ -1190,9 +1191,56 @@ class OrchaCodeVisitorImpl extends OrchaCodeVisitor{
 		
 		return instructions.toArray(new String[0]);
 	}
-
-
-
 	
+	@Override
+	public List computeInstructionIDsFromTheSameEventAs(InstructionNode instructionNode) {
+		
+		Instruction instruction = instructionNode.instruction
+		
+		def IDs = []
+		
+		if(instruction.springBean instanceof Application) {
+			// look for the receive node right before the compute node
+			InstructionNode receiveNodeToSearchFor = this.findAllPrecedingNodes(instructionNode).get(0)
+			// look for the index of the receiveNodeToSearchFor in the list of receive nodes with the same event
+			List<InstructionNode> receiveNodes = this.findAllReceiveNodesWithTheSameEvent()
+			receiveNodes.each { receiveNode ->
+				InstructionNode node = receiveNode
+				while(node!=null && node.instruction!=receiveNodeToSearchFor.instruction) {
+					node = node.next
+				}
+				if(node != null) {
+					node = receiveNode.next
+					while(node!=null) {
+						IDs.add(this.findNextNode(node).get(0).instruction.id)
+						node = node.next
+					}
+				}
+			}
+		}
+		
+		return IDs
+	}
+	
+	@Override
+	public boolean isAnOrchaApplication(int instructionID) {
+		InstructionNode node = graphOfInstructions.find { it.instruction.id == instructionID }
+		if(node.instruction.springBean instanceof Application && node.instruction.springBean.language.equalsIgnoreCase("Orcha")) {	
+			return true
+		} else {
+			return false
+		}
+	}
+	
+	@Override
+	public boolean isAMessagingPartition(InstructionNode computeNode) {
+		def IDs = this.computeInstructionIDsFromTheSameEventAs(computeNode)
+		def orchaIDs = IDs.findAll{ this.isAnOrchaApplication(it) == true }
+		if(orchaIDs.size() > 1) {
+			return true
+		} else {
+			return false
+		}
+	}
 
 }

@@ -120,4 +120,10 @@ abstract class OrchaCodeVisitor extends ClassCodeVisitorSupport{
 	
 	abstract String[] toStringGraphOfInstructions()
 	
+	abstract List computeInstructionIDsFromTheSameEventAs(InstructionNode orchaApplication) 
+	
+	abstract boolean isAnOrchaApplication(int instructionID)
+	
+	abstract boolean isAMessagingPartition(InstructionNode computeNode)
+	
 }

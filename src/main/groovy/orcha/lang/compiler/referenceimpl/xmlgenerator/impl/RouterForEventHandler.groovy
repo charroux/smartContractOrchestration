@@ -3,6 +3,7 @@ package orcha.lang.compiler.referenceimpl.xmlgenerator.impl
 import orcha.lang.compiler.qualityOfService.QueueOption
 import orcha.lang.compiler.referenceimpl.ExpressionParser
 import orcha.lang.compiler.visitor.OrchaCodeParser
+import orcha.lang.compiler.visitor.OrchaCodeVisitor
 
 import java.util.List
 
@@ -16,17 +17,53 @@ import orcha.lang.compiler.InstructionNode
 
 class RouterForEventHandler implements QoS, Chain, HeaderEnricher{
 	
+	OrchaCodeVisitor orchaCodeParser
 	ExpressionParser expressionParser
 	Document xmlSpringIntegration
 	
-	public RouterForEventHandler(Document xmlSpringIntegration, ExpressionParser expressionParser) {
+	public RouterForEventHandler(OrchaCodeVisitor orchaCodeParser, Document xmlSpringIntegration, ExpressionParser expressionParser) {
 		super();
+		this.orchaCodeParser = orchaCodeParser
 		this.xmlSpringIntegration = xmlSpringIntegration;
 		this.expressionParser = expressionParser
 	}
 	
 	public void routerForEventHandler(InstructionNode instructionNode){
-			
+		
+		InstructionNode node = instructionNode.next
+		
+		// if at least one instruction is followed by a compute instruction implemented by an Orcha program
+		int numberOfNonOrchaApplications = 0 
+		while(node!=null) {
+			if(orchaCodeParser.findNextNode(node).get(0).instruction.springBean.language.equalsIgnoreCase("Orcha") == false) {
+				numberOfNonOrchaApplications++
+			}
+			node = node.next
+		}
+		
+		if(numberOfNonOrchaApplications >= 1) {
+			this.router(instructionNode)
+		}
+		
+	}
+	
+	private void router(InstructionNode instructionNode){
+		
+		InstructionNode node = instructionNode.next
+		
+		String selectorOrchaExpression =  "["
+		while(node!=null) {
+			if(orchaCodeParser.findNextNode(node).get(0).instruction.springBean.language.equalsIgnoreCase("Orcha") == true) {
+				if(selectorOrchaExpression != "[") {
+					selectorOrchaExpression =  selectorOrchaExpression + " or "
+				}
+				Instruction nextInstruction = node.instruction
+				selectorOrchaExpression =  selectorOrchaExpression + "(" + expressionParser.filteringExpression(nextInstruction.condition) + ")"
+			}
+			node = node.next
+		}
+		selectorOrchaExpression = selectorOrchaExpression + "]"
+		
 		Element rootElement = xmlSpringIntegration.getRootElement()
 		
 		Namespace namespace = Namespace.getNamespace("int", "http://www.springframework.org/schema/integration")
@@ -40,49 +77,62 @@ class RouterForEventHandler implements QoS, Chain, HeaderEnricher{
 		router.setAttribute("input-channel", inputChannel)
 		rootElement.addContent(router)
 		
-		InstructionNode node = instructionNode.next
+		node = instructionNode.next
 		//int i=0
 		boolean  defaultChannel = true
-				
-		while(node != null){
-					
-			Instruction nextInstruction = node.instruction
-					
-			String channelName = node.outputName						
-			
-			Element recipient = new Element("recipient", namespace)
-	
-			int sequenceSize = expressionParser.getNumberOfApplicationsInExpression(node.instruction.variable)
-			
-			if(sequenceSize > 1) {
-
-				recipient.setAttribute("channel", channelName + "Sequence")
-				
-				int sequenceNumber = expressionParser.getIndexOfApplicationInExpression(node.instruction.variable, instructionNode.instruction.springBean.name)
-				Element chain = chain("sequenceNumber-" + channelName + "-id", channelName + "Sequence", channelName)
-				Element header = headerEnricher("sequenceSize", sequenceSize.toString())
-				chain.addContent(header)
-				header = headerEnricher("sequenceNumber", sequenceNumber.toString())
-				chain.addContent(header)				
-				rootElement.addContent(chain)	
-			} else {
-				recipient.setAttribute("channel", channelName)
-			}
-			
-			
-			if(nextInstruction.condition != null){
-
-				String selectorExpression =  expressionParser.filteringExpression(nextInstruction.condition)
-				recipient.setAttribute("selector-expression", selectorExpression)
-												
-			} else {
-				defaultChannel = false
-			}
-					
-			router.addContent(recipient)
+		boolean orchaProgramFound = false
 		
+		while(node != null){
+			
+			def springBean = orchaCodeParser.findNextNode(node).get(0).instruction.springBean
+			 		
+			if(springBean.language.equalsIgnoreCase("Orcha")==false || (springBean.language.equalsIgnoreCase("Orcha")==true && orchaProgramFound==false)) {
+				
+				orchaProgramFound = true
+				
+				Instruction nextInstruction = node.instruction
+				
+				String channelName = node.outputName
+				
+				Element recipient = new Element("recipient", namespace)
+		
+				int sequenceSize = expressionParser.getNumberOfApplicationsInExpression(node.instruction.variable)
+				
+				if(sequenceSize > 1) {
+		
+					recipient.setAttribute("channel", channelName + "Sequence")
+					
+					int sequenceNumber = expressionParser.getIndexOfApplicationInExpression(node.instruction.variable, instructionNode.instruction.springBean.name)
+					Element chain = chain("sequenceNumber-" + channelName + "-id", channelName + "Sequence", channelName)
+					Element header = headerEnricher("sequenceSize", sequenceSize.toString())
+					chain.addContent(header)
+					header = headerEnricher("sequenceNumber", sequenceNumber.toString())
+					chain.addContent(header)
+					rootElement.addContent(chain)
+				} else {
+					recipient.setAttribute("channel", channelName)
+				}
+				
+				
+				if(nextInstruction.condition != null){
+		
+					if(springBean.language.equalsIgnoreCase("Orcha") == true) {
+						recipient.setAttribute("selector-expression", selectorOrchaExpression)
+					} else {
+						String selectorExpression =  expressionParser.filteringExpression(nextInstruction.condition)
+						recipient.setAttribute("selector-expression", selectorExpression)
+					}
+																		
+				} else {
+					defaultChannel = false
+				}
+						
+				router.addContent(recipient)
+				
+			}
+			
 			node = node.next
-			//i++
+			
 		}
 				
 		if(defaultChannel == true){

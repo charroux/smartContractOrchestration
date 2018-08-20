@@ -332,5 +332,74 @@ class OrchaCodeParserTest {
 		Assert.assertTrue(node.instruction.id == 5)
 		
 	}
+	
+	@Test
+	public void orchaPartitioningTest() {
+		
+		String orchaProgram = "package source.orchaPartitioning\n"+
+		"title 'Orcha paritioning'\n"+
+		"receive order from bankCustomer condition 'bank == 0'\n"+			// instruction 1
+		"compute processOrderBank1 with order.value\n"+						// instruction 2
+		"when 'processOrderBank1 terminates'\n"+							// instruction 3
+		"send processOrderBank1.result to bankCustomer1\n"+					// instruction 4
+		"receive order from bankCustomer condition 'bank == 0'\n"+			// instruction 5
+		"compute processOrderBank2 with order.value\n"+						// instruction 6
+		"when 'processOrderBank2 terminates'\n"+							// instruction 7
+		"send processOrderBank2.result to bankCustomer1\n"					// instruction 8
+		
+		OrchaCodeVisitor orchaCodeVisitor = orchaCodeParser.parse(orchaProgram)
+		
+		def allReceiveNodes = orchaCodeVisitor.findAllReceiveNodes()
+		
+		InstructionNode node = allReceiveNodes.get(0)
+		Assert.assertTrue(node.instruction.id == 9)		// 9 is an empty node with two adjacent nodes (the two receive nodes)
+		
+		node = node.next								// instruction 1
+		Assert.assertNotNull(node)
+		
+		Assert.assertTrue(node.instruction.id == 1)
+		
+		def nextNodes = orchaCodeVisitor.findNextNode(node)
+		Assert.assertTrue(nextNodes.size() == 1)
+		InstructionNode node1 = nextNodes.get(0)
+		Assert.assertTrue(node1.instruction.instruction == 'compute')
+		Assert.assertTrue(node1.instruction.id == 2)
+		
+		node = node.next								// instruction 5
+		Assert.assertNotNull(node)
+		
+		Assert.assertTrue(node.instruction.id == 5)
+		
+		nextNodes = orchaCodeVisitor.findNextNode(node)
+		Assert.assertTrue(nextNodes.size() == 1)
+		node = nextNodes.get(0)
+		Assert.assertTrue(node.instruction.instruction == 'compute')
+		Assert.assertTrue(node.instruction.id == 6)
+		
+		node = allReceiveNodes.get(1)		// instruction 1
+		
+		Assert.assertNotNull(node)
+		
+		Assert.assertTrue(node.instruction.id == 1)
+		
+		nextNodes = orchaCodeVisitor.findNextNode(node)
+		Assert.assertTrue(nextNodes.size() == 1)
+		node1 = nextNodes.get(0)
+		Assert.assertTrue(node1.instruction.instruction == 'compute')
+		Assert.assertTrue(node1.instruction.id == 2)
+		
+		node = allReceiveNodes.get(2)		// instruction 5
+		
+		Assert.assertNotNull(node)
+		
+		Assert.assertTrue(node.instruction.id == 5)
+		
+		nextNodes = orchaCodeVisitor.findNextNode(node)
+		Assert.assertTrue(nextNodes.size() == 1)
+		node = nextNodes.get(0)
+		Assert.assertTrue(node.instruction.instruction == 'compute')
+		Assert.assertTrue(node.instruction.id == 6)
+		
+	}
 
 }

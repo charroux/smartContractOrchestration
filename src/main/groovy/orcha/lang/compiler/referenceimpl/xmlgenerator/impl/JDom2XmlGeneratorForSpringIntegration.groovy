@@ -502,7 +502,8 @@ class JDom2XmlGeneratorForSpringIntegration implements XmlGenerator{
 				generateReceiveEventHandler(instructionNode, xmlSpringIntegration, title)
 				
 				if(instructionNode.next.instruction.instruction == "receive"){
-					generateRouterForEventHandlers(instructionNode, expressionParser, xmlSpringIntegration)
+					
+					generateRouterForEventHandlers(orchaCodeParser, instructionNode, expressionParser, xmlSpringIntegration)
 					
 					InstructionNode node = instructionNode.next
 					
@@ -552,14 +553,14 @@ class JDom2XmlGeneratorForSpringIntegration implements XmlGenerator{
 			String title = orchaCodeParser.getOrchaMetadata().getTitle()
 			
 			if(sequenceSize>1 && nodes.size()==1) {
-				generateApplication(instructionNode, title, sequenceNumber, sequenceSize, computeFails, failChannel, xmlSpringIntegration)
+				generateApplication(orchaCodeParser, instructionNode, title, sequenceNumber, sequenceSize, computeFails, failChannel, xmlSpringIntegration)
 			} else {
 				
-				generateApplication(instructionNode, title, computeFails, failChannel, xmlSpringIntegration)
+				generateApplication(orchaCodeParser, instructionNode, title, computeFails, failChannel, xmlSpringIntegration)
 			}
 			
 			if(nodes.size() > 1) {
-				generateRouterForEventHandlers(instructionNode, expressionParser, xmlSpringIntegration)
+				generateRouterForEventHandlers(orchaCodeParser, instructionNode, expressionParser, xmlSpringIntegration)
 			}
 			
 		} else if(instruction.instruction == "when"){
@@ -623,7 +624,7 @@ class JDom2XmlGeneratorForSpringIntegration implements XmlGenerator{
 		
 		} else if(instruction.instruction == "send"){
 		
-			generateSendEventHandler(instructionNode, xmlSpringIntegration)
+			generateSendEventHandler(orchaCodeParser, instructionNode, xmlSpringIntegration)
 		
 		}
 
@@ -670,7 +671,7 @@ class JDom2XmlGeneratorForSpringIntegration implements XmlGenerator{
 		}
 	}
 	
-	private void generateApplication(InstructionNode instructionNode, String title, int sequenceNumber, int sequenceSize, boolean computeFails, String failChannel, Document xmlSpringIntegration){
+	private void generateApplication(OrchaCodeVisitor orchaCodeParser, InstructionNode instructionNode, String title, int sequenceNumber, int sequenceSize, boolean computeFails, String failChannel, Document xmlSpringIntegration){
 		
 		ServiceActivator serviceActivator = new ServiceActivator(xmlSpringIntegration)
 		
@@ -686,13 +687,13 @@ class JDom2XmlGeneratorForSpringIntegration implements XmlGenerator{
 			
 		} else if(instructionNode.instruction.springBean.input.adapter instanceof OrchaServiceAdapter){
 			
-			this.generateRedirectInputEventToSendEventHandler(instructionNode, xmlSpringIntegration)
+			this.generateRedirectInputEventToSendEventHandler(orchaCodeParser, instructionNode, xmlSpringIntegration)
 			this.generateRedirectOutputEventToReceiveEventHandler(instructionNode, title,  xmlSpringIntegration)
 	
 		}
 	}
 	
-	private void generateApplication(InstructionNode instructionNode, String title, boolean computeFails, String failChannel, Document xmlSpringIntegration){
+	private void generateApplication(OrchaCodeVisitor orchaCodeParser, InstructionNode instructionNode, String title, boolean computeFails, String failChannel, Document xmlSpringIntegration){
 		
 		ServiceActivator serviceActivator = new ServiceActivator(xmlSpringIntegration)
 		
@@ -708,7 +709,7 @@ class JDom2XmlGeneratorForSpringIntegration implements XmlGenerator{
 			
 		} else if(instructionNode.instruction.springBean.input.adapter instanceof OrchaServiceAdapter){
 			
-			this.generateRedirectInputEventToSendEventHandler(instructionNode, xmlSpringIntegration)
+			this.generateRedirectInputEventToSendEventHandler(orchaCodeParser, instructionNode, xmlSpringIntegration)
 			this.generateRedirectOutputEventToReceiveEventHandler(instructionNode, title, xmlSpringIntegration)
 			
 		}
@@ -734,16 +735,16 @@ class JDom2XmlGeneratorForSpringIntegration implements XmlGenerator{
 
 	}
 	
-	private void generateRouterForEventHandlers(InstructionNode instructionNode, ExpressionParser expressionParser, Document xmlSpringIntegration){
+	private void generateRouterForEventHandlers(OrchaCodeVisitor orchaCodeParser, InstructionNode instructionNode, ExpressionParser expressionParser, Document xmlSpringIntegration){
 		
-		RouterForEventHandler routerForEventHandler = new RouterForEventHandler(xmlSpringIntegration, expressionParser)
+		RouterForEventHandler routerForEventHandler = new RouterForEventHandler(orchaCodeParser, xmlSpringIntegration, expressionParser)
 		routerForEventHandler.routerForEventHandler(instructionNode)
 	
 	}
 	
-	private void generateSendEventHandler(InstructionNode instructionNode, Document xmlSpringIntegration){
+	private void generateSendEventHandler(OrchaCodeVisitor orchaCodeParser, InstructionNode instructionNode, Document xmlSpringIntegration){
 		
-		OutboundChannelAdapter outboundChannelAdapter = new OutboundChannelAdapter(xmlSpringIntegration)
+		OutboundChannelAdapter outboundChannelAdapter = new OutboundChannelAdapter(orchaCodeParser, xmlSpringIntegration)
 		
 		def EventHandler eventHandler = instructionNode.instruction.springBean
 		
@@ -768,9 +769,9 @@ class JDom2XmlGeneratorForSpringIntegration implements XmlGenerator{
 		}
 	}
 	
-	private void generateRedirectInputEventToSendEventHandler(InstructionNode instructionNode, Document xmlSpringIntegration){
+	private void generateRedirectInputEventToSendEventHandler(OrchaCodeVisitor orchaCodeParser, InstructionNode instructionNode, Document xmlSpringIntegration){
 		
-		OutboundChannelAdapter outboundChannelAdapter = new OutboundChannelAdapter(xmlSpringIntegration)
+		OutboundChannelAdapter outboundChannelAdapter = new OutboundChannelAdapter(orchaCodeParser, xmlSpringIntegration)
 		
 		OrchaServiceAdapter orchaServiceAdapter = instructionNode.instruction.springBean.input.adapter
 		

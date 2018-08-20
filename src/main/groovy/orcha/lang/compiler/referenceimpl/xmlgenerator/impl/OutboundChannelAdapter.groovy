@@ -26,6 +26,7 @@ import groovy.util.logging.Slf4j
 import orcha.lang.compiler.Instruction
 import orcha.lang.compiler.InstructionNode
 import orcha.lang.compiler.OrchaCompilationException
+import orcha.lang.compiler.visitor.OrchaCodeVisitor
 import orcha.lang.configuration.Application
 import orcha.lang.configuration.EventHandler
 import orcha.lang.configuration.EventSourcing.JoinPoint
@@ -45,10 +46,12 @@ import org.springframework.cloud.stream.messaging.Source
 @Slf4j
 class OutboundChannelAdapter implements Chain, Transformer{
 	
+	OrchaCodeVisitor orchaCodeParser
 	Document xmlSpringIntegration
 	
-	public OutboundChannelAdapter(Document xmlSpringIntegration) {
+	public OutboundChannelAdapter(OrchaCodeVisitor orchaCodeParser, Document xmlSpringIntegration) {
 		super();
+		this.orchaCodeParser = orchaCodeParser
 		this.xmlSpringIntegration = xmlSpringIntegration;
 	}
 
@@ -229,9 +232,25 @@ class OutboundChannelAdapter implements Chain, Transformer{
 		return chainElement
 	}
 	
+	private boolean isAMessagingMiddleWarePartitionAlreadyDone(InstructionNode instructionNode) {
+		def IDs = orchaCodeParser.computeInstructionIDsFromTheSameEventAs(instructionNode)
+		def orchaIDs = IDs.findAll{ orchaCodeParser.isAnOrchaApplication(it) == true }
+		int index = orchaIDs.indexOf(instructionNode.instruction.id)
+		if(index > 0) {
+			return true
+		} else {
+			return false
+		}
+	}
+	
 	public void messagingMiddleware(InstructionNode instructionNode) {
 				
+		if(this.isAMessagingMiddleWarePartitionAlreadyDone(instructionNode) == true) {
+			return
+		}
+		
 		Instruction instruction = instructionNode.instruction
+				
 		def inputChannel = instructionNode.inputName
 				
 		Element rootElement = xmlSpringIntegration.getRootElement()
@@ -392,6 +411,8 @@ class OutboundChannelAdapter implements Chain, Transformer{
 			destinationName = instruction.springBean.name
 		}
 		
+		log.info 'Adding the output binding destination ' + destinationName + ' to: ' + fichier
+		
 		def lines = []
 		
 		new File(fichier).eachLine {
@@ -406,12 +427,21 @@ class OutboundChannelAdapter implements Chain, Transformer{
 			}
 		}
 		
-		log.info 'Adding the output binding destination ' + destinationName + ' to: ' + fichier
-		
 		new File(fichier) << '''
 
 # Auto generation of the output destination to the messaging middleware. Do not delete this line:
 spring.cloud.stream.bindings.output.destination=''' + destinationName
+		
+		if(orchaCodeParser.isAMessagingPartition(instructionNode)) {
+			
+			new File(fichier) << '''
+
+# Auto generation of the output destination to the messaging middleware. Do not delete this line:
+spring.cloud.stream.bindings.output.producer.partitionKeyExpression=payload.bank
+# Auto generation of the output destination to the messaging middleware. Do not delete this line:
+spring.cloud.stream.bindings.output.producer.partitionCount=2'''
+
+		}
 		
 		log.info 'Adding the input binding destination ' + destinationName + ' to: ' + fichier + ' complete successfully'
 
