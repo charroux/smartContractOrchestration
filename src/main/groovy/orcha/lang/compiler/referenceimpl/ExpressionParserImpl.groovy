@@ -119,11 +119,11 @@ class ExpressionParserImpl implements ExpressionParser{
 			return null
 		}
 		
-		String selectorOrchaExpression =  "["
+		String selectorOrchaExpression =  "("
 		
 		while(node!=null) {
 			if(orchaCodeVisitor.findNextNode(node).get(0).instruction.springBean.language.equalsIgnoreCase("Orcha") == true) {
-				if(selectorOrchaExpression != "[") {
+				if(selectorOrchaExpression != "(") {
 					selectorOrchaExpression =  selectorOrchaExpression + " or "
 				}
 				Instruction nextInstruction = node.instruction
@@ -132,7 +132,7 @@ class ExpressionParserImpl implements ExpressionParser{
 			node = node.next
 		}
 		
-		selectorOrchaExpression = selectorOrchaExpression + "]"
+		selectorOrchaExpression = selectorOrchaExpression + ")"
 		
 		return selectorOrchaExpression
 	
