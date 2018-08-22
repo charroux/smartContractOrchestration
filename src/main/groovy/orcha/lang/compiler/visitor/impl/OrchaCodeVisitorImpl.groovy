@@ -1193,15 +1193,40 @@ class OrchaCodeVisitorImpl extends OrchaCodeVisitor{
 	}
 	
 	@Override
-	public List computeInstructionIDsFromTheSameEventAs(InstructionNode instructionNode) {
+	public List findAllPrecedingReceiveNodesWithTheSameEvent(InstructionNode computeNode) {
 		
-		Instruction instruction = instructionNode.instruction
+		Instruction instruction = computeNode.instruction
+		
+		if(instruction.springBean instanceof Application) {
+			// look for the receive node right before the compute node
+			InstructionNode receiveNodeToSearchFor = this.findAllPrecedingNodes(computeNode).get(0)
+			List receiveNodes = this.findAllReceiveNodesWithTheSameEvent()
+			Iterator nodes = receiveNodes.iterator()
+			while(nodes.hasNext()) {
+				InstructionNode node = nodes.next()
+				while(node!=null && node.instruction!=receiveNodeToSearchFor.instruction) {
+					node = node.next
+				}
+				if(node != null) {
+					return receiveNodes
+				}
+			}
+
+		}
+				
+		return []
+	}
+	
+	@Override
+	public List computeInstructionIDsFromTheSameEventAs(InstructionNode computeNode) {
+		
+		Instruction instruction = computeNode.instruction
 		
 		def IDs = []
 		
 		if(instruction.springBean instanceof Application) {
 			// look for the receive node right before the compute node
-			InstructionNode receiveNodeToSearchFor = this.findAllPrecedingNodes(instructionNode).get(0)
+			InstructionNode receiveNodeToSearchFor = this.findAllPrecedingNodes(computeNode).get(0)
 			// look for the index of the receiveNodeToSearchFor in the list of receive nodes with the same event
 			List<InstructionNode> receiveNodes = this.findAllReceiveNodesWithTheSameEvent()
 			receiveNodes.each { receiveNode ->

@@ -49,20 +49,9 @@ class RouterForEventHandler implements QoS, Chain, HeaderEnricher{
 	
 	private void router(InstructionNode instructionNode){
 		
-		InstructionNode node = instructionNode.next
+		String selectorOrchaExpression = expressionParser.partitonFilteringExpression(instructionNode)
 		
-		String selectorOrchaExpression =  "["
-		while(node!=null) {
-			if(orchaCodeParser.findNextNode(node).get(0).instruction.springBean.language.equalsIgnoreCase("Orcha") == true) {
-				if(selectorOrchaExpression != "[") {
-					selectorOrchaExpression =  selectorOrchaExpression + " or "
-				}
-				Instruction nextInstruction = node.instruction
-				selectorOrchaExpression =  selectorOrchaExpression + "(" + expressionParser.filteringExpression(nextInstruction.condition) + ")"
-			}
-			node = node.next
-		}
-		selectorOrchaExpression = selectorOrchaExpression + "]"
+		InstructionNode node = instructionNode.next
 		
 		Element rootElement = xmlSpringIntegration.getRootElement()
 		

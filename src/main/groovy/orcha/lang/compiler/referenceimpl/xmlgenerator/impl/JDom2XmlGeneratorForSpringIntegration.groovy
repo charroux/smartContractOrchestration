@@ -785,7 +785,9 @@ class JDom2XmlGeneratorForSpringIntegration implements XmlGenerator{
 			
 		} else if(orchaServiceAdapter instanceof OrchaServiceAdapter){
 			
-			outboundChannelAdapter.messagingMiddleware(instructionNode)
+			List<InstructionNode> receiveNodes = orchaCodeParser.findAllPrecedingReceiveNodesWithTheSameEvent(instructionNode)
+			String partitionKeyExpression = expressionParser.partitionKeyExpression(receiveNodes.get(0))
+			outboundChannelAdapter.messagingMiddleware(instructionNode, partitionKeyExpression)
 			
 		} else if(orchaServiceAdapter instanceof MailSenderAdapter){
 				

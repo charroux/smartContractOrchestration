@@ -93,6 +93,8 @@ abstract class OrchaCodeVisitor extends ClassCodeVisitorSupport{
 	 */
 	abstract List<InstructionNode> findAllReceiveNodesWithTheSameEvent()
 	
+	abstract List findAllPrecedingReceiveNodesWithTheSameEvent(InstructionNode computeNode)
+	
 	abstract List<InstructionNode> findAllSendNodes()
 	
 	abstract List<InstructionNode> findAllPrecedingNodes(InstructionNode node)

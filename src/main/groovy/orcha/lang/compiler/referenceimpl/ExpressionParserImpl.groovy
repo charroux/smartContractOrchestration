@@ -1,7 +1,7 @@
 package orcha.lang.compiler.referenceimpl
 
 import java.util.List;
-
+import orcha.lang.compiler.Instruction
 import orcha.lang.compiler.InstructionNode;
 import orcha.lang.compiler.OrchaCompilationException
 import orcha.lang.compiler.referenceimpl.ExpressionParser;
@@ -66,7 +66,78 @@ class ExpressionParserImpl implements ExpressionParser{
 		}
 		return applicationNames[0]
 	}
-
+	
+	@Override
+	public String partitionKeyExpression(InstructionNode receiveInstruction) {
+			
+		if(receiveInstruction.next == null) {
+			return null
+		}
+		
+		InstructionNode node = receiveInstruction.next
+		
+		if(node.instruction.instruction != "receive") {
+			return null
+		}
+		
+		String partitionKeyExpression =  "" 
+		boolean firstIntruction = true
+		int partitionIndex = 0
+		
+		while(node!=null) {
+			if(orchaCodeVisitor.findNextNode(node).get(0).instruction.springBean.language.equalsIgnoreCase("Orcha") == true) {
+				Instruction nextInstruction = node.instruction
+				partitionKeyExpression =  partitionKeyExpression + this.filteringExpression(nextInstruction.condition)
+				if(node.next != null) {
+					partitionKeyExpression =  partitionKeyExpression + " ? " + partitionIndex + " : ("
+				} else {
+					partitionKeyExpression =  partitionKeyExpression + " ? " + partitionIndex + " : -1"
+				}
+				if(firstIntruction == false) {
+					partitionKeyExpression =  partitionKeyExpression + ")"
+				}
+				firstIntruction = false
+				partitionIndex++
+			}
+			node = node.next
+		}
+		
+		return partitionKeyExpression
+	
+	}
+	
+	@Override
+	public String partitonFilteringExpression(InstructionNode receiveInstruction) {
+		
+		if(receiveInstruction.next == null) {
+			return null
+		}
+		
+		InstructionNode node = receiveInstruction.next
+		
+		if(node.instruction.instruction != "receive") {
+			return null
+		}
+		
+		String selectorOrchaExpression =  "["
+		
+		while(node!=null) {
+			if(orchaCodeVisitor.findNextNode(node).get(0).instruction.springBean.language.equalsIgnoreCase("Orcha") == true) {
+				if(selectorOrchaExpression != "[") {
+					selectorOrchaExpression =  selectorOrchaExpression + " or "
+				}
+				Instruction nextInstruction = node.instruction
+				selectorOrchaExpression =  selectorOrchaExpression + "(" + this.filteringExpression(nextInstruction.condition) + ")"
+			}
+			node = node.next
+		}
+		
+		selectorOrchaExpression = selectorOrchaExpression + "]"
+		
+		return selectorOrchaExpression
+	
+	}
+	
 	/**
 	 * Add payload before variable.
 	 * Exp. : 

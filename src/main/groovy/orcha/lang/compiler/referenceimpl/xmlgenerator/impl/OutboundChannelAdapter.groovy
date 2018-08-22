@@ -26,6 +26,7 @@ import groovy.util.logging.Slf4j
 import orcha.lang.compiler.Instruction
 import orcha.lang.compiler.InstructionNode
 import orcha.lang.compiler.OrchaCompilationException
+import orcha.lang.compiler.referenceimpl.ExpressionParser
 import orcha.lang.compiler.visitor.OrchaCodeVisitor
 import orcha.lang.configuration.Application
 import orcha.lang.configuration.EventHandler
@@ -243,7 +244,7 @@ class OutboundChannelAdapter implements Chain, Transformer{
 		}
 	}
 	
-	public void messagingMiddleware(InstructionNode instructionNode) {
+	public void messagingMiddleware(InstructionNode instructionNode, String partitionKeyExpression) {
 				
 		if(this.isAMessagingMiddleWarePartitionAlreadyDone(instructionNode) == true) {
 			return
@@ -416,7 +417,7 @@ class OutboundChannelAdapter implements Chain, Transformer{
 		def lines = []
 		
 		new File(fichier).eachLine {
-			line -> if(line.startsWith("spring.cloud.stream.bindings.output.destination")==false && line.startsWith("# Auto generation of the output")==false && line.equals("")==false) lines.add(line)
+			line -> if(line.startsWith("spring.cloud.stream.bindings.output")==false && line.startsWith("# Auto generation of the")==false && line.equals("")==false) lines.add(line)
 		}
 		
 		new File(fichier).delete()
@@ -436,9 +437,9 @@ spring.cloud.stream.bindings.output.destination=''' + destinationName
 			
 			new File(fichier) << '''
 
-# Auto generation of the output destination to the messaging middleware. Do not delete this line:
-spring.cloud.stream.bindings.output.producer.partitionKeyExpression=payload.bank
-# Auto generation of the output destination to the messaging middleware. Do not delete this line:
+# Auto generation of the partitionKeyExpression for the messaging middleware. Do not delete this line:
+spring.cloud.stream.bindings.output.producer.partitionKeyExpression=''' + partitionKeyExpression << '''
+# Auto generation of the output partitionCount for the messaging middleware. The partition index value is calculated as hashCode(key) % partitionCount. Do not delete this line:
 spring.cloud.stream.bindings.output.producer.partitionCount=2'''
 
 		}
@@ -458,29 +459,6 @@ spring.cloud.stream.bindings.output.producer.partitionCount=2'''
 
 		log.info 'Adding the output binding destination ' + destinationName + ' to: ' + fichier + ' complete successfully'
 		
-		
-		/*
-		
-		log.info 'Adding the output binding destination ' + instruction.springBean.name + ' to: ' + fichier
-		
-		new File(fichier) << '''
-
-# Auto generation of the output destination to the messaging middleware. Do not delete this line:
-spring.cloud.stream.bindings.output.destination=''' + instruction.springBean.name
-		
-		log.info 'Adding the output binding destination ' + instruction.springBean.name + ' to: ' + fichier + ' complete successfully'
-
-		fichier = "." + File.separator + "bin" + File.separator + "main" + File.separator + "application.properties"
-
-		log.info 'Adding the output binding destination ' + instruction.springBean.name + ' to: ' + fichier
-		
-		new File(fichier) << '''
-
-# Auto generation of the output destination to the messaging middleware. Do not delete this line:
-spring.cloud.stream.bindings.output.destination=''' + instruction.springBean.name 
-		
-		log.info 'Adding the output binding destination ' + instruction.springBean.name + ' to: ' + fichier + ' complete successfully'
-*/
 	}
 
 }
