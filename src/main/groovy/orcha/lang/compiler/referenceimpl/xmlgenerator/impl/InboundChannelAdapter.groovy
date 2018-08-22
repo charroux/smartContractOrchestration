@@ -209,8 +209,8 @@ class InboundChannelAdapter implements Poller, Chain, HeaderEnricher, Filter, Tr
 		
 		// generate gateway interface source code
 		
-		String s = "." + File.separator + "src" + File.separator + "main" + File.separator + "java"
-		String path = s + File.separator + gateWayClassName + ".java"
+		String s = "." + File.separator + "src" + File.separator + "main" + File.separator + "groovy"
+		String path = s + File.separator + gateWayClassName + ".groovy"
 		
 		log.info 'Generation of the gateway interface for receiving event from a messaging middleware: ' + path
 		
@@ -286,8 +286,8 @@ class InboundChannelAdapter implements Poller, Chain, HeaderEnricher, Filter, Tr
 		// generate stream handler interface source code
 
 		String streamHandlerClassName = "orcha.lang.generated.StreamHandler"
-		s = "." + File.separator + "src" + File.separator + "main" + File.separator + "java"
-		path = s + File.separator + streamHandlerClassName + ".java"
+		s = "." + File.separator + "src" + File.separator + "main" + File.separator + "groovy"
+		path = s + File.separator + streamHandlerClassName + ".groovy"
 		
 		log.info 'Generation of the stream handler for receiving event from a messaging middleware: ' + path
 		

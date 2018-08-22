@@ -1,6 +1,6 @@
 package source.orchaPartitioning
 
-title "Orcha paritioning"
+title "Orcha partitioning"
 
 receive order from bankCustomer condition "bank == 'BANK1'"
 compute processOrderBank1 with order.value
@@ -14,8 +14,3 @@ compute processOrderBank2 with order.value
 when "processOrderBank2 terminates"		
 send processOrderBank2.result to bankCustomer1
 
-receive order from bankCustomer condition "bank == 'BANK3'"
-compute processOrderBank3 with order.value
-
-when "processOrderBank3 terminates"
-send processOrderBank3.result to bankCustomer1

@@ -275,8 +275,8 @@ class OutboundChannelAdapter implements Chain, Transformer{
 		}
 						
 		String streamHandlerClassName = "orcha.lang.generated.OutputStreamHandler"
-		String s = "." + File.separator + "src" + File.separator + "main" + File.separator + "java"
-		String path = s + File.separator + streamHandlerClassName + ".java"
+		String s = "." + File.separator + "src" + File.separator + "main" + File.separator + "groovy"
+		String path = s + File.separator + streamHandlerClassName + ".groovy"
 		
 		log.info 'Generation of the stream handler for sending an event to a messaging middleware: ' + path
 		

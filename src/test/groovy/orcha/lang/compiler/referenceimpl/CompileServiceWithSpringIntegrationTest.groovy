@@ -1158,4 +1158,45 @@ class CompileServiceWithSpringIntegrationTest {
 		
 	}
 	
+	@Test
+	void orchaServiceJavaServiceFiltering() {
+
+		
+		// the Orcha source program
+		
+		String orchaProgram = "package source.orchaServiceJavaService\n"+
+			"title 'Orcha service Java service'\n"+
+			"receive order from bankCustomer condition 'bank == \\'BANK1\\''\n"+
+			"compute processOrderBank1 with order.value\n"+
+			"when 'processOrderBank1 terminates'\n"+
+			"send processOrderBank1.result to bankCustomer1\n"+
+			"receive order from bankCustomer condition 'bank == \\'BANK2\\''\n"+
+			"compute processOrderBank2 with order.value\n"+
+			"when 'processOrderBank2 terminates'\n"+		
+			"send processOrderBank2.result to bankCustomer1\n"
+			
+			// construct the graph of instructions for the Orcha programm
+			
+			OrchaCodeVisitor orchaCodeVisitor = orchaCodeParser.parse(orchaProgram)
+			
+			// generate an XML file (Spring integration configuration): this is the file to be tested
+			 
+			String path = "." + File.separator + "src" + File.separator + "test" + File.separator + "resources" + File.separator
+			File destinationDirectory = new File(path)
+			compile.compile(orchaCodeVisitor, destinationDirectory)
+			
+			String xmlSpringContextFileName = orchaCodeVisitor.getOrchaMetadata().getTitle() + ".xml"
+			String pathToXmlFile = destinationDirectory.getAbsolutePath() + File.separator + xmlSpringContextFileName
+			
+			// parse the XML file checking is correctness
+			
+			SAXBuilder builder = new SAXBuilder()
+			
+			Document xmlSpringIntegration = builder.build(pathToXmlFile)
+			
+			XPathFactory xFactory = XPathFactory.instance()
+			
+
+	}
+	
 }
