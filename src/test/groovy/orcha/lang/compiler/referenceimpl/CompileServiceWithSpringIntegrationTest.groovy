@@ -753,6 +753,14 @@ class CompileServiceWithSpringIntegrationTest {
 		 element = elements.get(1)
 		 long intervalBeforeHalfOpening = beanClass.getAnnotation(CircuitBreaker.class).intervalBeforeHalfOpening()
 		 Assert.assertEquals(element.getAttribute("value").getValue(), intervalBeforeHalfOpening.toString())
+		 
+		 Assert.assertTrue(new File(pathToXmlFile).delete())
+		 
+		 String xmlQoSSpringContextFileName = orchaCodeVisitor.getOrchaMetadata().getTitle() + "QoS.xml"
+		 String pathToQoSXmlFile = destinationDirectory.getAbsolutePath() + File.separator + xmlQoSSpringContextFileName
+			 
+		 Assert.assertTrue(new File(pathToQoSXmlFile).delete())
+		 
 	}
 	
 	@Test
@@ -1155,6 +1163,7 @@ class CompileServiceWithSpringIntegrationTest {
 		element = elements.get(4)
 		Assert.assertEquals(element.getAttribute("output-channel").getValue(), element3.getAttribute("output-channel").getValue())
 		
+		Assert.assertTrue(new File(pathToXmlFile).delete())
 		
 	}
 	
@@ -1196,7 +1205,13 @@ class CompileServiceWithSpringIntegrationTest {
 			
 			XPathFactory xFactory = XPathFactory.instance()
 			
-
+			Assert.assertTrue(new File(pathToXmlFile).delete())
+		
+			String xmlQoSSpringContextFileName = orchaCodeVisitor.getOrchaMetadata().getTitle() + "QoS.xml"
+			String pathToQoSXmlFile = destinationDirectory.getAbsolutePath() + File.separator + xmlQoSSpringContextFileName
+			
+			Assert.assertTrue(new File(pathToQoSXmlFile).delete())
+			
 	}
 	
 }

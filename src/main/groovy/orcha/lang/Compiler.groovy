@@ -2,7 +2,7 @@ package orcha.lang
 
 import orcha.lang.business.BusinessAdapter
 import orcha.lang.business.BasicBusinessAdapter
-import orcha.lang.compiler.Compile;
+import orcha.lang.compiler.Compile
 import orcha.lang.compiler.OrchaConfigurationException
 import orcha.lang.compiler.qualityOfService.QualityOfService
 import orcha.lang.compiler.qualityOfService.QualityOfServiceImpl

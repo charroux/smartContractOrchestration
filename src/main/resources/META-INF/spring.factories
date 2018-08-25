@@ -1,2 +1,4 @@
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-orcha.lang.AutoConfiguration
+# org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+# orcha.lang.AutoConfiguration
+
+

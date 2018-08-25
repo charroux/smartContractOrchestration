@@ -1,6 +1,10 @@
 package orcha.lang.compiler.referenceimpl
 
+import orcha.lang.compiler.visitor.OrchaCodeParser
+
 import org.springframework.boot.SpringBootConfiguration
+import org.springframework.boot.autoconfigure.ImportAutoConfiguration
+import org.springframework.context.annotation.Bean
 
 @SpringBootConfiguration
 class TestConfiguration implements PrepareOrderTestConfiguration, BenchmarkingExampleTestConfiguration, ComputesInSeriesTestConfiguration, JavascriptExampleTestConfiguration, RetryTestConfiguration, CircuitBreakerTestConfiguration, EventFilteringExampleTestConfiguration, QueueTestConfiguration, EventSourcingTestConfiguration, BroadcastEventTestConfiguration, OrchaServiceJavaServiceFilteringTestConfiguration{
