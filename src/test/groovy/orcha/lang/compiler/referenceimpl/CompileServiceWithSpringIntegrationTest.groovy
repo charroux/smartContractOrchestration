@@ -1204,7 +1204,56 @@ class CompileServiceWithSpringIntegrationTest {
 			Document xmlSpringIntegration = builder.build(pathToXmlFile)
 			
 			XPathFactory xFactory = XPathFactory.instance()
+		
+			// <int:recipient-list-router id="router-bankCustomer-OutputChannel-id" input-channel="bankCustomer-OutputChannel">
+			// 	<int:recipient channel="bankCustomer-OutputChannelRoute1" selector-expression="((payload.bank == 'BANK1'))" />
+			// 	<int:recipient channel="bankCustomer-OutputChannelRoute2" selector-expression="payload.bank == 'BANK2'" />
+			// 	<int:recipient channel="loggingChannel" />
+			// </int:recipient-list-router>
 			
+			XPathExpression<Element> expr2 = xFactory.compile("//*[local-name() = 'recipient']", Filters.element())
+			List<Element> elements2 = expr2.evaluate(xmlSpringIntegration)
+			Assert.assertTrue(elements2.size() == 3)
+			Element element2 = elements2.get(0)
+			  
+			// <int:channel id="bankCustomer-OutputChannelRoute1" />
+
+			XPathExpression<Element> expr = xFactory.compile("//*[local-name() = 'channel']", Filters.element())
+			List<Element> elements =  expr.evaluate(xmlSpringIntegration)
+  
+			Element element = elements.get(1)
+			Assert.assertEquals(element.getAttribute("id").getValue(), element2.getAttribute("channel").getValue())
+ 
+			// <int:gateway id="gateway-bankCustomer-OutputChannelRoute1Orcha-id" service-interface="orcha.lang.generated.OrchapartitioningGateway" default-request-channel="bankCustomer-OutputChannelRoute1Orcha" />
+
+			expr = xFactory.compile("//*[local-name() = 'gateway']", Filters.element())
+			elements =  expr.evaluate(xmlSpringIntegration)
+			Assert.assertTrue(elements.size() == 1)
+			element = elements.get(0)
+			Assert.assertEquals(element.getAttribute("default-request-channel").getValue(), element2.getAttribute("channel").getValue() + "Orcha" )
+						
+			// <int:chain input-channel="bankCustomer-OutputChannelRoute1Orcha" output-channel="processOrderBank1ServiceAcivatorOutput">
+			//  <int:header-enricher>
+			//	<int:header name="messageID" expression="headers['id'].toString()" />
+			//  </int:header-enricher>
+			// </int:chain>
+			
+			expr2 = xFactory.compile("//*[local-name() = 'chain']", Filters.element())
+			elements2 = expr2.evaluate(xmlSpringIntegration)
+			element2 = elements2.get(1)
+			Assert.assertEquals(element.getAttribute("default-request-channel").getValue(), element2.getAttribute("input-channel").getValue())
+			
+			// <int:transformer id="transformer-processOrderBank1ServiceAcivatorOutput-id" input-channel="processOrderBank1ServiceAcivatorOutput" output-channel="processOrderBank1AggregatorInput" method="transform">
+			//  <bean class="orcha.lang.compiler.referenceimpl.xmlgenerator.impl.ObjectToApplicationTransformer">
+			//	 <property name="application" ref="processOrderBank1" />
+			//  </bean>
+			// </int:transformer>
+			
+			expr = xFactory.compile("//*[local-name() = 'transformer']", Filters.element())
+			elements =  expr.evaluate(xmlSpringIntegration)
+			element = elements.get(1)
+			Assert.assertEquals(element.getAttribute("input-channel").getValue(), element2.getAttribute("output-channel").getValue())
+			 
 			Assert.assertTrue(new File(pathToXmlFile).delete())
 		
 			String xmlQoSSpringContextFileName = orchaCodeVisitor.getOrchaMetadata().getTitle() + "QoS.xml"
