@@ -14,7 +14,6 @@ import orcha.lang.compiler.referenceimpl.testing.ConfigurationMockGenerator
 import orcha.lang.compiler.referenceimpl.xmlgenerator.XmlGenerator
 import orcha.lang.compiler.referenceimpl.xmlgenerator.connectors.SpringIntegrationConnectors
 import orcha.lang.compiler.referenceimpl.xmlgenerator.impl.JDom2XmlGeneratorForSpringIntegration
-import orcha.lang.compiler.referenceimpl.xmlgenerator.impl.XmlGeneratorForSpringIntegration
 import orcha.lang.compiler.serviceOffer.ServiceOfferSelectionGenerator
 import orcha.lang.compiler.visitor.OrchaCodeParser
 import orcha.lang.compiler.visitor.impl.OrchaCodeParserImpl

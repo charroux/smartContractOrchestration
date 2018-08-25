@@ -7,7 +7,6 @@ import orcha.lang.compiler.referenceimpl.xmlgenerator.impl.InboundChannelAdapter
 import orcha.lang.compiler.referenceimpl.xmlgenerator.impl.JDom2XmlGeneratorForSpringIntegration
 import orcha.lang.compiler.referenceimpl.xmlgenerator.impl.Poller
 import orcha.lang.compiler.referenceimpl.xmlgenerator.impl.Transformer
-import orcha.lang.compiler.referenceimpl.xmlgenerator.impl.XmlGeneratorForSpringIntegration
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 

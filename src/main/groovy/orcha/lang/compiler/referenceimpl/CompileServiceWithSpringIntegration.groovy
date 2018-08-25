@@ -11,7 +11,6 @@ import orcha.lang.compiler.referenceimpl.testing.ConfigurationMockGenerator
 import orcha.lang.compiler.referenceimpl.xmlgenerator.XmlGenerator
 import orcha.lang.compiler.referenceimpl.xmlgenerator.connectors.SpringIntegrationConnectors
 import orcha.lang.compiler.referenceimpl.xmlgenerator.impl.ErrorUnwrapper;
-import orcha.lang.compiler.referenceimpl.xmlgenerator.impl.XmlGeneratorForSpringIntegration
 import orcha.lang.compiler.visitor.OrchaCodeVisitor
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -94,15 +93,17 @@ class CompileServiceWithSpringIntegration implements Compile{
 		
 		log.info 'Transpilatation of the Orcha program begins'
 		
-		String xmlSpringContextFileName = orchaCodeParser.getOrchaMetadata().getTitle() + ".xml"		
+		/*String xmlSpringContextFileName = orchaCodeParser.getOrchaMetadata().getTitle() + ".xml"		
 		String xmlSpringContent = destinationDirectory.getAbsolutePath() + File.separator + xmlSpringContextFileName
 		
 		String xmlSpringContextQoSFileName = orchaCodeParser.getOrchaMetadata().getTitle() + "QoS.xml"
 		String xmlQoSSpringContent = destinationDirectory.getAbsolutePath() + File.separator + xmlSpringContextQoSFileName
-				
-		xmlGenerator.generate(orchaCodeParser, new File(xmlSpringContent), new File(xmlQoSSpringContent))
+		*/
+		
+		xmlGenerator.generate(orchaCodeParser, destinationDirectory)
+		// xmlGenerator.generate(orchaCodeParser, new File(xmlSpringContent), new File(xmlQoSSpringContent))
 
-		File oldFile = new File(xmlSpringContent)
+		/*File oldFile = new File(xmlSpringContent)
 		
 		// used when the an executable jar is built
 		def xmlSpringContentInSrc = "." + File.separator + "bin" + File.separator + orchaCodeParser.getOrchaMetadata().getTitle() + ".xml"
@@ -141,7 +142,7 @@ class CompileServiceWithSpringIntegration implements Compile{
 		fos.close()
 
 		log.info 'Transpilatation complete successfully. QoS for Orcha orchestrator copied into ' + xmlSpringContentInSrc
-
+*/
 	}
 
 	
