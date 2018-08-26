@@ -1,3 +1,4 @@
+
 package orcha.lang.compiler.referenceimpl
 
 import org.slf4j.Logger
@@ -6,6 +7,7 @@ import org.springframework.context.ApplicationContext
 import org.springframework.integration.annotation.Transformer
 import orcha.lang.generated.OrchaserviceJavaserviceGateway
 import orcha.lang.generated.StreamHandler
+import orcha.lang.generated.OutputStreamHandler
 
 import org.codehaus.groovy.ast.Parameter
 import org.jdom2.Attribute
@@ -1189,7 +1191,6 @@ class CompileServiceWithSpringIntegrationTest {
 	@Test
 	void orchaServiceJavaServiceFiltering() {
 
-		
 		// the Orcha source program
 		
 		String orchaProgram = "package source.orchaServiceJavaService\n"+
@@ -1365,7 +1366,15 @@ class CompileServiceWithSpringIntegrationTest {
 			Assert.assertNotNull(streamListener)			
 			Assert.assertTrue(streamListener.value() == "input")
 
-			//
+			// @EnableBinding(org.springframework.cloud.stream.messaging.Source.class)
+			// public class OutputStreamHandler {
+			//		private final static Logger log = LoggerFactory.getLogger(OutputStreamHandler.class);
+			// 		@Transformer(inputChannel = "bankCustomer-OutputChannelRoute1", outputChannel = "output")
+			// 		public Object transform(Object message) {
+			//			log.info(("Sending message to the messaging middleware: "+ message));
+			//			return message;
+    		// 		}
+			// }
 			
 			Class outputStreamHandlerClass = Class.forName("orcha.lang.generated.OutputStreamHandler")
 			Assert.assertNotNull(outputStreamHandlerClass)
@@ -1383,6 +1392,5 @@ class CompileServiceWithSpringIntegrationTest {
 			Assert.assertTrue(transformer.outputChannel() == "output")
 			
 		}
-		
-	
+			
 }
