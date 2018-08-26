@@ -253,6 +253,10 @@ class OrchaCodeParserTest {
 		Assert.assertTrue(precedingNode.instruction.instruction == 'receive')
 		Assert.assertTrue(precedingNode.instruction.id == 1)
 		
+		precedingNodes = orchaCodeVisitor.findAllPrecedingReceiveNodesWithTheSameEvent(node)
+		Assert.assertTrue(precedingNodes.size() == 1)
+		node = allReceiveNodes.get(0)
+		Assert.assertTrue(node.instruction.instruction == 'receive')
 		
 		node = allReceiveNodes.get(2)
 		Assert.assertTrue(node.instruction.instruction == 'receive')
