@@ -1,5 +1,13 @@
 package orcha.lang.compiler.referenceimpl
 
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+import org.springframework.context.ApplicationContext
+import org.springframework.integration.annotation.Transformer
+import orcha.lang.generated.OrchaserviceJavaserviceGateway
+import orcha.lang.generated.StreamHandler
+
+import org.codehaus.groovy.ast.Parameter
 import org.jdom2.Attribute
 import org.jdom2.Document
 import org.jdom2.Element
@@ -12,8 +20,15 @@ import org.junit.Assert
 import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.cloud.stream.annotation.EnableBinding
+import org.springframework.cloud.stream.annotation.StreamListener
 import org.springframework.test.context.junit4.SpringRunner
+
+import groovy.util.logging.Slf4j
 import service.callingServiceByEMail.Customer
+import service.orchaPartitioning.BankingTransaction
+import java.lang.annotation.Annotation
+import java.lang.reflect.Method
 import java.nio.file.FileSystems
 import java.nio.file.Files
 import java.nio.file.Path
@@ -30,6 +45,7 @@ import orcha.lang.configuration.Retry
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
+@Slf4j
 class CompileServiceWithSpringIntegrationTest {
 	
 	@Autowired
@@ -100,6 +116,9 @@ class CompileServiceWithSpringIntegrationTest {
 	
 	@Autowired
 	EventHandler eventSourcingInputFile
+	
+	@Autowired
+	Application processOrderBank1
 	
 	@Test
 	void prepareOrder(){
@@ -1188,10 +1207,21 @@ class CompileServiceWithSpringIntegrationTest {
 			
 			OrchaCodeVisitor orchaCodeVisitor = orchaCodeParser.parse(orchaProgram)
 			
+			
 			// generate an XML file (Spring integration configuration): this is the file to be tested
 			 
 			String path = "." + File.separator + "src" + File.separator + "test" + File.separator + "resources" + File.separator
 			File destinationDirectory = new File(path)
+			
+			// create a property file
+			
+			String fichier = destinationDirectory.absolutePath + File.separator + "application.properties"
+			
+			File propertyFile = new File(fichier)
+			if(propertyFile.exists() == false) {
+				propertyFile.createNewFile()
+			}
+			
 			compile.compile(orchaCodeVisitor, destinationDirectory)
 			
 			String xmlSpringContextFileName = orchaCodeVisitor.getOrchaMetadata().getTitle() + ".xml"
@@ -1222,7 +1252,8 @@ class CompileServiceWithSpringIntegrationTest {
 			List<Element> elements =  expr.evaluate(xmlSpringIntegration)
   
 			Element element = elements.get(1)
-			Assert.assertEquals(element.getAttribute("id").getValue(), element2.getAttribute("channel").getValue())
+			String channelID = element.getAttribute("id").getValue()
+			Assert.assertEquals(channelID, element2.getAttribute("channel").getValue())
  
 			// <int:gateway id="gateway-bankCustomer-OutputChannelRoute1Orcha-id" service-interface="orcha.lang.generated.OrchapartitioningGateway" default-request-channel="bankCustomer-OutputChannelRoute1Orcha" />
 
@@ -1261,6 +1292,97 @@ class CompileServiceWithSpringIntegrationTest {
 			
 			Assert.assertTrue(new File(pathToQoSXmlFile).delete())
 			
-	}
+			// check application.properties
+			
+			// spring.cloud.stream.bindings.output.destination=bankingOrder
+			// spring.cloud.stream.bindings.input.destination=bankingTransaction
+			
+			String inputDestination = null
+			String outputDestination = null
+			
+			propertyFile.eachLine {
+				line -> 
+					if(line.startsWith("spring.cloud.stream.bindings.input.destination")==true) inputDestination = line
+					if(line.startsWith("spring.cloud.stream.bindings.output.destination")==true) outputDestination = line
+			}
+			
+			Assert.assertNotNull(inputDestination)
+			Assert.assertNotNull(outputDestination)
+			
+			String inputDestinationName = processOrderBank1.output.adapter.inputEventHandler.name			
+			Assert.assertTrue(inputDestination.endsWith(inputDestinationName))
+			
+			String outputDestinationName = processOrderBank1.input.adapter.outputEventHandler.name
+			Assert.assertTrue(outputDestination.endsWith(outputDestinationName))
+			
+			Assert.assertTrue(propertyFile.delete())
+			
+			// instrospection of generated groovy classes
+			
+			// public interface OrchaserviceJavaserviceGateway {
+			//		public void call(BankingTransaction event);				
+			// }
+			
+			String title = orchaCodeVisitor.getOrchaMetadata().getTitle()
+			
+			String gateWayClassName = "orcha.lang.generated." + title.replaceAll("\\s","") + "Gateway"			
+			Class gatewayClass = Class.forName(gateWayClassName)			
+			Assert.assertNotNull(gatewayClass)
+			
+			def methods = gatewayClass.getMethods()			
+			Assert.assertTrue(methods.size() == 1)
+			
+			def parameters = methods[0].getParameterTypes()			
+			Assert.assertTrue(parameters.size() == 1)		
+			Assert.assertTrue(parameters[0].getName() == processOrderBank1.output.adapter.inputEventHandler.input.type)
+			
+			// @EnableBinding(org.springframework.cloud.stream.messaging.Sink.class)
+			// public class StreamHandler {
+			//		@Autowired
+			//		private ApplicationContext context;
+			//		private final static Logger log = LoggerFactory.getLogger(StreamHandler.class);
+			// 		@StreamListener("input")
+			//		public void handle(BankingTransaction event) {
+			//			log.info(("Receiving message from the messaging middleware: "+ event));
+			//			OrchaserviceJavaserviceGateway gateway = context.getBean(OrchaserviceJavaserviceGateway.class);
+			//			gateway.call(event);
+			//		}
+			// 	}
+			
+			Class streamHandlerClass = Class.forName("orcha.lang.generated.StreamHandler")
+			Assert.assertNotNull(streamHandlerClass)
+			
+			EnableBinding binding = streamHandlerClass.getAnnotation(Class.forName("org.springframework.cloud.stream.annotation.EnableBinding"))
+			Assert.assertNotNull(binding)
+			Assert.assertTrue(binding.value().getAt(0) == Class.forName("org.springframework.cloud.stream.messaging.Sink"))
+
+			methods = streamHandlerClass.getDeclaredMethods()			
+			Method method = methods[0]
+			parameters = method.getParameterTypes()
+			Assert.assertTrue(parameters[0].getName() == processOrderBank1.output.adapter.inputEventHandler.input.type)
+			
+			StreamListener streamListener = method.getAnnotation(Class.forName("org.springframework.cloud.stream.annotation.StreamListener"))
+			Assert.assertNotNull(streamListener)			
+			Assert.assertTrue(streamListener.value() == "input")
+
+			//
+			
+			Class outputStreamHandlerClass = Class.forName("orcha.lang.generated.OutputStreamHandler")
+			Assert.assertNotNull(outputStreamHandlerClass)
+
+			binding = outputStreamHandlerClass.getAnnotation(Class.forName("org.springframework.cloud.stream.annotation.EnableBinding"))
+			Assert.assertNotNull(binding)
+			Assert.assertTrue(binding.value().getAt(0) == Class.forName("org.springframework.cloud.stream.messaging.Source"))
+
+			methods = outputStreamHandlerClass.getDeclaredMethods()
+			method = methods[0]
+			
+			Transformer transformer = method.getAnnotation(Class.forName("org.springframework.integration.annotation.Transformer"))
+			Assert.assertNotNull(transformer)
+			Assert.assertTrue(transformer.inputChannel() == channelID)
+			Assert.assertTrue(transformer.outputChannel() == "output")
+			
+		}
+		
 	
 }

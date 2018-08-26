@@ -47,11 +47,13 @@ import org.springframework.cloud.stream.messaging.Source
 @Slf4j
 class OutboundChannelAdapter implements Chain, Transformer{
 	
+	File resourcesDirectory
 	OrchaCodeVisitor orchaCodeParser
 	Document xmlSpringIntegration
 	
-	public OutboundChannelAdapter(OrchaCodeVisitor orchaCodeParser, Document xmlSpringIntegration) {
-		super();
+	public OutboundChannelAdapter(File resourcesDirectory, OrchaCodeVisitor orchaCodeParser, Document xmlSpringIntegration) {
+		super()
+		this.resourcesDirectory = resourcesDirectory
 		this.orchaCodeParser = orchaCodeParser
 		this.xmlSpringIntegration = xmlSpringIntegration;
 	}
@@ -402,7 +404,8 @@ class OutboundChannelAdapter implements Chain, Transformer{
 		
 		log.info 'Generation of the stream handler binary class for sending an event to a messaging middleware: ' + fichier + ' complete successfully'
 		
-		fichier = "." + File.separator + "src" + File.separator + "main" + File.separator + "resources" + File.separator + "application.properties"
+		//fichier = "." + File.separator + "src" + File.separator + "main" + File.separator + "resources" + File.separator + "application.properties"
+		fichier = resourcesDirectory.absolutePath + File.separator + "application.properties"
 
 		String destinationName
 		

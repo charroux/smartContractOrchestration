@@ -12,9 +12,11 @@ import orcha.lang.configuration.EventSourcing.JoinPoint
 
 class ServiceActivator implements Chain, Poller, QoS, orcha.lang.compiler.referenceimpl.xmlgenerator.impl.Bean, Transformer, HeaderEnricher{
 	
+	File destinationDirectory
 	Document xmlSpringIntegration
-	public ServiceActivator(Document xmlSpringIntegration) {
-		super();
+	public ServiceActivator(File destinationDirectory, Document xmlSpringIntegration) {
+		super()
+		this.destinationDirectory = destinationDirectory
 		this.xmlSpringIntegration = xmlSpringIntegration;
 	}
 

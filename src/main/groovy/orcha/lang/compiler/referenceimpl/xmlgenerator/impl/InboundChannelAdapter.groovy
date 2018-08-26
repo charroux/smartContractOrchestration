@@ -52,11 +52,13 @@ import org.springframework.cloud.stream.messaging.Sink
 @Slf4j
 class InboundChannelAdapter implements Poller, Chain, HeaderEnricher, Filter, Transformer {
 	
+	File resourcesDirectory
 	Document xmlSpringIntegration
 	String filteringExpression
 	
-	public InboundChannelAdapter(Document xmlSpringIntegration, String filteringExpression) {
-		super();
+	public InboundChannelAdapter(File resourcesDirectory, Document xmlSpringIntegration, String filteringExpression) {
+		super()
+		this.resourcesDirectory = resourcesDirectory
 		this.xmlSpringIntegration = xmlSpringIntegration
 		this.filteringExpression = filteringExpression
 		
@@ -448,7 +450,7 @@ class InboundChannelAdapter implements Poller, Chain, HeaderEnricher, Filter, Tr
 
 		log.info 'Generation of the stream handler binary file for receiving event from a messaging middleware: ' + fichier + ' complete successfully.'
 		
-		fichier = "." + File.separator + "src" + File.separator + "main" + File.separator + "resources" + File.separator + "application.properties"
+		fichier = resourcesDirectory.absolutePath + File.separator + "application.properties"
 		
 		String destinationName
 		
