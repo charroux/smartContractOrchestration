@@ -5,7 +5,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.context.ApplicationContext
 import org.springframework.integration.annotation.Transformer
-import orcha.lang.generated.OrchaserviceJavaserviceGateway
+//import orcha.lang.generated.OrchaserviceJavaserviceGateway
 import orcha.lang.generated.StreamHandler
 import orcha.lang.generated.OutputStreamHandler
 
