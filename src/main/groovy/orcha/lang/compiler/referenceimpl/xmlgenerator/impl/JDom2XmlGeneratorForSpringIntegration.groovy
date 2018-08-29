@@ -48,14 +48,14 @@ class JDom2XmlGeneratorForSpringIntegration implements XmlGenerator{
 	QualityOfService qualityOfService
 	
 	@Override
-	public void generate(OrchaCodeVisitor orchaCodeParser, File destinationDirectory) {
+	public void generate(OrchaCodeVisitor orchaCodeParser, File sourceCodeDirectory, File binaryCodeDirectory) {
 		
 		String xmlSpringContextFileName = orchaCodeParser.getOrchaMetadata().getTitle() + ".xml"
-		String xmlSpringContent = destinationDirectory.getAbsolutePath() + File.separator + xmlSpringContextFileName
+		String xmlSpringContent = sourceCodeDirectory.getAbsolutePath() + File.separator + "resources" + File.separator + xmlSpringContextFileName
 		File xmlSpringContextFile = new File(xmlSpringContent)
 		
 		String xmlSpringContextQoSFileName = orchaCodeParser.getOrchaMetadata().getTitle() + "QoS.xml"
-		String xmlQoSSpringContent = destinationDirectory.getAbsolutePath() + File.separator + xmlSpringContextQoSFileName
+		String xmlQoSSpringContent = sourceCodeDirectory.getAbsolutePath() + File.separator + "resources" + File.separator + xmlSpringContextQoSFileName
 		File xmlQoSSpringContextFile = new File(xmlQoSSpringContent)
 		
 		this.propagateReceiveEvent(orchaCodeParser)
@@ -88,7 +88,7 @@ class JDom2XmlGeneratorForSpringIntegration implements XmlGenerator{
 		 
 		 nodes.each {
 			 
-			 generateXMLForInstruction(it, destinationDirectory, orchaCodeParser, alreadyDoneInstructions, xmlSpringIntegration)
+			 generateXMLForInstruction(it, sourceCodeDirectory, binaryCodeDirectory, orchaCodeParser, alreadyDoneInstructions, xmlSpringIntegration)
 			 
 			 if(it.options!=null && it.options.eventSourcing!=null){
 				 eventsSourcing.add(it.options.eventSourcing)
@@ -515,7 +515,7 @@ class JDom2XmlGeneratorForSpringIntegration implements XmlGenerator{
 
 	}
 	
-	private void generateXMLForInstruction(InstructionNode instructionNode, File destinationDirectory, OrchaCodeVisitor orchaCodeParser, List<Instruction>alreadyDoneInstructions, Document xmlSpringIntegration){
+	private void generateXMLForInstruction(InstructionNode instructionNode, File sourceCodeDirectory, File binaryCodeDirectory,  OrchaCodeVisitor orchaCodeParser, List<Instruction>alreadyDoneInstructions, Document xmlSpringIntegration){
 		
 		//List<Instruction> graphOfInstructions = orchaCodeParser.findAllNodes()
 		
@@ -526,7 +526,7 @@ class JDom2XmlGeneratorForSpringIntegration implements XmlGenerator{
 			if( alreadyDoneInstructions.contains(instruction) == false){
 
 				String title = orchaCodeParser.getOrchaMetadata().getTitle()
-				generateReceiveEventHandler(instructionNode, destinationDirectory, xmlSpringIntegration, title)
+				generateReceiveEventHandler(instructionNode, sourceCodeDirectory, binaryCodeDirectory, xmlSpringIntegration, title)
 				
 				if(instructionNode.next.instruction.instruction == "receive"){
 					
@@ -580,10 +580,10 @@ class JDom2XmlGeneratorForSpringIntegration implements XmlGenerator{
 			String title = orchaCodeParser.getOrchaMetadata().getTitle()
 			
 			if(sequenceSize>1 && nodes.size()==1) {
-				generateApplication(destinationDirectory, orchaCodeParser, instructionNode, title, sequenceNumber, sequenceSize, computeFails, failChannel, xmlSpringIntegration)
+				generateApplication(sourceCodeDirectory, binaryCodeDirectory, orchaCodeParser, instructionNode, title, sequenceNumber, sequenceSize, computeFails, failChannel, xmlSpringIntegration)
 			} else {
 				
-				generateApplication(destinationDirectory, orchaCodeParser, instructionNode, title, computeFails, failChannel, xmlSpringIntegration)
+				generateApplication(sourceCodeDirectory, binaryCodeDirectory, orchaCodeParser, instructionNode, title, computeFails, failChannel, xmlSpringIntegration)
 			}
 			
 			if(nodes.size() > 1) {
@@ -651,13 +651,13 @@ class JDom2XmlGeneratorForSpringIntegration implements XmlGenerator{
 		
 		} else if(instruction.instruction == "send"){
 		
-			generateSendEventHandler(destinationDirectory, orchaCodeParser, instructionNode, xmlSpringIntegration)
+			generateSendEventHandler(sourceCodeDirectory, binaryCodeDirectory, orchaCodeParser, instructionNode, xmlSpringIntegration)
 		
 		}
 
 	}
 	
-	private void generateReceiveEventHandler(InstructionNode instructionNode, File destinationDirectory, Document xmlSpringIntegration, String title){
+	private void generateReceiveEventHandler(InstructionNode instructionNode, File sourceCodeDirectory, File binaryCodeDirectory, Document xmlSpringIntegration, String title){
 		
 		def EventHandler eventHandler = instructionNode.instruction.springBean
 		
@@ -667,7 +667,7 @@ class JDom2XmlGeneratorForSpringIntegration implements XmlGenerator{
 			filteringExpression = expressionParser.filteringExpression(instructionNode.instruction.condition)
 		}
 		
-		InboundChannelAdapter inboundChannelAdapter = new InboundChannelAdapter(destinationDirectory, xmlSpringIntegration, filteringExpression)
+		InboundChannelAdapter inboundChannelAdapter = new InboundChannelAdapter(sourceCodeDirectory, binaryCodeDirectory, xmlSpringIntegration, filteringExpression)
 		
 		if(eventHandler.input!=null && eventHandler.input.adapter instanceof HttpAdapter){
 				
@@ -698,9 +698,9 @@ class JDom2XmlGeneratorForSpringIntegration implements XmlGenerator{
 		}
 	}
 	
-	private void generateApplication(File destinationDirectory, OrchaCodeVisitor orchaCodeParser, InstructionNode instructionNode, String title, int sequenceNumber, int sequenceSize, boolean computeFails, String failChannel, Document xmlSpringIntegration){
+	private void generateApplication(File sourceCodeDirectory, File binaryCodeDirectory, OrchaCodeVisitor orchaCodeParser, InstructionNode instructionNode, String title, int sequenceNumber, int sequenceSize, boolean computeFails, String failChannel, Document xmlSpringIntegration){
 		
-		ServiceActivator serviceActivator = new ServiceActivator(destinationDirectory, xmlSpringIntegration)
+		ServiceActivator serviceActivator = new ServiceActivator(xmlSpringIntegration)
 		
 		if(instructionNode.instruction.springBean.input.adapter instanceof JavaServiceAdapter){
 			
@@ -714,15 +714,15 @@ class JDom2XmlGeneratorForSpringIntegration implements XmlGenerator{
 			
 		} else if(instructionNode.instruction.springBean.input.adapter instanceof OrchaServiceAdapter){
 			
-			this.generateRedirectInputEventToSendEventHandler(orchaCodeParser, instructionNode, xmlSpringIntegration)
-			this.generateRedirectOutputEventToReceiveEventHandler(instructionNode, title,  xmlSpringIntegration)
+			this.generateRedirectInputEventToSendEventHandler(sourceCodeDirectory, binaryCodeDirectory, orchaCodeParser, instructionNode, xmlSpringIntegration)
+			this.generateRedirectOutputEventToReceiveEventHandler(sourceCodeDirectory, binaryCodeDirectory, instructionNode, title,  xmlSpringIntegration)
 	
 		}
 	}
 	
-	private void generateApplication(File destinationDirectory, OrchaCodeVisitor orchaCodeParser, InstructionNode instructionNode, String title, boolean computeFails, String failChannel, Document xmlSpringIntegration){
+	private void generateApplication(File sourceCodeDirectory, File binaryCodeDirectory, OrchaCodeVisitor orchaCodeParser, InstructionNode instructionNode, String title, boolean computeFails, String failChannel, Document xmlSpringIntegration){
 		
-		ServiceActivator serviceActivator = new ServiceActivator(destinationDirectory, xmlSpringIntegration)
+		ServiceActivator serviceActivator = new ServiceActivator(xmlSpringIntegration)
 		
 		if(instructionNode.instruction.springBean.input.adapter instanceof JavaServiceAdapter){
 			
@@ -736,8 +736,8 @@ class JDom2XmlGeneratorForSpringIntegration implements XmlGenerator{
 			
 		} else if(instructionNode.instruction.springBean.input.adapter instanceof OrchaServiceAdapter){
 			
-			this.generateRedirectInputEventToSendEventHandler(destinationDirectory, orchaCodeParser, instructionNode, xmlSpringIntegration)
-			this.generateRedirectOutputEventToReceiveEventHandler(destinationDirectory, instructionNode, title, xmlSpringIntegration)
+			this.generateRedirectInputEventToSendEventHandler(sourceCodeDirectory, binaryCodeDirectory, orchaCodeParser, instructionNode, xmlSpringIntegration)
+			this.generateRedirectOutputEventToReceiveEventHandler(sourceCodeDirectory, binaryCodeDirectory, instructionNode, title, xmlSpringIntegration)
 			
 		}
 		
@@ -769,9 +769,9 @@ class JDom2XmlGeneratorForSpringIntegration implements XmlGenerator{
 	
 	}
 	
-	private void generateSendEventHandler(File destinationDirectory, OrchaCodeVisitor orchaCodeParser, InstructionNode instructionNode, Document xmlSpringIntegration){
+	private void generateSendEventHandler(File sourceCodeDirectory, File binaryCodeDirectory, OrchaCodeVisitor orchaCodeParser, InstructionNode instructionNode, Document xmlSpringIntegration){
 		
-		OutboundChannelAdapter outboundChannelAdapter = new OutboundChannelAdapter(destinationDirectory, orchaCodeParser, xmlSpringIntegration)
+		OutboundChannelAdapter outboundChannelAdapter = new OutboundChannelAdapter(sourceCodeDirectory, binaryCodeDirectory, orchaCodeParser, xmlSpringIntegration)
 		
 		def EventHandler eventHandler = instructionNode.instruction.springBean
 		
@@ -796,9 +796,9 @@ class JDom2XmlGeneratorForSpringIntegration implements XmlGenerator{
 		}
 	}
 	
-	private void generateRedirectInputEventToSendEventHandler(File destinationDirectory, OrchaCodeVisitor orchaCodeParser, InstructionNode instructionNode, Document xmlSpringIntegration){
+	private void generateRedirectInputEventToSendEventHandler(File sourceCodeDirectory, File binaryCodeDirectory, OrchaCodeVisitor orchaCodeParser, InstructionNode instructionNode, Document xmlSpringIntegration){
 		
-		OutboundChannelAdapter outboundChannelAdapter = new OutboundChannelAdapter(destinationDirectory, orchaCodeParser, xmlSpringIntegration)
+		OutboundChannelAdapter outboundChannelAdapter = new OutboundChannelAdapter(sourceCodeDirectory, binaryCodeDirectory, orchaCodeParser, xmlSpringIntegration)
 		
 		OrchaServiceAdapter orchaServiceAdapter = instructionNode.instruction.springBean.input.adapter
 		
@@ -825,14 +825,14 @@ class JDom2XmlGeneratorForSpringIntegration implements XmlGenerator{
 		}
 	}
 
-	private void generateRedirectOutputEventToReceiveEventHandler(File destinationDirectory, InstructionNode instructionNode, String title, Document xmlSpringIntegration){
+	private void generateRedirectOutputEventToReceiveEventHandler(File sourceCodeDirectory, File binaryCodeDirectory, InstructionNode instructionNode, String title, Document xmlSpringIntegration){
 		
 		String filteringExpression = null
 		
 		if(instructionNode.instruction.condition != null) {
 			filteringExpression = expressionParser.filteringExpression(instructionNode.instruction.condition)
 		}
-		InboundChannelAdapter inboundChannelAdapter = new InboundChannelAdapter(destinationDirectory, xmlSpringIntegration, filteringExpression)
+		InboundChannelAdapter inboundChannelAdapter = new InboundChannelAdapter(sourceCodeDirectory, binaryCodeDirectory, xmlSpringIntegration, filteringExpression)
 		
 		OrchaServiceAdapter orchaServiceAdapter = instructionNode.instruction.springBean.output.adapter
 		

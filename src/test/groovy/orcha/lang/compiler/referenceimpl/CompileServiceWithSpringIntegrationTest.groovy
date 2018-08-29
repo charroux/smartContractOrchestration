@@ -5,9 +5,6 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.context.ApplicationContext
 import org.springframework.integration.annotation.Transformer
-//import orcha.lang.generated.OrchaserviceJavaserviceGateway
-import orcha.lang.generated.StreamHandler
-import orcha.lang.generated.OutputStreamHandler
 
 import org.codehaus.groovy.ast.Parameter
 import org.jdom2.Attribute
@@ -144,12 +141,16 @@ class CompileServiceWithSpringIntegrationTest {
 		
 		// generate an XML file (Spring integration configuration): this is the file to be tested
 		 
-		String path = "." + File.separator + "src" + File.separator + "test" + File.separator + "resources" + File.separator		
-		File destinationDirectory = new File(path)
-		compile.compile(orchaCodeVisitor, destinationDirectory)
+		String path = "." + File.separator + "src" + File.separator + "test"		
+		File sourceCodeDirectory = new File(path)
+		
+		path = "." + File.separator + "bin" + File.separator + "test"
+		File binaryDestinationDirectory = new File(path)
+		
+		compile.compile(orchaCodeVisitor, sourceCodeDirectory, binaryDestinationDirectory)
 		
 		String xmlSpringContextFileName = orchaCodeVisitor.getOrchaMetadata().getTitle() + ".xml"
-		String pathToXmlFile = destinationDirectory.getAbsolutePath() + File.separator + xmlSpringContextFileName
+		String pathToXmlFile = sourceCodeDirectory.getAbsolutePath() + File.separator + "resources" + File.separator + xmlSpringContextFileName
 		
 		// parse the XML file checking is correctness
 		
@@ -305,7 +306,7 @@ class CompileServiceWithSpringIntegrationTest {
 		Assert.assertTrue(new File(pathToXmlFile).delete())
 	
 		String xmlQoSSpringContextFileName = orchaCodeVisitor.getOrchaMetadata().getTitle() + "QoS.xml"
-		String pathToQoSXmlFile = destinationDirectory.getAbsolutePath() + File.separator + xmlQoSSpringContextFileName
+		String pathToQoSXmlFile = sourceCodeDirectory.getAbsolutePath() + File.separator + "resources" + File.separator + xmlQoSSpringContextFileName
 		
 		Assert.assertTrue(new File(pathToQoSXmlFile).delete())
 		
@@ -329,12 +330,16 @@ class CompileServiceWithSpringIntegrationTest {
 		
 		// generate an XML file (Spring integration configuration): this is the file to be tested
 		 
-		String path = "." + File.separator + "src" + File.separator + "test" + File.separator + "resources" + File.separator
-		File destinationDirectory = new File(path)
-		compile.compile(orchaCodeVisitor, destinationDirectory)
+		String path = "." + File.separator + "src" + File.separator + "test"
+		File sourceCodeDirectory = new File(path)
+		
+		path = "." + File.separator + "bin" + File.separator + "test"
+		File binaryDestinationDirectory = new File(path)
+		
+		compile.compile(orchaCodeVisitor, sourceCodeDirectory, binaryDestinationDirectory)
 		
 		String xmlSpringContextFileName = orchaCodeVisitor.getOrchaMetadata().getTitle() + ".xml"
-		String pathToXmlFile = destinationDirectory.getAbsolutePath() + File.separator + xmlSpringContextFileName
+		String pathToXmlFile = sourceCodeDirectory.getAbsolutePath()  + File.separator + "resources" + File.separator + xmlSpringContextFileName
 		
 		// parse the XML file checking is correctness
 		
@@ -495,7 +500,7 @@ class CompileServiceWithSpringIntegrationTest {
 		Assert.assertTrue(new File(pathToXmlFile).delete())
 	
 		String xmlQoSSpringContextFileName = orchaCodeVisitor.getOrchaMetadata().getTitle() + "QoS.xml"
-		String pathToQoSXmlFile = destinationDirectory.getAbsolutePath() + File.separator + xmlQoSSpringContextFileName
+		String pathToQoSXmlFile = sourceCodeDirectory.getAbsolutePath() + File.separator + "resources" + File.separator + xmlQoSSpringContextFileName
 		
 		Assert.assertTrue(new File(pathToQoSXmlFile).delete())
 	}
@@ -518,12 +523,16 @@ class CompileServiceWithSpringIntegrationTest {
 		
 		// generate an XML file (Spring integration configuration): this is the file to be tested
 		 
-		String path = "." + File.separator + "src" + File.separator + "test" + File.separator + "resources" + File.separator
-		File destinationDirectory = new File(path)
-		compile.compile(orchaCodeVisitor, destinationDirectory)
+		String path = "." + File.separator + "src" + File.separator + "test"
+		File sourceCodeDirectory = new File(path)
+		
+		path = "." + File.separator + "bin" + File.separator + "test"
+		File binaryDestinationDirectory = new File(path)
+		
+		compile.compile(orchaCodeVisitor, sourceCodeDirectory, binaryDestinationDirectory)
 		
 		String xmlSpringContextFileName = orchaCodeVisitor.getOrchaMetadata().getTitle() + ".xml"
-		String pathToXmlFile = destinationDirectory.getAbsolutePath() + File.separator + xmlSpringContextFileName
+		String pathToXmlFile = sourceCodeDirectory.getAbsolutePath()  + File.separator + "resources" + File.separator + xmlSpringContextFileName
 		
 		// parse the XML file checking is correctness
 		
@@ -568,7 +577,7 @@ class CompileServiceWithSpringIntegrationTest {
 		
 		Assert.assertTrue(new File(pathToXmlFile).delete())
 		String xmlQoSSpringContextFileName = orchaCodeVisitor.getOrchaMetadata().getTitle() + "QoS.xml"
-		String pathToQoSXmlFile = destinationDirectory.getAbsolutePath() + File.separator + xmlQoSSpringContextFileName
+		String pathToQoSXmlFile = sourceCodeDirectory.getAbsolutePath()  + File.separator + "resources" + File.separator + xmlQoSSpringContextFileName
 		Assert.assertTrue(new File(pathToQoSXmlFile).delete())
 	}
 	
@@ -589,12 +598,16 @@ class CompileServiceWithSpringIntegrationTest {
 		
 		// generate an XML file (Spring integration configuration): this is the file to be tested
 		 
-		String path = "." + File.separator + "src" + File.separator + "test" + File.separator + "resources" + File.separator
-		File destinationDirectory = new File(path)
-		compile.compile(orchaCodeVisitor, destinationDirectory)
+		String path = "." + File.separator + "src" + File.separator + "test"
+		File sourceCodeDirectory = new File(path)
+		
+		path = "." + File.separator + "bin" + File.separator + "test"
+		File binaryDestinationDirectory = new File(path)
+		
+		compile.compile(orchaCodeVisitor, sourceCodeDirectory, binaryDestinationDirectory)
 		
 		String xmlSpringContextFileName = orchaCodeVisitor.getOrchaMetadata().getTitle() + ".xml"
-		String pathToXmlFile = destinationDirectory.getAbsolutePath() + File.separator + xmlSpringContextFileName
+		String pathToXmlFile = sourceCodeDirectory.getAbsolutePath()  + File.separator + "resources" + File.separator + xmlSpringContextFileName
 		
 		// parse the XML file checking is correctness
 		
@@ -657,7 +670,7 @@ class CompileServiceWithSpringIntegrationTest {
 				
 		Assert.assertTrue(new File(pathToXmlFile).delete())
 		String xmlQoSSpringContextFileName = orchaCodeVisitor.getOrchaMetadata().getTitle() + "QoS.xml"
-		String pathToQoSXmlFile = destinationDirectory.getAbsolutePath() + File.separator + xmlQoSSpringContextFileName
+		String pathToQoSXmlFile = sourceCodeDirectory.getAbsolutePath()  + File.separator + "resources" + File.separator + xmlQoSSpringContextFileName
 		
 		Assert.assertTrue(new File(pathToQoSXmlFile).delete())
 	}
@@ -679,12 +692,16 @@ class CompileServiceWithSpringIntegrationTest {
 		
 		// generate an XML file (Spring integration configuration): this is the file to be tested
 		 
-		String path = "." + File.separator + "src" + File.separator + "test" + File.separator + "resources" + File.separator
-		File destinationDirectory = new File(path)
-		compile.compile(orchaCodeVisitor, destinationDirectory)
+		String path = "." + File.separator + "src" + File.separator + "test"
+		File sourceCodeDirectory = new File(path)
+		
+		path = "." + File.separator + "bin" + File.separator + "test"
+		File binaryDestinationDirectory = new File(path)
+		
+		compile.compile(orchaCodeVisitor, sourceCodeDirectory, binaryDestinationDirectory)
 		
 		String xmlSpringContextFileName = orchaCodeVisitor.getOrchaMetadata().getTitle() + ".xml"
-		String pathToXmlFile = destinationDirectory.getAbsolutePath() + File.separator + xmlSpringContextFileName
+		String pathToXmlFile = sourceCodeDirectory.getAbsolutePath()  + File.separator + "resources" + File.separator + xmlSpringContextFileName
 		
 		// parse the XML file checking is correctness
 		
@@ -715,7 +732,7 @@ class CompileServiceWithSpringIntegrationTest {
 				
 		Assert.assertTrue(new File(pathToXmlFile).delete())
 		String xmlQoSSpringContextFileName = orchaCodeVisitor.getOrchaMetadata().getTitle() + "QoS.xml"
-		String pathToQoSXmlFile = destinationDirectory.getAbsolutePath() + File.separator + xmlQoSSpringContextFileName
+		String pathToQoSXmlFile = sourceCodeDirectory.getAbsolutePath()  + File.separator + "resources" + File.separator + xmlQoSSpringContextFileName
 		
 		Assert.assertTrue(new File(pathToQoSXmlFile).delete())
 	}
@@ -740,12 +757,16 @@ class CompileServiceWithSpringIntegrationTest {
 		
 		// generate an XML file (Spring integration configuration): this is the file to be tested
 		 
-		String path = "." + File.separator + "src" + File.separator + "test" + File.separator + "resources" + File.separator
-		File destinationDirectory = new File(path)
-		compile.compile(orchaCodeVisitor, destinationDirectory)
+		String path = "." + File.separator + "src" + File.separator + "test"
+		File sourceCodeDirectory = new File(path)
+		
+		path = "." + File.separator + "bin" + File.separator + "test"
+		File binaryDestinationDirectory = new File(path)
+		
+		compile.compile(orchaCodeVisitor, sourceCodeDirectory, binaryDestinationDirectory)
 		
 		String xmlSpringContextFileName = orchaCodeVisitor.getOrchaMetadata().getTitle() + ".xml"
-		String pathToXmlFile = destinationDirectory.getAbsolutePath() + File.separator + xmlSpringContextFileName
+		String pathToXmlFile = sourceCodeDirectory.getAbsolutePath()  + File.separator + "resources" + File.separator + xmlSpringContextFileName
 		
 		// parse the XML file checking is correctness
 		
@@ -778,7 +799,7 @@ class CompileServiceWithSpringIntegrationTest {
 		 Assert.assertTrue(new File(pathToXmlFile).delete())
 		 
 		 String xmlQoSSpringContextFileName = orchaCodeVisitor.getOrchaMetadata().getTitle() + "QoS.xml"
-		 String pathToQoSXmlFile = destinationDirectory.getAbsolutePath() + File.separator + xmlQoSSpringContextFileName
+		 String pathToQoSXmlFile = sourceCodeDirectory.getAbsolutePath()  + File.separator + "resources" + File.separator + xmlQoSSpringContextFileName
 			 
 		 Assert.assertTrue(new File(pathToQoSXmlFile).delete())
 		 
@@ -802,12 +823,16 @@ class CompileServiceWithSpringIntegrationTest {
 		
 		// generate an XML file (Spring integration configuration): this is the file to be tested
 		 
-		String path = "." + File.separator + "src" + File.separator + "test" + File.separator + "resources" + File.separator
-		File destinationDirectory = new File(path)
-		compile.compile(orchaCodeVisitor, destinationDirectory)
+		String path = "." + File.separator + "src" + File.separator + "test"
+		File sourceCodeDirectory = new File(path)
+		
+		path = "." + File.separator + "bin" + File.separator + "test"
+		File binaryDestinationDirectory = new File(path)
+		
+		compile.compile(orchaCodeVisitor, sourceCodeDirectory, binaryDestinationDirectory)
 		
 		String xmlSpringContextFileName = orchaCodeVisitor.getOrchaMetadata().getTitle() + ".xml"
-		String pathToXmlFile = destinationDirectory.getAbsolutePath() + File.separator + xmlSpringContextFileName
+		String pathToXmlFile = sourceCodeDirectory.getAbsolutePath()  + File.separator + "resources" + File.separator + xmlSpringContextFileName
 		
 		// parse the XML file checking is correctness
 		
@@ -828,7 +853,7 @@ class CompileServiceWithSpringIntegrationTest {
 		Assert.assertTrue(new File(pathToXmlFile).delete())
 	
 		String xmlQoSSpringContextFileName = orchaCodeVisitor.getOrchaMetadata().getTitle() + "QoS.xml"
-		String pathToQoSXmlFile = destinationDirectory.getAbsolutePath() + File.separator + xmlQoSSpringContextFileName
+		String pathToQoSXmlFile = sourceCodeDirectory.getAbsolutePath()  + File.separator + "resources" + File.separator + xmlQoSSpringContextFileName
 		
 		Assert.assertTrue(new File(pathToQoSXmlFile).delete())
 		
@@ -853,12 +878,16 @@ class CompileServiceWithSpringIntegrationTest {
 		
 		// generate an XML file (Spring integration configuration): this is the file to be tested
 		 
-		String path = "." + File.separator + "src" + File.separator + "test" + File.separator + "resources" + File.separator
-		File destinationDirectory = new File(path)
-		compile.compile(orchaCodeVisitor, destinationDirectory)
+		String path = "." + File.separator + "src" + File.separator + "test"
+		File sourceCodeDirectory = new File(path)
+		
+		path = "." + File.separator + "bin" + File.separator + "test"
+		File binaryDestinationDirectory = new File(path)
+		
+		compile.compile(orchaCodeVisitor, sourceCodeDirectory, binaryDestinationDirectory)
 		
 		String xmlSpringContextFileName = orchaCodeVisitor.getOrchaMetadata().getTitle() + ".xml"
-		String pathToXmlFile = destinationDirectory.getAbsolutePath() + File.separator + xmlSpringContextFileName
+		String pathToXmlFile = sourceCodeDirectory.getAbsolutePath()  + File.separator + "resources" + File.separator + xmlSpringContextFileName
 		
 		// parse the XML file checking is correctness
 		
@@ -887,7 +916,7 @@ class CompileServiceWithSpringIntegrationTest {
 		Assert.assertTrue(new File(pathToXmlFile).delete())
 	
 		String xmlQoSSpringContextFileName = orchaCodeVisitor.getOrchaMetadata().getTitle() + "QoS.xml"
-		String pathToQoSXmlFile = destinationDirectory.getAbsolutePath() + File.separator + xmlQoSSpringContextFileName
+		String pathToQoSXmlFile = sourceCodeDirectory.getAbsolutePath()  + File.separator + "resources" + File.separator + xmlQoSSpringContextFileName
 		
 		Assert.assertTrue(new File(pathToQoSXmlFile).delete())
 		
@@ -914,12 +943,16 @@ class CompileServiceWithSpringIntegrationTest {
 		
 		// generate an XML file (Spring integration configuration): this is the file to be tested
 		 
-		String path = "." + File.separator + "src" + File.separator + "test" + File.separator + "resources" + File.separator
-		File destinationDirectory = new File(path)
-		compile.compile(orchaCodeVisitor, destinationDirectory)
+		String path = "." + File.separator + "src" + File.separator + "test"
+		File sourceCodeDirectory = new File(path)
+		
+		path = "." + File.separator + "bin" + File.separator + "test"
+		File binaryDestinationDirectory = new File(path)
+		
+		compile.compile(orchaCodeVisitor, sourceCodeDirectory, binaryDestinationDirectory)
 		
 		String xmlSpringContextFileName = orchaCodeVisitor.getOrchaMetadata().getTitle() + ".xml"
-		String pathToXmlFile = destinationDirectory.getAbsolutePath() + File.separator + xmlSpringContextFileName
+		String pathToXmlFile = sourceCodeDirectory.getAbsolutePath()  + File.separator + "resources" + File.separator + xmlSpringContextFileName
 		
 		// parse the XML file checking is correctness
 		
@@ -973,7 +1006,7 @@ class CompileServiceWithSpringIntegrationTest {
 		Assert.assertTrue(new File(pathToXmlFile).delete())
 		
 		String xmlQoSSpringContextFileName = orchaCodeVisitor.getOrchaMetadata().getTitle() + "QoS.xml"
-		String pathToQoSXmlFile = destinationDirectory.getAbsolutePath() + File.separator + xmlQoSSpringContextFileName
+		String pathToQoSXmlFile = sourceCodeDirectory.getAbsolutePath()  + File.separator + "resources" + File.separator + xmlQoSSpringContextFileName
 			
 		// parse the XML file checking is correctness
 		
@@ -1065,12 +1098,16 @@ class CompileServiceWithSpringIntegrationTest {
 		
 		// generate an XML file (Spring integration configuration): this is the file to be tested
 		 
-		String path = "." + File.separator + "src" + File.separator + "test" + File.separator + "resources" + File.separator
-		File destinationDirectory = new File(path)
-		compile.compile(orchaCodeVisitor, destinationDirectory)
+		String path = "." + File.separator + "src" + File.separator + "test"
+		File sourceCodeDirectory = new File(path)
+		
+		path = "." + File.separator + "bin" + File.separator + "test"
+		File binaryDestinationDirectory = new File(path)
+		
+		compile.compile(orchaCodeVisitor, sourceCodeDirectory, binaryDestinationDirectory)
 		
 		String xmlSpringContextFileName = orchaCodeVisitor.getOrchaMetadata().getTitle() + ".xml"
-		String pathToXmlFile = destinationDirectory.getAbsolutePath() + File.separator + xmlSpringContextFileName
+		String pathToXmlFile = sourceCodeDirectory.getAbsolutePath()  + File.separator + "resources" + File.separator + xmlSpringContextFileName
 		
 		// parse the XML file checking is correctness
 		
@@ -1211,22 +1248,26 @@ class CompileServiceWithSpringIntegrationTest {
 			
 			// generate an XML file (Spring integration configuration): this is the file to be tested
 			 
-			String path = "." + File.separator + "src" + File.separator + "test" + File.separator + "resources" + File.separator
-			File destinationDirectory = new File(path)
+			String path = "." + File.separator + "src" + File.separator + "test"
+			File sourceCodeDirectory = new File(path)
 			
 			// create a property file
 			
-			String fichier = destinationDirectory.absolutePath + File.separator + "application.properties"
+			String fichier = path + File.separator + "resources" + File.separator + "application.properties"
 			
 			File propertyFile = new File(fichier)
 			if(propertyFile.exists() == false) {
 				propertyFile.createNewFile()
 			}
 			
-			compile.compile(orchaCodeVisitor, destinationDirectory)
 			
+			path = "." + File.separator + "bin" + File.separator + "test"
+			File binaryDestinationDirectory = new File(path)
+		
+			compile.compile(orchaCodeVisitor, sourceCodeDirectory, binaryDestinationDirectory)
+		
 			String xmlSpringContextFileName = orchaCodeVisitor.getOrchaMetadata().getTitle() + ".xml"
-			String pathToXmlFile = destinationDirectory.getAbsolutePath() + File.separator + xmlSpringContextFileName
+			String pathToXmlFile = sourceCodeDirectory.getAbsolutePath() + File.separator + "resources" + File.separator + xmlSpringContextFileName
 			
 			// parse the XML file checking is correctness
 			
@@ -1289,7 +1330,7 @@ class CompileServiceWithSpringIntegrationTest {
 			Assert.assertTrue(new File(pathToXmlFile).delete())
 		
 			String xmlQoSSpringContextFileName = orchaCodeVisitor.getOrchaMetadata().getTitle() + "QoS.xml"
-			String pathToQoSXmlFile = destinationDirectory.getAbsolutePath() + File.separator + xmlQoSSpringContextFileName
+			String pathToQoSXmlFile = sourceCodeDirectory.getAbsolutePath() + File.separator + "resources" + File.separator + xmlQoSSpringContextFileName
 			
 			Assert.assertTrue(new File(pathToQoSXmlFile).delete())
 			

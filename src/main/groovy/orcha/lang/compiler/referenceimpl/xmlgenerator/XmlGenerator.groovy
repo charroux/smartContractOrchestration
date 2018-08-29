@@ -8,6 +8,6 @@ import orcha.lang.compiler.visitor.OrchaCodeVisitor
 
 interface XmlGenerator {
 	
-	void generate(OrchaCodeVisitor orchaCodeParser, File destinationDirectory)
+	void generate(OrchaCodeVisitor orchaCodeParser, File resourcesDestinationDirectory, File binaryCodeDirectory)
 
 }

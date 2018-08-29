@@ -47,13 +47,15 @@ import org.springframework.cloud.stream.messaging.Source
 @Slf4j
 class OutboundChannelAdapter implements Chain, Transformer{
 	
-	File resourcesDirectory
+	File sourceCodeDirectory
+	File binaryCodeDirectory
 	OrchaCodeVisitor orchaCodeParser
 	Document xmlSpringIntegration
 	
-	public OutboundChannelAdapter(File resourcesDirectory, OrchaCodeVisitor orchaCodeParser, Document xmlSpringIntegration) {
+	public OutboundChannelAdapter(File sourceCodeDirectory, File binaryCodeDirectory, OrchaCodeVisitor orchaCodeParser, Document xmlSpringIntegration) {
 		super()
-		this.resourcesDirectory = resourcesDirectory
+		this.sourceCodeDirectory = sourceCodeDirectory
+		this.binaryCodeDirectory = binaryCodeDirectory
 		this.orchaCodeParser = orchaCodeParser
 		this.xmlSpringIntegration = xmlSpringIntegration;
 	}
@@ -277,7 +279,8 @@ class OutboundChannelAdapter implements Chain, Transformer{
 		}
 						
 		String streamHandlerClassName = "orcha.lang.generated.OutputStreamHandler"
-		String s = "." + File.separator + "src" + File.separator + "main" + File.separator + "groovy"
+		//String s = "." + File.separator + "src" + File.separator + "main" + File.separator + "groovy"
+		String s = sourceCodeDirectory.getAbsolutePath() + File.separator + "groovy"
 		String path = s + File.separator + streamHandlerClassName + ".groovy"
 		
 		log.info 'Generation of the stream handler for sending an event to a messaging middleware: ' + path
@@ -318,13 +321,14 @@ class OutboundChannelAdapter implements Chain, Transformer{
 		String tt = streamHandlerClassName.replaceAll('\\.', "/")
 		
 		String[] packagePathElements = tt.split("/");
-		String fichier = "." + File.separator + "bin" + File.separator + "main" + File.separator
+		//String fichier = "." + File.separator + "bin" + File.separator + "main" + File.separator
+		String fichier = binaryCodeDirectory.getAbsolutePath()
 		
 		for(int i=0; i<packagePathElements.length-1; i++) {
-			fichier = fichier + packagePathElements[i] + File.separator
+			fichier = fichier + File.separator + packagePathElements[i]
 		}
 				
-		fichier = fichier + packagePathElements[packagePathElements.length-1] + ".class";
+		fichier = fichier + File.separator + packagePathElements[packagePathElements.length-1] + ".class";
 
 		log.info 'Generation of the stream handler binary class for sending an event to a messaging middleware: ' + fichier
 		
@@ -405,7 +409,7 @@ class OutboundChannelAdapter implements Chain, Transformer{
 		log.info 'Generation of the stream handler binary class for sending an event to a messaging middleware: ' + fichier + ' complete successfully'
 		
 		//fichier = "." + File.separator + "src" + File.separator + "main" + File.separator + "resources" + File.separator + "application.properties"
-		fichier = resourcesDirectory.absolutePath + File.separator + "application.properties"
+		fichier = sourceCodeDirectory.absolutePath + File.separator + "resources" + File.separator + "application.properties"
 
 		String destinationName
 		
@@ -419,26 +423,30 @@ class OutboundChannelAdapter implements Chain, Transformer{
 		
 		def lines = []
 		
-		new File(fichier).eachLine {
+		File src = new File(fichier)
+		
+		src.eachLine {
 			line -> if(line.startsWith("spring.cloud.stream.bindings.output")==false && line.startsWith("# Auto generation of the")==false && line.equals("")==false) lines.add(line)
 		}
 		
-		new File(fichier).delete()
+		src.delete()
 		
-		new File(fichier).withWriter('utf-8') { writer ->
+		src = new File(fichier)
+		
+		src.withWriter('utf-8') { writer ->
 			lines.each{
 				writer.writeLine(it)
 			}
 		}
 		
-		new File(fichier) << '''
+		src << '''
 
 # Auto generation of the output destination to the messaging middleware. Do not delete this line:
 spring.cloud.stream.bindings.output.destination=''' + destinationName
 		
 		if(orchaCodeParser.isAMessagingPartition(instructionNode)) {
 			
-			new File(fichier) << '''
+			src << '''
 
 # Auto generation of the partitionKeyExpression for the messaging middleware. Do not delete this line:
 spring.cloud.stream.bindings.output.producer.partitionKeyExpression=''' + partitionKeyExpression << '''
@@ -447,16 +455,14 @@ spring.cloud.stream.bindings.output.producer.partitionCount=2'''
 
 		}
 		
-		log.info 'Adding the input binding destination ' + destinationName + ' to: ' + fichier + ' complete successfully'
-
-		def src = new File(fichier)
+		log.info 'Adding the output binding destination ' + destinationName + ' to: ' + fichier + ' complete successfully'
 		
-		fichier = "." + File.separator + "bin" + File.separator + "main" + File.separator + "application.properties"
+		//fichier = "." + File.separator + "bin" + File.separator + "main" + File.separator + "application.properties"
+		fichier = binaryCodeDirectory.absolutePath + File.separator + "application.properties"
 		
 		log.info 'Adding the output binding destination ' + destinationName + ' to: ' + fichier
 		
-		def dst = new File(fichier)
-		dst.delete()
+		File dst = new File(fichier)
 		
 		dst << src.text
 

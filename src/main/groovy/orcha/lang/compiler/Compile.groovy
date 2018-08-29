@@ -23,6 +23,6 @@ interface Compile{
 	 */
 	void compileForTesting(OrchaCodeVisitor orchaCodeParser)  throws OrchaCompilationException, OrchaConfigurationException
 	
-	void compile(OrchaCodeVisitor orchaCodeParser, File destinationDirectory) throws OrchaCompilationException, OrchaConfigurationException
+	void compile(OrchaCodeVisitor orchaCodeParser, File resourcesDestinationDirectory, File binaryCodeDirectory) throws OrchaCompilationException, OrchaConfigurationException
 	
 }

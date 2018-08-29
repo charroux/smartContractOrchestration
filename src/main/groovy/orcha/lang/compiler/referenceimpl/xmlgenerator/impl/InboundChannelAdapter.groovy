@@ -52,13 +52,15 @@ import org.springframework.cloud.stream.messaging.Sink
 @Slf4j
 class InboundChannelAdapter implements Poller, Chain, HeaderEnricher, Filter, Transformer {
 	
-	File resourcesDirectory
+	File sourceCodeDirectory
+	File binaryCodeDirectory
 	Document xmlSpringIntegration
 	String filteringExpression
 	
-	public InboundChannelAdapter(File resourcesDirectory, Document xmlSpringIntegration, String filteringExpression) {
+	public InboundChannelAdapter(File sourceCodeDirectory, File binaryCodeDirectory, Document xmlSpringIntegration, String filteringExpression) {
 		super()
-		this.resourcesDirectory = resourcesDirectory
+		this.sourceCodeDirectory = sourceCodeDirectory
+		this.binaryCodeDirectory = binaryCodeDirectory
 		this.xmlSpringIntegration = xmlSpringIntegration
 		this.filteringExpression = filteringExpression
 		
@@ -211,7 +213,8 @@ class InboundChannelAdapter implements Poller, Chain, HeaderEnricher, Filter, Tr
 		
 		// generate gateway interface source code
 		
-		String s = "." + File.separator + "src" + File.separator + "main" + File.separator + "groovy"
+		//String s = "." + File.separator + "src" + File.separator + "main" + File.separator + "groovy"
+		String s = sourceCodeDirectory.getAbsolutePath() + File.separator + "groovy"
 		String path = s + File.separator + gateWayClassName + ".groovy"
 		
 		log.info 'Generation of the gateway interface for receiving event from a messaging middleware: ' + path
@@ -245,8 +248,8 @@ class InboundChannelAdapter implements Poller, Chain, HeaderEnricher, Filter, Tr
 		
 		// generate gateway interface binary code
 		
-		s = "." + File.separator + "bin" + File.separator + "main"
-		path = s + File.separator + gateWayClassName + ".class"
+		//s = "." + File.separator + "bin" + File.separator + "main"
+		path = binaryCodeDirectory.getAbsolutePath() + File.separator + gateWayClassName + ".class"
 		
 		log.info 'Generation of the binary file gateway interface for receiving event from a messaging middleware: ' + path
 		
@@ -270,7 +273,8 @@ class InboundChannelAdapter implements Poller, Chain, HeaderEnricher, Filter, Tr
 		byte[] bytes = cw.toByteArray()
 		
 		String[] packagePathElements = t.split("/");
-		String fichier = "." + File.separator + "bin" + File.separator + "main" + File.separator
+		//String fichier = "." + File.separator + "bin" + File.separator + "main" + File.separator
+		String fichier = binaryCodeDirectory.getAbsolutePath() + File.separator
 		
 		for(int i=0; i<packagePathElements.length-1; i++) {
 			fichier = fichier + packagePathElements[i] + File.separator
@@ -288,7 +292,8 @@ class InboundChannelAdapter implements Poller, Chain, HeaderEnricher, Filter, Tr
 		// generate stream handler interface source code
 
 		String streamHandlerClassName = "orcha.lang.generated.StreamHandler"
-		s = "." + File.separator + "src" + File.separator + "main" + File.separator + "groovy"
+		//s = "." + File.separator + "src" + File.separator + "main" + File.separator + "groovy"
+		s = sourceCodeDirectory.getAbsolutePath() + File.separator + "groovy"
 		path = s + File.separator + streamHandlerClassName + ".groovy"
 		
 		log.info 'Generation of the stream handler for receiving event from a messaging middleware: ' + path
@@ -343,13 +348,14 @@ class InboundChannelAdapter implements Poller, Chain, HeaderEnricher, Filter, Tr
 		String tt = streamHandlerClassName.replaceAll('\\.', "/")
 		
 		packagePathElements = tt.split("/");
-		fichier = "." + File.separator + "bin" + File.separator + "main" + File.separator
+		//fichier = "." + File.separator + "bin" + File.separator + "main" + File.separator
+		fichier = binaryCodeDirectory.getAbsolutePath()
 		
 		for(int i=0; i<packagePathElements.length-1; i++) {
-			fichier = fichier + packagePathElements[i] + File.separator
+			fichier = fichier + File.separator + packagePathElements[i]
 		}
 				
-		fichier = fichier + packagePathElements[packagePathElements.length-1] + ".class";
+		fichier = fichier + File.separator + packagePathElements[packagePathElements.length-1] + ".class";
 
 		log.info 'Generation of the stream handler binary file for receiving event from a messaging middleware: ' + fichier
 		
@@ -450,7 +456,7 @@ class InboundChannelAdapter implements Poller, Chain, HeaderEnricher, Filter, Tr
 
 		log.info 'Generation of the stream handler binary file for receiving event from a messaging middleware: ' + fichier + ' complete successfully.'
 		
-		fichier = resourcesDirectory.absolutePath + File.separator + "application.properties"
+		fichier = sourceCodeDirectory.absolutePath + File.separator + "resources" + File.separator + "application.properties"
 		
 		String destinationName
 		
@@ -462,13 +468,17 @@ class InboundChannelAdapter implements Poller, Chain, HeaderEnricher, Filter, Tr
 		
 		def lines = []
 		
-		new File(fichier).eachLine {
+		File src = new File(fichier)
+		
+		src.eachLine {
 			line -> if(line.startsWith("spring.cloud.stream.bindings.input.destination")==false && line.startsWith("# Auto generation of the input")==false && line.equals("")==false) lines.add(line)
 		}
 		
-		new File(fichier).delete()
+		src.delete()
 		
-		new File(fichier).withWriter('utf-8') { writer ->
+		src = new File(fichier)
+		
+		src.withWriter('utf-8') { writer ->
 			lines.each{
 				writer.writeLine(it)
 			}
@@ -476,31 +486,21 @@ class InboundChannelAdapter implements Poller, Chain, HeaderEnricher, Filter, Tr
 		
 		log.info 'Adding the input binding destination ' + destinationName + ' to: ' + fichier
 		
-		new File(fichier) << '''
+		src << '''
 
 # Auto generation of the input destination to the messaging middleware. Do not delete this line:
 spring.cloud.stream.bindings.input.destination=''' + destinationName
 		
 		log.info 'Adding the input binding destination ' + destinationName + ' to: ' + fichier + ' complete successfully'
 
-		def src = new File(fichier)
-		
-		fichier = "." + File.separator + "bin" + File.separator + "main" + File.separator + "application.properties"
+		fichier = binaryCodeDirectory.absolutePath + File.separator + "application.properties"
 		
 		log.info 'Adding the input binding destination ' + destinationName + ' to: ' + fichier
 		
-		def dst = new File(fichier)
-		dst.delete()
+		File dst = new File(fichier)
 		
 		dst << src.text
-		
-		/*
-		
-		new File(fichier) << '''
 
-# Auto generation of the input destination to the messaging middleware. Do not delete this line:
-spring.cloud.stream.bindings.input.destination=''' + destinationName 
-*/		
 		log.info 'Adding the input binding destination ' + destinationName + ' to: ' + fichier + ' complete successfully'
 
 	}

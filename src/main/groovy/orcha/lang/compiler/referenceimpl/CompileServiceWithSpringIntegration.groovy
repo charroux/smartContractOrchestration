@@ -44,10 +44,13 @@ class CompileServiceWithSpringIntegration implements Compile{
 	@Override
 	public void compileForLaunching(OrchaCodeVisitor orchaCodeParser) throws OrchaCompilationException, OrchaConfigurationException {
 		
-		String path = "." + File.separator + "src" + File.separator + "main" + File.separator + "resources" + File.separator
-		log.info 'Transpilatation of the orcha program \"' + orchaCodeParser.getOrchaMetadata().getTitle() + '\" into the directory ' + path
+		String pathToResources = "." + File.separator + "src" + File.separator + "main"
+		log.info 'Transpilatation of the orcha program \"' + orchaCodeParser.getOrchaMetadata().getTitle() + '\" into the directory ' + pathToResources + File.separator + "resources"
 		
-		this.compile(orchaCodeParser, new File(path))
+		String pathToBinaryCode = "." + File.separator + "bin" + File.separator + "main"
+		log.info 'Path to binary generated code ' + pathToBinaryCode
+		
+		this.compile(orchaCodeParser, new File(pathToResources), new File(pathToBinaryCode))
 		
 		String xmlSpringContextFileName = orchaCodeParser.getOrchaMetadata().getTitle() + ".xml"
 		String xmlSpringContextQoSFileName = orchaCodeParser.getOrchaMetadata().getTitle() + "QoS.xml"
@@ -66,10 +69,13 @@ class CompileServiceWithSpringIntegration implements Compile{
 		
 		if(orchaCodeParser != null){
 
-			String path = "." + File.separator + "src" + File.separator + "test" + File.separator + "resources" + File.separator
-			log.info 'Transpilatation of the orcha testing program \"' + orchaCodeParser.getOrchaMetadata().getTitle() + '\" into the directory ' + path
+			String pathToResources = "." + File.separator + "src" + File.separator + "test"
+			log.info 'Transpilatation of the orcha testing program \"' + orchaCodeParser.getOrchaMetadata().getTitle() + '\" into the directory ' + pathToResources  + File.separator + "resources"
+		
+			String pathToBinaryCode = "." + File.separator + "bin" + File.separator + "test"
+			log.info 'Path to binary generated code ' + pathToBinaryCode
 			
-			this.compile(orchaCodeParser, new File(path));
+			this.compile(orchaCodeParser, new File(pathToResources), new File(pathToBinaryCode))
 			
 			String xmlSpringContextFileName = orchaCodeParser.getOrchaMetadata().getTitle() + ".xml"
 			String xmlSpringContextQoSFileName = orchaCodeParser.getOrchaMetadata().getTitle() + "QoS.xml"
@@ -89,61 +95,12 @@ class CompileServiceWithSpringIntegration implements Compile{
 	 * @throws OrchaConfigurationException
 	 */
 	@Override
-	public void compile(OrchaCodeVisitor orchaCodeParser, File destinationDirectory) throws OrchaCompilationException, OrchaConfigurationException {
+	public void compile(OrchaCodeVisitor orchaCodeParser, File resourcesDestinationDirectory, File binaryCodeDirectory) throws OrchaCompilationException, OrchaConfigurationException {
 		
 		log.info 'Transpilatation of the Orcha program begins'
 		
-		/*String xmlSpringContextFileName = orchaCodeParser.getOrchaMetadata().getTitle() + ".xml"		
-		String xmlSpringContent = destinationDirectory.getAbsolutePath() + File.separator + xmlSpringContextFileName
-		
-		String xmlSpringContextQoSFileName = orchaCodeParser.getOrchaMetadata().getTitle() + "QoS.xml"
-		String xmlQoSSpringContent = destinationDirectory.getAbsolutePath() + File.separator + xmlSpringContextQoSFileName
-		*/
-		
-		xmlGenerator.generate(orchaCodeParser, destinationDirectory)
-		// xmlGenerator.generate(orchaCodeParser, new File(xmlSpringContent), new File(xmlQoSSpringContent))
+		xmlGenerator.generate(orchaCodeParser, resourcesDestinationDirectory, binaryCodeDirectory)
 
-		/*File oldFile = new File(xmlSpringContent)
-		
-		// used when the an executable jar is built
-		def xmlSpringContentInSrc = "." + File.separator + "bin" + File.separator + orchaCodeParser.getOrchaMetadata().getTitle() + ".xml"
-		File newFile = new File(xmlSpringContentInSrc);
-		FileOutputStream fos = new FileOutputStream(newFile)
-		Files.copy(oldFile.toPath(), fos);
-		fos.close()
-
-		log.info 'Transpilatation complete successfully. Orcha orchestrator copied into ' + xmlSpringContentInSrc
-		
-		// Update temporary file 
-		xmlSpringContentInSrc = "." + File.separator + "bin" + File.separator + "main" + File.separator + orchaCodeParser.getOrchaMetadata().getTitle() + ".xml"
-		newFile = new File(xmlSpringContentInSrc)
-		fos = new FileOutputStream(newFile)
-		Files.copy(oldFile.toPath(), fos);
-		fos.close()
-		
-		log.info 'Transpilatation complete successfully. Orcha orchestrator copied into ' + xmlSpringContentInSrc
-		
-		oldFile = new File(xmlQoSSpringContent)
-				
-		// used when the an executable jar is built
-		xmlSpringContentInSrc = "." + File.separator + "bin" + File.separator + orchaCodeParser.getOrchaMetadata().getTitle() + "QoS.xml"
-		newFile = new File(xmlSpringContentInSrc);
-		fos = new FileOutputStream(newFile)				
-		Files.copy(oldFile.toPath(), fos);
-		fos.close()
-
-		log.info 'Transpilatation complete successfully. QoS for Orcha orchestrator copied into ' + xmlSpringContentInSrc
-		
-		// update temporary file
-		xmlSpringContentInSrc = "." + File.separator + "bin" + File.separator + "main" + File.separator + orchaCodeParser.getOrchaMetadata().getTitle() + "QoS.xml"
-		newFile = new File(xmlSpringContentInSrc);
-		fos = new FileOutputStream(newFile)
-		Files.copy(oldFile.toPath(), fos);
-		fos.close()
-
-		log.info 'Transpilatation complete successfully. QoS for Orcha orchestrator copied into ' + xmlSpringContentInSrc
-*/
 	}
-
 	
 }
