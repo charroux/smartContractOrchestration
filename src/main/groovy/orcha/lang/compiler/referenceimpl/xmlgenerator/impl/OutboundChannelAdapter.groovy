@@ -406,6 +406,13 @@ class OutboundChannelAdapter implements Chain, Transformer{
 		fos.write(bytes);
 		fos.close();
 		
+		Class streamHandlerClasse
+		try {
+			streamHandlerClasse = Class.forName(streamHandlerClassName)
+		} catch(ClassNotFoundException e) {
+			streamHandlerClasse = this.getClass().getClassLoader().defineClass(null, bytes, 0, bytes.size())
+		}
+		
 		log.info 'Generation of the stream handler binary class for sending an event to a messaging middleware: ' + fichier + ' complete successfully'
 		
 		//fichier = "." + File.separator + "src" + File.separator + "main" + File.separator + "resources" + File.separator + "application.properties"

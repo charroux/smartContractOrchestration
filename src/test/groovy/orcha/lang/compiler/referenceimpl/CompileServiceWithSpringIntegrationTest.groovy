@@ -1239,7 +1239,11 @@ class CompileServiceWithSpringIntegrationTest {
 			"receive order from bankCustomer condition 'bank == \\'BANK2\\''\n"+
 			"compute processOrderBank2 with order.value\n"+
 			"when 'processOrderBank2 terminates'\n"+		
-			"send processOrderBank2.result to bankCustomer1\n"
+			"send processOrderBank2.result to bankCustomer1\n" + 
+			"receive order from bankCustomer condition 'bank == \\'BANK3\\''\n"+
+			"compute processOrderBank3 with order.value\n"+
+			"when 'processOrderBank3 terminates'\n"+
+			"send processOrderBank3.result to bankCustomer1"
 			
 			// construct the graph of instructions for the Orcha programm
 			
@@ -1278,7 +1282,7 @@ class CompileServiceWithSpringIntegrationTest {
 			XPathFactory xFactory = XPathFactory.instance()
 		
 			// <int:recipient-list-router id="router-bankCustomer-OutputChannel-id" input-channel="bankCustomer-OutputChannel">
-			// 	<int:recipient channel="bankCustomer-OutputChannelRoute1" selector-expression="((payload.bank == 'BANK1'))" />
+			// 	<int:recipient channel="bankCustomer-OutputChannelRoute1" selector-expression="((payload.bank == 'BANK1') or (payload.bank == 'BANK3'))" />
 			// 	<int:recipient channel="bankCustomer-OutputChannelRoute2" selector-expression="payload.bank == 'BANK2'" />
 			// 	<int:recipient channel="loggingChannel" />
 			// </int:recipient-list-router>
@@ -1288,6 +1292,8 @@ class CompileServiceWithSpringIntegrationTest {
 			Assert.assertTrue(elements2.size() == 3)
 			Element element2 = elements2.get(0)
 			  
+			Assert.assertEquals("((payload.bank == 'BANK1') or (payload.bank == 'BANK3'))", element2.getAttribute("selector-expression").getValue())
+			
 			// <int:channel id="bankCustomer-OutputChannelRoute1" />
 
 			XPathExpression<Element> expr = xFactory.compile("//*[local-name() = 'channel']", Filters.element())
@@ -1301,10 +1307,13 @@ class CompileServiceWithSpringIntegrationTest {
 
 			expr = xFactory.compile("//*[local-name() = 'gateway']", Filters.element())
 			elements =  expr.evaluate(xmlSpringIntegration)
-			Assert.assertTrue(elements.size() == 1)
+			Assert.assertTrue(elements.size() == 2)
 			element = elements.get(0)
 			Assert.assertEquals(element.getAttribute("default-request-channel").getValue(), element2.getAttribute("channel").getValue() + "Orcha" )
-						
+			
+			element2 = elements2.get(1)
+			Assert.assertEquals("payload.bank == 'BANK2'", element2.getAttribute("selector-expression").getValue())
+		  
 			// <int:chain input-channel="bankCustomer-OutputChannelRoute1Orcha" output-channel="processOrderBank1ServiceAcivatorOutput">
 			//  <int:header-enricher>
 			//	<int:header name="messageID" expression="headers['id'].toString()" />
@@ -1341,21 +1350,26 @@ class CompileServiceWithSpringIntegrationTest {
 			
 			String inputDestination = null
 			String outputDestination = null
+			String partitionKeyExpression = null
 			
 			propertyFile.eachLine {
 				line -> 
 					if(line.startsWith("spring.cloud.stream.bindings.input.destination")==true) inputDestination = line
 					if(line.startsWith("spring.cloud.stream.bindings.output.destination")==true) outputDestination = line
+					if(line.startsWith("spring.cloud.stream.bindings.output.producer.partitionKeyExpression")==true) partitionKeyExpression = line
 			}
 			
 			Assert.assertNotNull(inputDestination)
 			Assert.assertNotNull(outputDestination)
+			Assert.assertNotNull(partitionKeyExpression)
 			
 			String inputDestinationName = processOrderBank1.output.adapter.inputEventHandler.name			
 			Assert.assertTrue(inputDestination.endsWith(inputDestinationName))
 			
 			String outputDestinationName = processOrderBank1.input.adapter.outputEventHandler.name
 			Assert.assertTrue(outputDestination.endsWith(outputDestinationName))
+			
+			Assert.assertTrue(partitionKeyExpression.endsWith("'BANK1' ? 0 : (payload.bank == 'BANK3' ? 1 : -1)"))
 			
 			Assert.assertTrue(propertyFile.delete())
 			
@@ -1431,6 +1445,16 @@ class CompileServiceWithSpringIntegrationTest {
 			Assert.assertNotNull(transformer)
 			Assert.assertTrue(transformer.inputChannel() == channelID)
 			Assert.assertTrue(transformer.outputChannel() == "output")
+			
+			// delete generated classes
+			
+			File sourceFile = new File(sourceCodeDirectory.getAbsolutePath() + File.separator + "groovy" + File.separator + "orcha" + File.separator + "lang" + File.separator + "generated")
+			File[] files = sourceFile.listFiles()
+			files.each { Assert.assertTrue(it.delete()) }
+			
+			File binaryFile = new File(binaryDestinationDirectory.getAbsolutePath() + File.separator + "orcha" + File.separator + "lang" + File.separator + "generated")
+			files = binaryFile.listFiles()
+			files.each { Assert.assertTrue(it.delete()) }
 			
 		}
 			

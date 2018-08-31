@@ -63,8 +63,6 @@ class InboundChannelAdapter implements Poller, Chain, HeaderEnricher, Filter, Tr
 		this.binaryCodeDirectory = binaryCodeDirectory
 		this.xmlSpringIntegration = xmlSpringIntegration
 		this.filteringExpression = filteringExpression
-		
-		println filteringExpression
 	}
 	
 	private Element addDefaultPoller(InstructionNode instructionNode) {
@@ -333,7 +331,13 @@ class InboundChannelAdapter implements Poller, Chain, HeaderEnricher, Filter, Tr
 		argu = argu.plus(nameParam)
 		body.add(JExpr.invoke(loggerField, "info").arg(argu))
 		
-		Class gateWayClass = Class.forName(gateWayClassName)
+		Class gateWayClass
+		
+		try {
+			gateWayClass = Class.forName(gateWayClassName)
+		} catch(ClassNotFoundException e) {
+			gateWayClass = this.getClass().getClassLoader().defineClass(null, bytes, 0, bytes.size())
+		}
 		
 		JVar applicationVar = body.decl(codeModel.ref(gateWayClass), "gateway", JExpr.invoke(contextField, "getBean").arg(codeModel.ref(gateWayClass).dotclass()))
 		
@@ -453,7 +457,14 @@ class InboundChannelAdapter implements Poller, Chain, HeaderEnricher, Filter, Tr
 		fos = new FileOutputStream(file);
 		fos.write(bytes);
 		fos.close();
-
+		
+		Class streamHandlerClasse
+		try {
+			streamHandlerClasse = Class.forName(streamHandlerClassName)
+		} catch(ClassNotFoundException e) {
+			streamHandlerClasse = this.getClass().getClassLoader().defineClass(null, bytes, 0, bytes.size())
+		}
+		
 		log.info 'Generation of the stream handler binary file for receiving event from a messaging middleware: ' + fichier + ' complete successfully.'
 		
 		fichier = sourceCodeDirectory.absolutePath + File.separator + "resources" + File.separator + "application.properties"

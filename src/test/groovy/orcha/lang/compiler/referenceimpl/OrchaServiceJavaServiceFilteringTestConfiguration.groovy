@@ -72,4 +72,26 @@ trait OrchaServiceJavaServiceFilteringTestConfiguration {
 	}
 
 
+	
+	@Bean
+	Application processOrderBank3(){
+		
+		def application = new Application(name: "processOrderBank3", language: "Orcha")
+		
+		def orchaServiceAdapter = new OrchaServiceAdapter()
+		
+		application.input = new Input(type: "service.orchaPartitioning.Order", adapter: orchaServiceAdapter)
+		application.output = new Output(type: "service.orchaPartitioning.BankingTransaction", adapter: orchaServiceAdapter)
+			
+		def inputEventHandler = new EventHandler(name: "bankingTransaction")
+		inputEventHandler.input = new Input(mimeType: "application/json", type: "service.orchaPartitioning.BankingTransaction", adapter: new MessagingMiddlewareAdapter())
+		orchaServiceAdapter.inputEventHandler = inputEventHandler
+		
+		def outputEventHandler = new EventHandler(name: "bankingOrder")
+		outputEventHandler.output = new Output(mimeType: "application/json", type: "service.orchaPartitioning.Order", adapter: new MessagingMiddlewareAdapter())
+		orchaServiceAdapter.outputEventHandler = outputEventHandler
+		
+		return application
+	}
+
 }
