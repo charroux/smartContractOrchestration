@@ -449,6 +449,7 @@ class OutboundChannelAdapter implements Chain, Transformer{
 		src << '''
 
 # Auto generation of the output destination to the messaging middleware. Do not delete this line:
+spring.cloud.stream.bindings.output.content-type=application/json
 spring.cloud.stream.bindings.output.destination=''' + destinationName
 		
 		if(orchaCodeParser.isAMessagingPartition(instructionNode)) {

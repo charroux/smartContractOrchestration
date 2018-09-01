@@ -1,6 +1,6 @@
 package source.orchaPartitioning
 
-title "Orcha partitioning"
+title "bank service"
 
 receive order from bankCustomer condition "bank == 'BANK1'"
 compute processOrderBank1 with order.value

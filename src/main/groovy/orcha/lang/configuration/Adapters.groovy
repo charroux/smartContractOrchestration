@@ -156,6 +156,10 @@ class ScriptServiceAdapter extends ConfigurableProperties{
 class MessagingMiddlewareAdapter extends ConfigurableProperties{
 	
 	def adapter = BidirectionalAdapter.MessagingMiddleware
+	boolean partitioned = false
+	int instanceCount = 1		// number of instances of a the application to scale up
+	int partitionNumber			// the number that identifies the partition
+	String groupName			// generated automatically if not provided (required for partitioning)
 
 }
 

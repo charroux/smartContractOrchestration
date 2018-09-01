@@ -9,8 +9,8 @@ import org.springframework.context.annotation.ImportResource;
  * 
  */
 @ImportResource({
-    "classpath:/Orcha partitioning.xml",
-    "classpath:/Orcha partitioningQoS.xml"
+    "classpath:/process order bank1.xml",
+    "classpath:/process order bank1QoS.xml"
 })
 public class ImportDynamicResourcesForConfiguration {
 

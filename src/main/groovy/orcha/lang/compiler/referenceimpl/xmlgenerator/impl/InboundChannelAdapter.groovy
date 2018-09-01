@@ -23,8 +23,10 @@ import orcha.lang.compiler.InstructionNode
 import orcha.lang.compiler.OrchaCompilationException
 import orcha.lang.compiler.qualityOfService.QueueOption
 import orcha.lang.configuration.Application
+import orcha.lang.configuration.EventHandler
 import orcha.lang.configuration.HttpAdapter
 import orcha.lang.configuration.Input
+import orcha.lang.configuration.MessagingMiddlewareAdapter
 import org.springframework.http.MediaType
 
 import org.jdom2.Document
@@ -482,7 +484,7 @@ class InboundChannelAdapter implements Poller, Chain, HeaderEnricher, Filter, Tr
 		File src = new File(fichier)
 		
 		src.eachLine {
-			line -> if(line.startsWith("spring.cloud.stream.bindings.input.destination")==false && line.startsWith("# Auto generation of the input")==false && line.equals("")==false) lines.add(line)
+			line -> if(line.startsWith("spring.cloud.stream.bindings.input")==false && line.startsWith("spring.cloud.stream.instance")==false && line.startsWith("# Auto generation of the input")==false && line.equals("")==false) lines.add(line)
 		}
 		
 		src.delete()
@@ -496,11 +498,33 @@ class InboundChannelAdapter implements Poller, Chain, HeaderEnricher, Filter, Tr
 		}
 		
 		log.info 'Adding the input binding destination ' + destinationName + ' to: ' + fichier
-		
+
 		src << '''
 
-# Auto generation of the input destination to the messaging middleware. Do not delete this line:
+# Auto generation of the input destination to the messaging middleware. Do not delete this line:'''
+
+		src << '''
+spring.cloud.stream.bindings.input.content-type=application/json
 spring.cloud.stream.bindings.input.destination=''' + destinationName
+		
+		if(instruction.springBean instanceof EventHandler && instruction.springBean.input!=null) {
+			MessagingMiddlewareAdapter messagingMiddlewareAdapter = instruction.springBean.input.adapter
+			if(messagingMiddlewareAdapter.partitioned == true) {
+		src << '''
+# Auto generation of the configuration for the partitioning. Do not delete this line:
+spring.cloud.stream.bindings.input.consumer.partitioned=true
+spring.cloud.stream.instanceIndex=''' + messagingMiddlewareAdapter.partitionNumber
+		src << '''
+spring.cloud.stream.instanceCount=''' + messagingMiddlewareAdapter.instanceCount
+				if(messagingMiddlewareAdapter.groupName != null) {
+					src << '''
+spring.cloud.stream.bindings.input.group=''' + messagingMiddlewareAdapter.groupName				
+				} else {
+		src << '''
+spring.cloud.stream.bindings.input.group=''' + instruction.springBean.name + "Group"
+				}
+			}
+		}
 		
 		log.info 'Adding the input binding destination ' + destinationName + ' to: ' + fichier + ' complete successfully'
 

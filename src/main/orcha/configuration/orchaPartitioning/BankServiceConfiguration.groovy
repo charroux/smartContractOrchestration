@@ -17,7 +17,7 @@ import service.orchaPartitioning.OrchaBankingService2
 import service.orchaService.OrchaGroovyService
 
 @Configuration
-class OrchaPartitioningConfiguration {
+class BankServiceConfiguration {
 	
 	@Bean
 	EventHandler bankCustomer(){
