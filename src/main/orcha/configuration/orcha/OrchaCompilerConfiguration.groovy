@@ -10,6 +10,7 @@ import orcha.lang.compiler.referenceimpl.CompileServiceWithSpringIntegration
 import orcha.lang.compiler.referenceimpl.ExpressionParser
 import orcha.lang.compiler.referenceimpl.ExpressionParserImpl
 import orcha.lang.compiler.referenceimpl.OrchaLauncherGenerator
+import orcha.lang.compiler.referenceimpl.configurationproperties.ConfigurationPropertiesGenerator
 import orcha.lang.compiler.referenceimpl.testing.ConfigurationMockGenerator
 import orcha.lang.compiler.referenceimpl.xmlgenerator.XmlGenerator
 import orcha.lang.compiler.referenceimpl.xmlgenerator.connectors.SpringIntegrationConnectors
@@ -92,10 +93,15 @@ class OrchaCompilerConfiguration {
 	}
 	
 	@Bean
+	ConfigurationPropertiesGenerator configurationPropertiesGenerator(){
+		return new ConfigurationPropertiesGenerator()
+	}
+	
+	@Bean
 	Compile compile(){
 		return new CompileServiceWithSpringIntegration()
 	}
-	
+		
 	@Bean
 	XmlGenerator xmlGenerator(){
 		//return new XmlGeneratorForSpringIntegration()

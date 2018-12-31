@@ -27,8 +27,8 @@ class ProcessOrderBank1Configuration {
 	}
 	
 	@Bean
-	Application processOrderBank1(){
-		def application = new Application(name: "processOrderBank1", language: "Groovy")
+	Application processOrderBank(){
+		def application = new Application(name: "processOrderBank", language: "Groovy")
 		def groovyCode1Adapter = new JavaServiceAdapter(javaClass: 'service.orchaPartitioning.BankingService1', method:'process')
 		def input = new Input(type: "service.orchaPartitioning.Order", adapter: groovyCode1Adapter)
 		application.input = input

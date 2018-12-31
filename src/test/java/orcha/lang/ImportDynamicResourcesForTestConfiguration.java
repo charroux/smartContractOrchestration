@@ -1,6 +1,7 @@
 
 package orcha.lang;
 
+import orcha.lang.compiler.referenceimpl.configurationproperties.ConfigurationPropertiesGenerator;
 import orcha.lang.configuration.OrchaSession;
 
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
@@ -32,5 +33,10 @@ public class ImportDynamicResourcesForTestConfiguration {
         OrchaSession orchaSession = new OrchaSession();
         return orchaSession;
     }
+    
+    @Bean
+	ConfigurationPropertiesGenerator configurationPropertiesGenerator(){
+		return new ConfigurationPropertiesGenerator();
+	}
 
 }

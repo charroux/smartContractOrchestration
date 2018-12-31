@@ -21,7 +21,18 @@ apply plugin: 'eclipse'
 apply plugin: 'idea'
 apply plugin: 'groovy'
 apply plugin: 'org.springframework.boot'
+
+apply plugin: 'io.spring.dependency-management'
+
+
 apply plugin: 'jacoco'
+
+
+
+
+group = 'orcha.lang'
+version = '0.0.1-SNAPSHOT'
+
 
 repositories {
 	mavenCentral()
@@ -30,17 +41,17 @@ repositories {
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-springBoot {
-	mainClassName = "orcha.lang.OrchaSpringIntegrationLauncher"
+task customFatJar(type: Jar) {
+    manifest {
+        attributes 'Main-Class': 'orcha.lang.OrchaSpringIntegrationLauncher'
+    }
+    baseName = 'orchalang'
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
 }
 
-jar {
-	baseName = 'Orcha'
-	version =  'alpha-1.1'
-	// exclude ('source/**', 'configuration/**', 'service/**')
-	manifest {
-		attributes 'Main-Class' : 'orcha.lang.OrchaSpringIntegrationLauncher'
-	}
+springBoot {
+	mainClassName = "orcha.lang.OrchaSpringIntegrationLauncher"
 }
 
 dependencies {

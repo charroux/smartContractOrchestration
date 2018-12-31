@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Bean
 import orcha.lang.compiler.Compile
 import orcha.lang.compiler.qualityOfService.QualityOfService
 import orcha.lang.compiler.qualityOfService.QualityOfServiceImpl
+import orcha.lang.compiler.referenceimpl.configurationproperties.ConfigurationPropertiesGenerator
 import orcha.lang.compiler.referenceimpl.xmlgenerator.XmlGenerator
 import orcha.lang.compiler.referenceimpl.xmlgenerator.impl.JDom2XmlGeneratorForSpringIntegration
 import orcha.lang.compiler.visitor.OrchaCodeParser
@@ -63,6 +64,11 @@ trait PrepareOrderTestConfiguration{
 		return new OrchaCodeParserImpl()
 	}
 
+	@Bean
+	ConfigurationPropertiesGenerator configurationPropertiesGenerator(){
+		return new ConfigurationPropertiesGenerator()
+	}
+	
 	@Bean
 	Compile compile(){
 		return new CompileServiceWithSpringIntegration()

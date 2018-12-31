@@ -28,8 +28,8 @@ import java.util.List;
 import java.util.Map;
 
 @Slf4j
-@Configuration
-@ComponentScan(basePackages=['orcha.lang.compiler.referenceimpl.xmlgenerator'])
+//@Configuration
+@ComponentScan(basePackages=['orcha.lang.compiler', 'orcha.lang.compiler.referenceimpl.xmlgenerator'])
 class CompileServiceWithSpringIntegration implements Compile{
 		
 	@Autowired
@@ -40,17 +40,20 @@ class CompileServiceWithSpringIntegration implements Compile{
 	
 	@Autowired
 	OrchaLauncherGenerator orchaLauncherGenerator
-
+	
+	@Autowired
+	ConfigurationPropertiesGenerator configurationPropertiesGenerator
+	
 	@Override
 	public void compileForLaunching(OrchaCodeVisitor orchaCodeParser) throws OrchaCompilationException, OrchaConfigurationException {
 		
-		String pathToResources = "." + File.separator + "src" + File.separator + "main"
-		log.info 'Transpilatation of the orcha program \"' + orchaCodeParser.getOrchaMetadata().getTitle() + '\" into the directory ' + pathToResources + File.separator + "resources"
+		String pathToSouresCode = "." + File.separator + "src" + File.separator + "main"
+		log.info 'Transpilatation of the orcha program \"' + orchaCodeParser.getOrchaMetadata().getTitle() + '\" into the directory ' + pathToSouresCode + File.separator + "resources"
 		
 		String pathToBinaryCode = "." + File.separator + "bin" + File.separator + "main"
 		log.info 'Path to binary generated code ' + pathToBinaryCode
 		
-		this.compile(orchaCodeParser, new File(pathToResources), new File(pathToBinaryCode))
+		this.compile(orchaCodeParser, new File(pathToSouresCode), new File(pathToBinaryCode))
 		
 		String xmlSpringContextFileName = orchaCodeParser.getOrchaMetadata().getTitle() + ".xml"
 		String xmlSpringContextQoSFileName = orchaCodeParser.getOrchaMetadata().getTitle() + "QoS.xml"
@@ -69,13 +72,13 @@ class CompileServiceWithSpringIntegration implements Compile{
 		
 		if(orchaCodeParser != null){
 
-			String pathToResources = "." + File.separator + "src" + File.separator + "test"
-			log.info 'Transpilatation of the orcha testing program \"' + orchaCodeParser.getOrchaMetadata().getTitle() + '\" into the directory ' + pathToResources  + File.separator + "resources"
+			String pathToSouresCode = "." + File.separator + "src" + File.separator + "test"
+			log.info 'Transpilatation of the orcha testing program \"' + orchaCodeParser.getOrchaMetadata().getTitle() + '\" into the directory ' + pathToSouresCode  + File.separator + "resources"
 		
 			String pathToBinaryCode = "." + File.separator + "bin" + File.separator + "test"
 			log.info 'Path to binary generated code ' + pathToBinaryCode
 			
-			this.compile(orchaCodeParser, new File(pathToResources), new File(pathToBinaryCode))
+			this.compile(orchaCodeParser, new File(pathToSouresCode), new File(pathToBinaryCode))
 			
 			String xmlSpringContextFileName = orchaCodeParser.getOrchaMetadata().getTitle() + ".xml"
 			String xmlSpringContextQoSFileName = orchaCodeParser.getOrchaMetadata().getTitle() + "QoS.xml"
@@ -95,12 +98,16 @@ class CompileServiceWithSpringIntegration implements Compile{
 	 * @throws OrchaConfigurationException
 	 */
 	@Override
-	public void compile(OrchaCodeVisitor orchaCodeParser, File resourcesDestinationDirectory, File binaryCodeDirectory) throws OrchaCompilationException, OrchaConfigurationException {
+	public void compile(OrchaCodeVisitor orchaCodeParser, File sourceCodeDirectory, File binaryCodeDirectory) throws OrchaCompilationException, OrchaConfigurationException {
 		
 		log.info 'Transpilatation of the Orcha program begins'
 		
-		xmlGenerator.generate(orchaCodeParser, resourcesDestinationDirectory, binaryCodeDirectory)
+		configurationPropertiesGenerator.resetSpringCloudStream(sourceCodeDirectory, binaryCodeDirectory)
+		
+		xmlGenerator.generate(orchaCodeParser, sourceCodeDirectory, binaryCodeDirectory)
 
+		log.info 'Transpilatation complete successfully'
+		
 	}
 	
 }

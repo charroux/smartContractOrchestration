@@ -27,12 +27,14 @@ import orcha.lang.compiler.Instruction
 import orcha.lang.compiler.InstructionNode
 import orcha.lang.compiler.OrchaCompilationException
 import orcha.lang.compiler.referenceimpl.ExpressionParser
+import orcha.lang.compiler.referenceimpl.configurationproperties.ConfigurationPropertiesGenerator
 import orcha.lang.compiler.visitor.OrchaCodeVisitor
 import orcha.lang.configuration.Application
 import orcha.lang.configuration.EventHandler
 import orcha.lang.configuration.EventSourcing.JoinPoint
 import orcha.lang.configuration.InputFileAdapter
 
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.cloud.stream.messaging.Source
 
 /**
@@ -50,14 +52,16 @@ class OutboundChannelAdapter implements Chain, Transformer{
 	File sourceCodeDirectory
 	File binaryCodeDirectory
 	OrchaCodeVisitor orchaCodeParser
+	ConfigurationPropertiesGenerator configurationPropertiesGenerator
 	Document xmlSpringIntegration
 	
-	public OutboundChannelAdapter(File sourceCodeDirectory, File binaryCodeDirectory, OrchaCodeVisitor orchaCodeParser, Document xmlSpringIntegration) {
+	public OutboundChannelAdapter(File sourceCodeDirectory, File binaryCodeDirectory, OrchaCodeVisitor orchaCodeParser, ConfigurationPropertiesGenerator configurationPropertiesGenerator, Document xmlSpringIntegration) {
 		super()
 		this.sourceCodeDirectory = sourceCodeDirectory
 		this.binaryCodeDirectory = binaryCodeDirectory
 		this.orchaCodeParser = orchaCodeParser
-		this.xmlSpringIntegration = xmlSpringIntegration;
+		this.configurationPropertiesGenerator = configurationPropertiesGenerator
+		this.xmlSpringIntegration = xmlSpringIntegration
 	}
 
 	public void file(InstructionNode instructionNode) {
@@ -415,67 +419,7 @@ class OutboundChannelAdapter implements Chain, Transformer{
 		
 		log.info 'Generation of the stream handler binary class for sending an event to a messaging middleware: ' + fichier + ' complete successfully'
 		
-		//fichier = "." + File.separator + "src" + File.separator + "main" + File.separator + "resources" + File.separator + "application.properties"
-		fichier = sourceCodeDirectory.absolutePath + File.separator + "resources" + File.separator + "application.properties"
-
-		String destinationName
-		
-		if(instruction.springBean instanceof Application) {
-			destinationName = instruction.springBean.input.adapter.outputEventHandler.name
-		} else {
-			destinationName = instruction.springBean.name
-		}
-		
-		log.info 'Adding the output binding destination ' + destinationName + ' to: ' + fichier
-		
-		def lines = []
-		
-		File src = new File(fichier)
-		
-		src.eachLine {
-			line -> if(line.startsWith("spring.cloud.stream.bindings.output")==false && line.startsWith("# Auto generation of the")==false && line.equals("")==false) lines.add(line)
-		}
-		
-		src.delete()
-		
-		src = new File(fichier)
-		
-		src.withWriter('utf-8') { writer ->
-			lines.each{
-				writer.writeLine(it)
-			}
-		}
-		
-		src << '''
-
-# Auto generation of the output destination to the messaging middleware. Do not delete this line:
-spring.cloud.stream.bindings.output.content-type=application/json
-spring.cloud.stream.bindings.output.destination=''' + destinationName
-		
-		if(orchaCodeParser.isAMessagingPartition(instructionNode)) {
-			
-			src << '''
-
-# Auto generation of the partitionKeyExpression for the messaging middleware. Do not delete this line:
-spring.cloud.stream.bindings.output.producer.partitionKeyExpression=''' + partitionKeyExpression << '''
-# Auto generation of the output partitionCount for the messaging middleware. The partition index value is calculated as hashCode(key) % partitionCount. Do not delete this line:
-spring.cloud.stream.bindings.output.producer.partitionCount=2'''
-
-		}
-		
-		log.info 'Adding the output binding destination ' + destinationName + ' to: ' + fichier + ' complete successfully'
-		
-		//fichier = "." + File.separator + "bin" + File.separator + "main" + File.separator + "application.properties"
-		fichier = binaryCodeDirectory.absolutePath + File.separator + "application.properties"
-		
-		log.info 'Adding the output binding destination ' + destinationName + ' to: ' + fichier
-		
-		File dst = new File(fichier)
-		
-		dst << src.text
-
-		log.info 'Adding the output binding destination ' + destinationName + ' to: ' + fichier + ' complete successfully'
-		
+		configurationPropertiesGenerator.configureSpringCloudOutputStream(orchaCodeParser, instructionNode, sourceCodeDirectory, binaryCodeDirectory, partitionKeyExpression)
 	}
-
+	
 }

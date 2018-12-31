@@ -1371,8 +1371,6 @@ class CompileServiceWithSpringIntegrationTest {
 			
 			Assert.assertTrue(partitionKeyExpression.endsWith("'BANK1' ? 0 : (payload.bank == 'BANK3' ? 1 : -1)"))
 			
-			Assert.assertTrue(propertyFile.delete())
-			
 			// instrospection of generated groovy classes
 			
 			// public interface OrchaserviceJavaserviceGateway {
@@ -1455,6 +1453,47 @@ class CompileServiceWithSpringIntegrationTest {
 			File binaryFile = new File(binaryDestinationDirectory.getAbsolutePath() + File.separator + "orcha" + File.separator + "lang" + File.separator + "generated")
 			files = binaryFile.listFiles()
 			files.each { Assert.assertTrue(it.delete()) }
+			
+			
+			// check the reset of application.properties if no spring cloud stream is used
+			
+			orchaProgram = 	"package source.prepareOrder\n" +
+			"domain productSales\n" +
+			"description 'Prepare an order.'\n" +
+			"title 'prepare order'\n" +
+			"author 'Ben C.'\n" +
+			"version '1.0'\n" +
+			"receive order from customer\n" +
+			"compute prepareOrder with order.value\n" +
+			"when 'prepareOrder terminates'\n" +
+			"send prepareOrder.result to delivery"
+			
+			// construct the graph of instructions for the Orcha programm
+			
+			orchaCodeVisitor = orchaCodeParser.parse(orchaProgram)
+			
+			// generate an XML file (Spring integration configuration): this is the file to be tested
+			 
+			path = "." + File.separator + "src" + File.separator + "test"
+			sourceCodeDirectory = new File(path)
+			
+			path = "." + File.separator + "bin" + File.separator + "test"
+			binaryDestinationDirectory = new File(path)
+			
+			compile.compile(orchaCodeVisitor, sourceCodeDirectory, binaryDestinationDirectory)
+			
+			Assert.assertTrue(propertyFile.exists())
+			
+			propertyFile.eachLine {
+				line ->
+					if(line.startsWith("# Auto generation of the output destination to the messaging middleware. Do not delete this line:")==true) Assert.fail("# Auto generation of the output destination to the messaging middleware. Do not delete this line: should not be present")
+					if(line.startsWith("# Auto generation of the input destination to the messaging middleware. Do not delete this line:")==true) Assert.fail("# Auto generation of the input destination to the messaging middleware. Do not delete this line: should not be present")
+					if(line.startsWith("spring.cloud.stream.bindings.input.destination")==true) Assert.fail("spring.cloud.stream.bindings.input.destination should not be present")
+					if(line.startsWith("spring.cloud.stream.bindings.output.destination")==true) Assert.fail("spring.cloud.stream.bindings.output.destination should not be present")
+					if(line.startsWith("spring.cloud.stream.bindings.output.producer.partitionKeyExpression")==true) Assert.fail("spring.cloud.stream.bindings.output.producer.partitionKeyExpression should not be present")
+			}
+			
+			Assert.assertTrue(propertyFile.delete())
 			
 		}
 			
