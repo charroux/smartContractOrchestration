@@ -41,7 +41,7 @@ repositories {
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-task customFatJar(type: Jar) {
+task fatJar(type: Jar) {
     manifest {
         attributes 'Main-Class': 'orcha.lang.OrchaSpringIntegrationLauncher'
     }
@@ -56,6 +56,8 @@ springBoot {
 
 dependencies {
 
+	implementation('org.springframework.boot:spring-boot-starter-actuator:2.0.3.RELEASE')
+	
 	compile 'org.codehaus.groovy:groovy-all:2.4.5'
 	
 	compile 'org.codehaus.groovy.modules.http-builder:http-builder:0.7.1'

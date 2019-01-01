@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner
 import org.springframework.boot.ExitCodeGenerator
 import org.springframework.boot.SpringApplication
+import org.springframework.boot.WebApplicationType
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration
 import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.context.annotation.Bean
@@ -30,6 +31,9 @@ import org.springframework.context.annotation.ComponentScan
 import org.springframework.context.annotation.ImportResource;
 
 import groovy.util.logging.Slf4j
+
+import java.lang.reflect.Method
+import java.nio.file.Paths
 
 @Slf4j
 @Configuration
@@ -73,10 +77,14 @@ class Compiler implements CommandLineRunner{
 		if(orchaFile.endsWith(".groovy") == false){
 			throw new OrchaConfigurationException("An orcha source file (.orcha or .groovy extension) should be in ./orcha/source\nPut the file name without the extension (.orcha or .groovy) as the argument of this command.\nIf the orcha file is in a subdirectory of ./orcha/source, add this subdirectory to the command line like directoryNama/orchaFileNameWithOutExtension")
 		}
-				
-		String pathToCode = "." + File.separator + "src" + File.separator + "main" + File.separator + "orcha" + File.separator + "source" + File.separator + orchaFile
+
+		String pathToCode = Paths.get("").toAbsolutePath().toString() + File.separator + "src" + File.separator + "main" + File.separator + "orcha" + File.separator + "source" + File.separator + orchaFile
+		//String pathToCode = "." + File.separator + "src" + File.separator + "main" + File.separator + "orcha" + File.separator + "source" + File.separator + orchaFile
 		File orchaSourceFile = new File(pathToCode)
-				
+
+		if(orchaSourceFile.exists() == false){
+			throw new FileNotFoundException(orchaSourceFile.getAbsolutePath())
+		}
 		OrchaCodeVisitor orchaCodeVisitor = orchaCodeParser.parse(orchaSourceFile)
 		
 		serviceOfferSelectionGenerator.generate(orchaCodeVisitor)
@@ -136,7 +144,7 @@ class Compiler implements CommandLineRunner{
 	public static void main(String[] args) {
 
 		SpringApplication application = new SpringApplication(Compiler.class)
-		application.setWebEnvironment(false)
+		application.setWebApplicationType(WebApplicationType.NONE)
 		ConfigurableApplicationContext configurableApplicationContext = application.run(args)
 		
 		ConfigurationMockGenerator configurationMockGenerator = configurableApplicationContext.getBean("configurationMockGenerator")
@@ -148,7 +156,7 @@ class Compiler implements CommandLineRunner{
 			configurableApplicationContext.close()
 			
 			application = new SpringApplication(Compiler.class)
-			application.setWebEnvironment(false)
+			application.setWebApplicationType(WebApplicationType.NONE)
 			application.run(args)
 			
 		}
