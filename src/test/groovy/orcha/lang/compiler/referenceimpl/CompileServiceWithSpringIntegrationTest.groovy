@@ -48,7 +48,7 @@ import orcha.lang.configuration.Retry
 @Slf4j
 class CompileServiceWithSpringIntegrationTest {
 
-	@Value('${orcha.pathToBinaryCode}')
+	@Value('${orcha.pathToBinaryCode:build/resources/main}')
 	String pathToBinaryCode;
 
 	@Autowired
@@ -147,8 +147,15 @@ class CompileServiceWithSpringIntegrationTest {
 		 
 		String path = "." + File.separator + "src" + File.separator + "test"		
 		File sourceCodeDirectory = new File(path)
-		
-		path = "." + File.separator + pathToBinaryCode + File.separator + "test"
+
+		path = "."
+
+		def directories = pathToBinaryCode.split("/")
+		directories.each {
+			path = path + File.separator + it
+		}
+
+		//path = "." + File.separator + pathToBinaryCode + File.separator + "test"
 		File binaryDestinationDirectory = new File(path)
 		
 		compile.compile(orchaCodeVisitor, sourceCodeDirectory, binaryDestinationDirectory)
@@ -336,8 +343,15 @@ class CompileServiceWithSpringIntegrationTest {
 		 
 		String path = "." + File.separator + "src" + File.separator + "test"
 		File sourceCodeDirectory = new File(path)
-		
-		path = "." + File.separator + pathToBinaryCode + File.separator + "test"
+
+		path = "."
+
+		def directories = pathToBinaryCode.split("/")
+		directories.each {
+			path = path + File.separator + it
+		}
+
+		//path = "." + File.separator + pathToBinaryCode + File.separator + "test"
 		File binaryDestinationDirectory = new File(path)
 		
 		compile.compile(orchaCodeVisitor, sourceCodeDirectory, binaryDestinationDirectory)
@@ -529,8 +543,15 @@ class CompileServiceWithSpringIntegrationTest {
 		 
 		String path = "." + File.separator + "src" + File.separator + "test"
 		File sourceCodeDirectory = new File(path)
-		
-		path = "." + File.separator + pathToBinaryCode + File.separator + "test"
+
+		path = "."
+
+		def directories = pathToBinaryCode.split("/")
+		directories.each {
+			path = path + File.separator + it
+		}
+
+		// path = "." + File.separator + pathToBinaryCode + File.separator + "test"
 		File binaryDestinationDirectory = new File(path)
 		
 		compile.compile(orchaCodeVisitor, sourceCodeDirectory, binaryDestinationDirectory)
@@ -604,8 +625,15 @@ class CompileServiceWithSpringIntegrationTest {
 		 
 		String path = "." + File.separator + "src" + File.separator + "test"
 		File sourceCodeDirectory = new File(path)
-		
-		path = "." + File.separator + pathToBinaryCode + File.separator + "test"
+
+		path = "."
+
+		def directories = pathToBinaryCode.split("/")
+		directories.each {
+			path = path + File.separator + it
+		}
+
+		//path = "." + File.separator + pathToBinaryCode + File.separator + "test"
 		File binaryDestinationDirectory = new File(path)
 		
 		compile.compile(orchaCodeVisitor, sourceCodeDirectory, binaryDestinationDirectory)
@@ -698,8 +726,15 @@ class CompileServiceWithSpringIntegrationTest {
 		 
 		String path = "." + File.separator + "src" + File.separator + "test"
 		File sourceCodeDirectory = new File(path)
-		
-		path = "." + File.separator + pathToBinaryCode + File.separator + "test"
+
+		path = "."
+
+		def directories = pathToBinaryCode.split("/")
+		directories.each {
+			path = path + File.separator + it
+		}
+
+		//path = "." + File.separator + pathToBinaryCode + File.separator + "test"
 		File binaryDestinationDirectory = new File(path)
 		
 		compile.compile(orchaCodeVisitor, sourceCodeDirectory, binaryDestinationDirectory)
@@ -763,8 +798,15 @@ class CompileServiceWithSpringIntegrationTest {
 		 
 		String path = "." + File.separator + "src" + File.separator + "test"
 		File sourceCodeDirectory = new File(path)
-		
-		path = "." + File.separator + pathToBinaryCode + File.separator + "test"
+
+		path = "."
+
+		def directories = pathToBinaryCode.split("/")
+		directories.each {
+			path = path + File.separator + it
+		}
+
+		//path = "." + File.separator + pathToBinaryCode + File.separator + "test"
 		File binaryDestinationDirectory = new File(path)
 		
 		compile.compile(orchaCodeVisitor, sourceCodeDirectory, binaryDestinationDirectory)
@@ -829,8 +871,15 @@ class CompileServiceWithSpringIntegrationTest {
 		 
 		String path = "." + File.separator + "src" + File.separator + "test"
 		File sourceCodeDirectory = new File(path)
-		
-		path = "." + File.separator + pathToBinaryCode + File.separator + "test"
+
+		path = "."
+
+		def directories = pathToBinaryCode.split("/")
+		directories.each {
+			path = path + File.separator + it
+		}
+
+		//path = "." + File.separator + pathToBinaryCode + File.separator + "test"
 		File binaryDestinationDirectory = new File(path)
 		
 		compile.compile(orchaCodeVisitor, sourceCodeDirectory, binaryDestinationDirectory)
@@ -884,8 +933,15 @@ class CompileServiceWithSpringIntegrationTest {
 		 
 		String path = "." + File.separator + "src" + File.separator + "test"
 		File sourceCodeDirectory = new File(path)
-		
-		path = "." + File.separator + pathToBinaryCode + File.separator + "test"
+
+		path = "."
+
+		def directories = pathToBinaryCode.split("/")
+		directories.each {
+			path = path + File.separator + it
+		}
+
+		//path = "." + File.separator + pathToBinaryCode + File.separator + "test"
 		File binaryDestinationDirectory = new File(path)
 		
 		compile.compile(orchaCodeVisitor, sourceCodeDirectory, binaryDestinationDirectory)
@@ -949,8 +1005,15 @@ class CompileServiceWithSpringIntegrationTest {
 		 
 		String path = "." + File.separator + "src" + File.separator + "test"
 		File sourceCodeDirectory = new File(path)
-		
-		path = "." + File.separator + pathToBinaryCode + File.separator + "test"
+
+		path = "."
+
+		def directories = pathToBinaryCode.split("/")
+		directories.each {
+			path = path + File.separator + it
+		}
+
+		//path = "." + File.separator + pathToBinaryCode + File.separator + "test"
 		File binaryDestinationDirectory = new File(path)
 		
 		compile.compile(orchaCodeVisitor, sourceCodeDirectory, binaryDestinationDirectory)
@@ -1104,8 +1167,15 @@ class CompileServiceWithSpringIntegrationTest {
 		 
 		String path = "." + File.separator + "src" + File.separator + "test"
 		File sourceCodeDirectory = new File(path)
-		
-		path = "." + File.separator + pathToBinaryCode + File.separator + "test"
+
+		path = "."
+
+		def directories = pathToBinaryCode.split("/")
+		directories.each {
+			path = path + File.separator + it
+		}
+
+		//path = "." + File.separator + pathToBinaryCode + File.separator + "test"
 		File binaryDestinationDirectory = new File(path)
 		
 		compile.compile(orchaCodeVisitor, sourceCodeDirectory, binaryDestinationDirectory)
@@ -1267,9 +1337,15 @@ class CompileServiceWithSpringIntegrationTest {
 			if(propertyFile.exists() == false) {
 				propertyFile.createNewFile()
 			}
-			
-			
-			path = "." + File.separator + pathToBinaryCode + File.separator + "test"
+
+			path = "."
+
+			def directories = pathToBinaryCode.split("/")
+			directories.each {
+				path = path + File.separator + it
+			}
+
+			//path = "." + File.separator + pathToBinaryCode + File.separator + "test"
 			File binaryDestinationDirectory = new File(path)
 		
 			compile.compile(orchaCodeVisitor, sourceCodeDirectory, binaryDestinationDirectory)
@@ -1480,8 +1556,15 @@ class CompileServiceWithSpringIntegrationTest {
 			 
 			path = "." + File.separator + "src" + File.separator + "test"
 			sourceCodeDirectory = new File(path)
-			
-			path = "." + File.separator + pathToBinaryCode + File.separator + "test"
+
+			path = "."
+
+			directories = pathToBinaryCode.split("/")
+			directories.each {
+				path = path + File.separator + it
+			}
+
+		//path = "." + File.separator + pathToBinaryCode + File.separator + "test"
 			binaryDestinationDirectory = new File(path)
 			
 			compile.compile(orchaCodeVisitor, sourceCodeDirectory, binaryDestinationDirectory)

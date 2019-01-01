@@ -34,7 +34,7 @@ import java.util.Map;
 @ComponentScan(basePackages=['orcha.lang.compiler', 'orcha.lang.compiler.referenceimpl.xmlgenerator'])
 class CompileServiceWithSpringIntegration implements Compile{
 
-	@Value('${orcha.pathToBinaryCode}')
+	@Value('${orcha.pathToBinaryCode:build/resources/main}')
 	String pathToBinaryCode;
 
 	@Autowired
@@ -54,8 +54,15 @@ class CompileServiceWithSpringIntegration implements Compile{
 		
 		String pathToSouresCode = "." + File.separator + "src" + File.separator + "main"
 		log.info 'Transpilatation of the orcha program \"' + orchaCodeParser.getOrchaMetadata().getTitle() + '\" into the directory ' + pathToSouresCode + File.separator + "resources"
-		
-		String pathToBinCode = "." + File.separator + pathToBinaryCode + File.separator + "main"
+
+		String pathToBinCode = "."
+
+		def directories = pathToBinaryCode.split("/")
+		directories.each {
+			pathToBinCode = pathToBinCode + File.separator + it
+		}
+
+		//String pathToBinCode = "." + File.separator + pathToBinaryCode + File.separator + "main"
 		log.info 'Path to binary generated code ' + pathToBinCode
 		
 		this.compile(orchaCodeParser, new File(pathToSouresCode), new File(pathToBinCode))
@@ -80,7 +87,14 @@ class CompileServiceWithSpringIntegration implements Compile{
 			String pathToSouresCode = "." + File.separator + "src" + File.separator + "test"
 			log.info 'Transpilatation of the orcha testing program \"' + orchaCodeParser.getOrchaMetadata().getTitle() + '\" into the directory ' + pathToSouresCode  + File.separator + "resources"
 
-			String pathToBinCode = "." + File.separator + pathToBinaryCode + File.separator + "test"
+//			String pathToBinCode = "." + File.separator + pathToBinaryCode + File.separator + "test"
+			String pathToBinCode = "."
+
+			def directories = pathToBinaryCode.split("/")
+			directories.each {
+				pathToBinCode = pathToBinCode + File.separator + it
+			}
+
 			log.info 'Path to binary generated code ' + pathToBinCode
 			
 			this.compile(orchaCodeParser, new File(pathToSouresCode), new File(pathToBinCode))

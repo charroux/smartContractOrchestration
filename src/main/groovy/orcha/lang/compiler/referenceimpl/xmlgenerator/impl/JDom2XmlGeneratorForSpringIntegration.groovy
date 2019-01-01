@@ -128,18 +128,20 @@ class JDom2XmlGeneratorForSpringIntegration implements XmlGenerator{
 		File oldFile = new File(xmlSpringContent)
 		
 		// used when the an executable jar is built
-		def xmlSpringContentInSrc = "." + File.separator + "bin" + File.separator + orchaCodeParser.getOrchaMetadata().getTitle() + ".xml"
+		/*def xmlSpringContentInSrc = "." + File.separator + "bin" + File.separator + orchaCodeParser.getOrchaMetadata().getTitle() + ".xml"
 		File newFile = new File(xmlSpringContentInSrc);
 		FileOutputStream fos = new FileOutputStream(newFile)
 		Files.copy(oldFile.toPath(), fos);
 		fos.close()
 
 		log.info 'Transpilatation complete successfully. Orcha orchestrator copied into ' + xmlSpringContentInSrc
-		
+		*/
 		// Update temporary file
-		xmlSpringContentInSrc = "." + File.separator + "bin" + File.separator + "main" + File.separator + orchaCodeParser.getOrchaMetadata().getTitle() + ".xml"
-		newFile = new File(xmlSpringContentInSrc)
-		fos = new FileOutputStream(newFile)
+		//def xmlSpringContentInSrc = "." + File.separator + "bin" + File.separator + "main" + File.separator + orchaCodeParser.getOrchaMetadata().getTitle() + ".xml"
+		
+		def xmlSpringContentInSrc = binaryCodeDirectory.getCanonicalPath() + File.separator + orchaCodeParser.getOrchaMetadata().getTitle() + ".xml"
+		File newFile = new File(xmlSpringContentInSrc)
+		FileOutputStream fos = new FileOutputStream(newFile)
 		Files.copy(oldFile.toPath(), fos);
 		fos.close()
 		
@@ -148,16 +150,17 @@ class JDom2XmlGeneratorForSpringIntegration implements XmlGenerator{
 		oldFile = new File(xmlQoSSpringContent)
 				
 		// used when the an executable jar is built
-		xmlSpringContentInSrc = "." + File.separator + "bin" + File.separator + orchaCodeParser.getOrchaMetadata().getTitle() + "QoS.xml"
+		/*xmlSpringContentInSrc = "." + File.separator + "bin" + File.separator + orchaCodeParser.getOrchaMetadata().getTitle() + "QoS.xml"
 		newFile = new File(xmlSpringContentInSrc);
 		fos = new FileOutputStream(newFile)
 		Files.copy(oldFile.toPath(), fos);
 		fos.close()
 
 		log.info 'Transpilatation complete successfully. QoS for Orcha orchestrator copied into ' + xmlSpringContentInSrc
-		
+		*/
 		// update temporary file
-		xmlSpringContentInSrc = "." + File.separator + "bin" + File.separator + "main" + File.separator + orchaCodeParser.getOrchaMetadata().getTitle() + "QoS.xml"
+		//xmlSpringContentInSrc = "." + File.separator + "bin" + File.separator + "main" + File.separator + orchaCodeParser.getOrchaMetadata().getTitle() + "QoS.xml"
+		xmlSpringContentInSrc = binaryCodeDirectory.getCanonicalPath() + File.separator + orchaCodeParser.getOrchaMetadata().getTitle() + "QoS.xml"
 		newFile = new File(xmlSpringContentInSrc);
 		fos = new FileOutputStream(newFile)
 		Files.copy(oldFile.toPath(), fos);
