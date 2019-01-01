@@ -79,7 +79,7 @@ class Compiler implements CommandLineRunner{
 		}
 
 		String pathToCode = Paths.get("").toAbsolutePath().toString() + File.separator + "src" + File.separator + "main" + File.separator + "orcha" + File.separator + "source" + File.separator + orchaFile
-		
+
 		File orchaSourceFile = new File(pathToCode)
 
 		if(orchaSourceFile.exists() == false){

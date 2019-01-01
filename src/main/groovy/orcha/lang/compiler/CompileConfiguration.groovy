@@ -1,5 +1,6 @@
 package orcha.lang.compiler
 
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.stereotype.Component
@@ -23,7 +24,7 @@ import orcha.lang.compiler.visitor.impl.OrchaCodeVisitorImpl
 @Configuration
 //@Component
 class CompileConfiguration {
-	
+
 	@Bean
 	Compile compile(){
 		return new CompileServiceWithSpringIntegration()

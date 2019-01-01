@@ -45,12 +45,12 @@ class OrchaCompilerConfiguration {
 		return program
 	}
 	
-	//@Bean
+	@Bean
 	OrchaCodeParser orchaCodeParser(){
 		return new OrchaCodeParserImpl()
 	}
 	
-	//@Bean
+	@Bean
 	ExpressionParser ExpressionParser(){
 		return new ExpressionParserImpl()
 	}

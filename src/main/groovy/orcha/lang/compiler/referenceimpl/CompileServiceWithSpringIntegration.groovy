@@ -13,11 +13,13 @@ import orcha.lang.compiler.referenceimpl.xmlgenerator.connectors.SpringIntegrati
 import orcha.lang.compiler.referenceimpl.xmlgenerator.impl.ErrorUnwrapper;
 import orcha.lang.compiler.visitor.OrchaCodeVisitor
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan
-import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Configuration
+import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.nio.file.Files
@@ -31,7 +33,10 @@ import java.util.Map;
 //@Configuration
 @ComponentScan(basePackages=['orcha.lang.compiler', 'orcha.lang.compiler.referenceimpl.xmlgenerator'])
 class CompileServiceWithSpringIntegration implements Compile{
-		
+
+	@Value('${orcha.pathToBinaryCode}')
+	String pathToBinaryCode;
+
 	@Autowired
 	ApplicationContext context
 	
@@ -50,10 +55,10 @@ class CompileServiceWithSpringIntegration implements Compile{
 		String pathToSouresCode = "." + File.separator + "src" + File.separator + "main"
 		log.info 'Transpilatation of the orcha program \"' + orchaCodeParser.getOrchaMetadata().getTitle() + '\" into the directory ' + pathToSouresCode + File.separator + "resources"
 		
-		String pathToBinaryCode = "." + File.separator + "bin" + File.separator + "main"
-		log.info 'Path to binary generated code ' + pathToBinaryCode
+		String pathToBinCode = "." + File.separator + pathToBinaryCode + File.separator + "main"
+		log.info 'Path to binary generated code ' + pathToBinCode
 		
-		this.compile(orchaCodeParser, new File(pathToSouresCode), new File(pathToBinaryCode))
+		this.compile(orchaCodeParser, new File(pathToSouresCode), new File(pathToBinCode))
 		
 		String xmlSpringContextFileName = orchaCodeParser.getOrchaMetadata().getTitle() + ".xml"
 		String xmlSpringContextQoSFileName = orchaCodeParser.getOrchaMetadata().getTitle() + "QoS.xml"
@@ -74,11 +79,11 @@ class CompileServiceWithSpringIntegration implements Compile{
 
 			String pathToSouresCode = "." + File.separator + "src" + File.separator + "test"
 			log.info 'Transpilatation of the orcha testing program \"' + orchaCodeParser.getOrchaMetadata().getTitle() + '\" into the directory ' + pathToSouresCode  + File.separator + "resources"
-		
-			String pathToBinaryCode = "." + File.separator + "bin" + File.separator + "test"
-			log.info 'Path to binary generated code ' + pathToBinaryCode
+
+			String pathToBinCode = "." + File.separator + pathToBinaryCode + File.separator + "test"
+			log.info 'Path to binary generated code ' + pathToBinCode
 			
-			this.compile(orchaCodeParser, new File(pathToSouresCode), new File(pathToBinaryCode))
+			this.compile(orchaCodeParser, new File(pathToSouresCode), new File(pathToBinCode))
 			
 			String xmlSpringContextFileName = orchaCodeParser.getOrchaMetadata().getTitle() + ".xml"
 			String xmlSpringContextQoSFileName = orchaCodeParser.getOrchaMetadata().getTitle() + "QoS.xml"
