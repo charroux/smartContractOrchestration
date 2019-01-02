@@ -42,7 +42,7 @@ class ConfigurationPropertiesGenerator {
 		
 		if(src.exists()) {
 			
-			log.info 'Reset Spring Cloud Stram property file begins ' + fichier
+			log.info 'Reset Spring Cloud Stream property file begins ' + fichier
 
 			src.eachLine {
 				line -> if(line.startsWith("spring.cloud.stream.bindings.output")==false && line.startsWith("spring.cloud.stream.bindings.input")==false && line.startsWith("spring.cloud.stream.instance")==false && line.startsWith("# Auto generation of the input")==false && line.startsWith("# Auto generation of the output")==false) lines.add(line)
@@ -194,7 +194,7 @@ spring.cloud.stream.bindings.output.destination=''' + destinationName
 			
 			src << '''
 
-# Auto generation of the partitionKeyExpression for the messaging middleware. Do not delete this line:
+# Auto generation of the output partitionKeyExpression for the messaging middleware. Do not delete this line:
 spring.cloud.stream.bindings.output.producer.partitionKeyExpression=''' + partitionKeyExpression << '''
 # Auto generation of the output partitionCount for the messaging middleware. The partition index value is calculated as hashCode(key) % partitionCount. Do not delete this line:
 spring.cloud.stream.bindings.output.producer.partitionCount=2'''

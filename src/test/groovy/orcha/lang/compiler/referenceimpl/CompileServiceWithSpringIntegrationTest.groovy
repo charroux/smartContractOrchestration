@@ -149,7 +149,7 @@ class CompileServiceWithSpringIntegrationTest {
 		File sourceCodeDirectory = new File(path)
 
 		path = "."
-
+		
 		def directories = pathToBinaryCode.split("/")
 		directories.each {
 			path = path + File.separator + it
@@ -1431,17 +1431,20 @@ class CompileServiceWithSpringIntegrationTest {
 			String inputDestination = null
 			String outputDestination = null
 			String partitionKeyExpression = null
+			String partitionCount = null
 			
 			propertyFile.eachLine {
 				line -> 
 					if(line.startsWith("spring.cloud.stream.bindings.input.destination")==true) inputDestination = line
 					if(line.startsWith("spring.cloud.stream.bindings.output.destination")==true) outputDestination = line
 					if(line.startsWith("spring.cloud.stream.bindings.output.producer.partitionKeyExpression")==true) partitionKeyExpression = line
+					if(line.startsWith("spring.cloud.stream.bindings.output.producer.partitionCount")==true) partitionCount = line
 			}
 			
 			Assert.assertNotNull(inputDestination)
 			Assert.assertNotNull(outputDestination)
 			Assert.assertNotNull(partitionKeyExpression)
+			Assert.assertNotNull(partitionCount)
 			
 			String inputDestinationName = processOrderBank1.output.adapter.inputEventHandler.name			
 			Assert.assertTrue(inputDestination.endsWith(inputDestinationName))
@@ -1450,6 +1453,8 @@ class CompileServiceWithSpringIntegrationTest {
 			Assert.assertTrue(outputDestination.endsWith(outputDestinationName))
 			
 			Assert.assertTrue(partitionKeyExpression.endsWith("'BANK1' ? 0 : (payload.bank == 'BANK3' ? 1 : -1)"))
+			
+			Assert.assertTrue(partitionCount.endsWith("2"))
 			
 			// instrospection of generated groovy classes
 			
@@ -1575,12 +1580,13 @@ class CompileServiceWithSpringIntegrationTest {
 				line ->
 					if(line.startsWith("# Auto generation of the output destination to the messaging middleware. Do not delete this line:")==true) Assert.fail("# Auto generation of the output destination to the messaging middleware. Do not delete this line: should not be present")
 					if(line.startsWith("# Auto generation of the input destination to the messaging middleware. Do not delete this line:")==true) Assert.fail("# Auto generation of the input destination to the messaging middleware. Do not delete this line: should not be present")
+					if(line.startsWith("# Auto generation of the partitionKeyExpression for the messaging middleware. Do not delete this line:")==true) Assert.fail("# Auto generation of the partitionKeyExpression for the messaging middleware. Do not delete this line: should not be present")
 					if(line.startsWith("spring.cloud.stream.bindings.input.destination")==true) Assert.fail("spring.cloud.stream.bindings.input.destination should not be present")
 					if(line.startsWith("spring.cloud.stream.bindings.output.destination")==true) Assert.fail("spring.cloud.stream.bindings.output.destination should not be present")
 					if(line.startsWith("spring.cloud.stream.bindings.output.producer.partitionKeyExpression")==true) Assert.fail("spring.cloud.stream.bindings.output.producer.partitionKeyExpression should not be present")
 			}
 			
-			Assert.assertTrue(propertyFile.delete())
+			//Assert.assertTrue(propertyFile.delete())
 			
 		}
 			
