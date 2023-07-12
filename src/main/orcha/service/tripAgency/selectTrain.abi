@@ -1,0 +1,66 @@
+[
+	{
+		"inputs": [
+			{
+				"internalType": "int256",
+				"name": "trainNumber",
+				"type": "int256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "dateDeparture",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "dateArrival",
+				"type": "uint256"
+			}
+		],
+		"name": "CreateTrain",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"stateMutability": "nonpayable",
+		"type": "constructor"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "dateP",
+				"type": "uint256"
+			}
+		],
+		"name": "getTrain",
+		"outputs": [
+			{
+				"components": [
+					{
+						"internalType": "int256",
+						"name": "number",
+						"type": "int256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "effectiveDepartureDate",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "effectiveArrivalDate",
+						"type": "uint256"
+					}
+				],
+				"internalType": "struct SelecTrain.SelectedTrain",
+				"name": "train",
+				"type": "tuple"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	}
+]
