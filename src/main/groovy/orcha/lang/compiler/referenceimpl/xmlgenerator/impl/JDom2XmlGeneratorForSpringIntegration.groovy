@@ -1,5 +1,7 @@
 package orcha.lang.compiler.referenceimpl.xmlgenerator.impl
 
+import orcha.lang.configuration.BlockchainAdapter
+
 import java.io.BufferedWriter
 import java.io.File
 import java.util.List
@@ -710,25 +712,25 @@ class JDom2XmlGeneratorForSpringIntegration implements XmlGenerator{
 		}
 	}
 	
-	private void generateApplication(File sourceCodeDirectory, File binaryCodeDirectory, OrchaCodeVisitor orchaCodeParser, InstructionNode instructionNode, String title, int sequenceNumber, int sequenceSize, boolean computeFails, String failChannel, Document xmlSpringIntegration){
-		
+	private void generateApplication(File sourceCodeDirectory, File binaryCodeDirectory, OrchaCodeVisitor orchaCodeParser, InstructionNode instructionNode, String title, int sequenceNumber, int sequenceSize, boolean computeFails, String failChannel, Document xmlSpringIntegration) {
+
 		ServiceActivator serviceActivator = new ServiceActivator(xmlSpringIntegration)
-		
-		if(instructionNode.instruction.springBean.input.adapter instanceof JavaServiceAdapter){
-			
+
+		if (instructionNode.instruction.springBean.input.adapter instanceof JavaServiceAdapter) {
+
 			boolean isScript = false
 			serviceActivator.service(instructionNode, sequenceNumber, sequenceSize, computeFails, failChannel, isScript)
-			
-		} else if(instructionNode.instruction.springBean.input.adapter instanceof ScriptServiceAdapter){
-		
+
+		} else if (instructionNode.instruction.springBean.input.adapter instanceof ScriptServiceAdapter) {
+
 			boolean isScript = true
 			serviceActivator.service(instructionNode, sequenceNumber, sequenceSize, computeFails, failChannel, isScript)
-			
-		} else if(instructionNode.instruction.springBean.input.adapter instanceof OrchaServiceAdapter){
-			
+
+		} else if (instructionNode.instruction.springBean.input.adapter instanceof OrchaServiceAdapter) {
+
 			this.generateRedirectInputEventToSendEventHandler(sourceCodeDirectory, binaryCodeDirectory, orchaCodeParser, instructionNode, xmlSpringIntegration)
-			this.generateRedirectOutputEventToReceiveEventHandler(sourceCodeDirectory, binaryCodeDirectory, instructionNode, title,  xmlSpringIntegration)
-	
+			this.generateRedirectOutputEventToReceiveEventHandler(sourceCodeDirectory, binaryCodeDirectory, instructionNode, title, xmlSpringIntegration)
+
 		}
 	}
 	
@@ -751,8 +753,14 @@ class JDom2XmlGeneratorForSpringIntegration implements XmlGenerator{
 			this.generateRedirectInputEventToSendEventHandler(sourceCodeDirectory, binaryCodeDirectory, orchaCodeParser, instructionNode, xmlSpringIntegration)
 			this.generateRedirectOutputEventToReceiveEventHandler(sourceCodeDirectory, binaryCodeDirectory, instructionNode, title, xmlSpringIntegration)
 			
+		} else if(instructionNode.instruction.springBean.input.adapter instanceof BlockchainAdapter){
+
+			boolean isScript = false
+			serviceActivator.service(instructionNode, computeFails, failChannel, isScript)
+
+
 		}
-		
+
 /*		if(instructionNode.instruction.springBean.input.adapter instanceof MailSenderAdapter){
 			
 			def xml = new StreamingMarkupBuilder()

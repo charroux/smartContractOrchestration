@@ -121,8 +121,10 @@ class CompileServiceWithSpringIntegration implements Compile{
 		
 		log.info 'Transpilatation of the Orcha program begins'
 		
-		configurationPropertiesGenerator.resetSpringCloudStream(sourceCodeDirectory, binaryCodeDirectory)
-		
+		//configurationPropertiesGenerator.resetSpringCloudStream(sourceCodeDirectory, binaryCodeDirectory)
+
+		//log.info 'Transpilatation of the Orcha program begins'
+
 		xmlGenerator.generate(orchaCodeParser, sourceCodeDirectory, binaryCodeDirectory)
 
 		log.info 'Transpilatation complete successfully'

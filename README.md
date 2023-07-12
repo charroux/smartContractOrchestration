@@ -1,3 +1,17 @@
+========
+
+Un Oracle :
+appel RPC avec comme arg : 
+- ad contrat = public key
+- info
+- authen via compte utili block  sign requete avce clef privée
+
+
+Le mécanisme de validation est interne au contrat
+
+un smart contrat peut vérifier la finitude 
+
+
 welcome to the ORCHA project
 ========
 

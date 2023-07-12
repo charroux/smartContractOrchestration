@@ -28,6 +28,7 @@ enum BidirectionalAdapter{
 	AMQP,
 	WebService,
 	JavaApplication,
+	Blockchain,
 	ScriptingApplication,
 	MessagingMiddleware,
 	OrchaApplication
@@ -136,6 +137,14 @@ class HttpAdapter extends ConfigurableProperties{
 class JavaServiceAdapter extends ConfigurableProperties{
 	def adapter = BidirectionalAdapter.JavaApplication
 	def javaClass 
+	def method
+}
+
+@ToString
+@EqualsAndHashCode
+class BlockchainAdapter extends ConfigurableProperties{
+	def adapter = BidirectionalAdapter.Blockchain
+	def javaClass
 	def method
 }
 

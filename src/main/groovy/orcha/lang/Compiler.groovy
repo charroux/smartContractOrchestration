@@ -63,13 +63,15 @@ class Compiler implements CommandLineRunner{
 	
 	@Override
 	public void run(String... args) throws Exception {
-		
+
 		if(args.length != 1){
 			throw new OrchaConfigurationException("Usage: orchaSourceFile.\nAn orcha source file (.orcha or .groovy extension) should be in ./orcha/source\nPut the file name without the extension (.orcha or .groovy) as the argument of this command.\nIf the orcha file is in a subdirectory of ./orcha/source, add this subdirectory to the command line like directoryName/orchaFileNameWithOutExtension")
 		}
 		
 		String orchaFile = args[0]
-		
+
+		log.info 'Compile: ' + orchaFile
+
 		if(orchaFile.endsWith(".orcha")){
 			orchaFile = businessAdapter.adaptOrchaFileToBusiness(orchaFile)
 		}
@@ -80,11 +82,15 @@ class Compiler implements CommandLineRunner{
 
 		String pathToCode = Paths.get("").toAbsolutePath().toString() + File.separator + "src" + File.separator + "main" + File.separator + "orcha" + File.separator + "source" + File.separator + orchaFile
 
+		log.info 'Compile: ' + pathToCode
+
 		File orchaSourceFile = new File(pathToCode)
 
 		if(orchaSourceFile.exists() == false){
+			log.info 'Orcha file not found: ' + orchaSourceFile.getAbsolutePath()
 			throw new FileNotFoundException(orchaSourceFile.getAbsolutePath())
 		}
+
 		OrchaCodeVisitor orchaCodeVisitor = orchaCodeParser.parse(orchaSourceFile)
 		
 		serviceOfferSelectionGenerator.generate(orchaCodeVisitor)

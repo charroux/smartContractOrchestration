@@ -1,13 +1,13 @@
-package source.travelAgency
+package source.tripAgency
 
-domain travelAgency
+domain tripAgency
 description "organize a trip for a costumer"
 title "organize trip"
 author "Ben C."
 version "1.0"
 
-receive travelInfo from travelAgency
-compute selectTrain with travelInfo.value
+receive tripInfo from tripAgency
+compute selectTrain with tripInfo.value
 
 when "selectTrain terminates"
 compute selectHotel with selectTrain.value
@@ -16,5 +16,4 @@ when "selectHotel terminates and selectTrain terminates"
 compute selectTaxi with selectHotel.value, selectTrain.value
 
 when "selectTaxi terminates"
-send selectTaxi.result to travelAgencyCustomer
-  
+send selectTaxi.result to tripAgencyCustomer

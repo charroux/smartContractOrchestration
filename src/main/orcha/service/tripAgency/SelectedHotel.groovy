@@ -1,12 +1,11 @@
-package configuration.travelAgency
+package service.tripAgency
 
 import groovy.transform.ToString
 
 @ToString
-class TravelInfo {
+class SelectedHotel {
 	
 	String passenger
-	Date departure
 	Date arrival
-
+	
 }

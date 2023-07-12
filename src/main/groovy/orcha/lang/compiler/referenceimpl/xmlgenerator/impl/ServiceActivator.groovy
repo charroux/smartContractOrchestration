@@ -1,5 +1,7 @@
 package orcha.lang.compiler.referenceimpl.xmlgenerator.impl
 
+import groovy.util.logging.Slf4j
+import orcha.lang.configuration.BlockchainAdapter
 import org.jdom2.Document
 import org.jdom2.Element
 import org.jdom2.Namespace
@@ -10,9 +12,11 @@ import orcha.lang.configuration.OrchaServiceAdapter
 import orcha.lang.configuration.ScriptServiceAdapter
 import orcha.lang.configuration.EventSourcing.JoinPoint
 
+@Slf4j
 class ServiceActivator implements Chain, Poller, QoS, orcha.lang.compiler.referenceimpl.xmlgenerator.impl.Bean, Transformer, HeaderEnricher{
 	
-	Document xmlSpringIntegration
+	Document xmlSpringIntegration
+
 	public ServiceActivator(Document xmlSpringIntegration) {
 		super()
 		this.xmlSpringIntegration = xmlSpringIntegration;
@@ -64,17 +68,34 @@ class ServiceActivator implements Chain, Poller, QoS, orcha.lang.compiler.refere
 				
 		if(isScript == false){
 
-			JavaServiceAdapter javaServiceAdapter = (JavaServiceAdapter)instruction.springBean.input.adapter
-			String className = javaServiceAdapter.javaClass
-			className = className.substring(className.lastIndexOf('.')+1)
-			className = className.substring(0,1).toLowerCase() + className.substring(1)
-			def methodName = instruction.springBean.input.adapter.method
-			def expression = '@' + className + '.' + methodName + '(payload)'
-			
-			serviceActivatorElement = new Element("service-activator", namespace)
-			serviceActivatorElement.setAttribute("id", "service-activator-"+id+"-id")
-			serviceActivatorElement.setAttribute("expression", expression)
-			
+			if(instruction.springBean.input.adapter instanceof JavaServiceAdapter) {
+
+				JavaServiceAdapter javaServiceAdapter = (JavaServiceAdapter)instruction.springBean.input.adapter
+				String className = javaServiceAdapter.javaClass
+				className = className.substring(className.lastIndexOf('.')+1)
+				className = className.substring(0,1).toLowerCase() + className.substring(1)
+				def methodName = instruction.springBean.input.adapter.method
+				def expression = '@' + className + '.' + methodName + '(payload)'
+
+				serviceActivatorElement = new Element("service-activator", namespace)
+				serviceActivatorElement.setAttribute("id", "service-activator-"+id+"-id")
+				serviceActivatorElement.setAttribute("expression", expression)
+
+			} else if(instruction.springBean.input.adapter instanceof BlockchainAdapter) {
+				log.info("BlockchainAdapter")
+				BlockchainAdapter blockchainAdapter = (BlockchainAdapter)instruction.springBean.input.adapter
+				String className = blockchainAdapter.javaClass
+				className = className.substring(className.lastIndexOf('.')+1)
+				className = className.substring(0,1).toLowerCase() + className.substring(1)
+				def methodName = instruction.springBean.input.adapter.method
+				def expression = '@' + className + '.' + methodName + '(payload)'
+
+				serviceActivatorElement = new Element("service-activator", namespace)
+				serviceActivatorElement.setAttribute("id", "service-activator-"+id+"-id")
+				serviceActivatorElement.setAttribute("expression", expression)
+
+			}
+
 		} else {
 
 			ScriptServiceAdapter scriptingServiceAdapter = (ScriptServiceAdapter)instructionNode.instruction.springBean.input.adapter

@@ -1,5 +1,7 @@
 package orcha.lang.compiler.referenceimpl.xmlgenerator.connectors
 
+import groovy.util.logging.Slf4j
+
 import java.util.List;
 
 import orcha.lang.compiler.OrchaCompilationException
@@ -20,6 +22,8 @@ import org.springframework.http.MediaType
  * @author Ben C.
  *
  */
+
+@Slf4j
 class SpringIntegrationConnectors{
 	
 	def inputFileAdapter(InstructionNode instructionNode){
