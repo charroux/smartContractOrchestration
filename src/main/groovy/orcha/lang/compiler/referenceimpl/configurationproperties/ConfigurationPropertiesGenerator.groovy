@@ -24,7 +24,7 @@ import groovy.util.logging.Slf4j
 import java.io.File
 import java.util.concurrent.atomic.DoubleAdder
 
-import javax.validation.constraints.NotNull
+//import javax.validation.constraints.NotNull
 
 import org.springframework.boot.context.properties.ConfigurationProperties
 

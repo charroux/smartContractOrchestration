@@ -38,9 +38,9 @@ import service.order.Order
 import service.order.VendorComparison;
 import service.order.VendorOrderConverter
 
-import org.aspectj.lang.JoinPoint
-import org.aspectj.lang.annotation.After
-import org.aspectj.lang.annotation.Aspect
+//import org.aspectj.lang.JoinPoint
+//import org.aspectj.lang.annotation.After
+//import org.aspectj.lang.annotation.Aspect
 
 @Configuration
 class FailsHandlingConfiguration {

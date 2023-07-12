@@ -11,17 +11,17 @@ import orcha.lang.configuration.OutputFileAdapter.WritingMode
 @Configuration
 class QoSConfiguration {
 	
-	@Bean
+	/*@Bean
 	Service service(){
 		return new Service()
-	}
+	}*/
 	
-	@Bean
+	/*@Bean
 	EventHandler qosOutputFile(){
 		def eventHandler = new EventHandler(name: "qosOutputFile")
 		def fileAdapter = new OutputFileAdapter(directory: 'data/output', createDirectory: true, filename:'qosOutputFile.txt', appendNewLine: true, writingMode: WritingMode.REPLACE)
 		eventHandler.output = new Output(mimeType: "text/plain", type: "java.lang.String", adapter: fileAdapter)
 		return eventHandler
-	}
+	}*/
 
 }

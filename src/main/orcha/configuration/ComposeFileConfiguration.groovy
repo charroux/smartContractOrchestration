@@ -14,7 +14,7 @@ import orcha.lang.configuration.OutputFileAdapter.WritingMode
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import service.MyProgram;
+import service.MyProgram2;
 
 @CircuitBreaker(numberOfFailuresBeforeOpening=2, intervalBeforeHalfOpening=3000L, orderInChain=1)
 @Retry(maxNumberOfAttempts=3, intervalBetweenTheFirstAndSecondAttempt=1000L, intervalMultiplierBetweenAttemps=1, maximumIntervalBetweenAttempts=1000L, orderInChain=2)
@@ -25,14 +25,14 @@ class ProgramConfiguration extends Application{
 class ComposeFileConfiguration {
 		
 	@Bean
-	MyProgram myProgram(){
-		return new MyProgram()
+	MyProgram2 myProgram2(){
+		return new MyProgram2()
 	}
 	
 	@Bean
 	Application program(){
 		def program = new ProgramConfiguration(name: "program", language: "Java")
-		def javaAdapter = new JavaServiceAdapter(javaClass: 'service.MyProgram', method:'myMethod')
+		def javaAdapter = new JavaServiceAdapter(javaClass: 'service.MyProgram2', method:'myMethod')
 		program.input = new Input(type: "java.lang.Integer", adapter: javaAdapter)
 		program.output = new Output(type: "java.lang.Integer", adapter: javaAdapter)
 		return program

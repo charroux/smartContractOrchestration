@@ -20,19 +20,23 @@ plugins {
 	id 'jacoco'
 	id 'java'
 	id 'idea'
+	id 'groovy'
+	id 'org.springframework.boot' version '3.1.1'
+	id 'io.spring.dependency-management' version '1.1.0'
+	id 'org.web3j' version '4.10.0'
 }
 
 //apply plugin: 'java'
 //apply plugin: 'eclipse'
 //apply plugin: 'idea'
-apply plugin: 'groovy'
-apply plugin: 'org.springframework.boot'
+//apply plugin: 'groovy'
+//apply plugin: 'org.springframework.boot'
 
 
-apply plugin: 'io.spring.dependency-management'
+//apply plugin: 'io.spring.dependency-management'
 
 
-apply plugin: 'jacoco'
+//apply plugin: 'jacoco'
 
 
 
@@ -44,8 +48,8 @@ repositories {
 	mavenCentral()
 }
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+sourceCompatibility = 17
+targetCompatibility = 17
 
 task fatJar(type: Jar) {
     manifest {
@@ -56,37 +60,37 @@ task fatJar(type: Jar) {
     with jar
 }
 
-springBoot {
-	mainClassName = "orcha.lang.OrchaSpringIntegrationLauncher"
-}
+//springBoot {
+//	mainClassName = "orcha.lang.OrchaSpringIntegrationLauncher"
+//}
 
 dependencies {
 
-	implementation('org.springframework.boot:spring-boot-starter-actuator:2.0.3.RELEASE')
-	
-	compile 'org.codehaus.groovy:groovy-all:2.4.5'
-	
-	compile 'org.codehaus.groovy.modules.http-builder:http-builder:0.7.1'
+	implementation('org.springframework.boot:spring-boot-starter-actuator')
+
+	//implementation 'org.codehaus.groovy:groovy-all:2.4.5'
+	implementation 'org.codehaus.groovy:groovy-all:3.0.18'
+
+	implementation 'org.codehaus.groovy.modules.http-builder:http-builder:0.7.1'
 	
 	//compile('org.springframework.boot:spring-boot-starter')
-	
-	compile("org.springframework.boot:spring-boot-starter-web:2.0.3.RELEASE")
-	
-	compile("org.springframework.boot:spring-boot-devtools:2.0.3.RELEASE")
+
+	implementation("org.springframework.boot:spring-boot-starter-web")
+
+	implementation("org.springframework.boot:spring-boot-devtools")
 	
 	// for auto completion in the properties files
-	compile("org.springframework.boot:spring-boot-configuration-processor:2.0.3.RELEASE")
+	implementation("org.springframework.boot:spring-boot-configuration-processor")
 	
 	
 	/*// https://mvnrepository.com/artifact/org.mockito/mockito-core
 	testCompile group: 'org.mockito', name: 'mockito-core', version: '2.8.47'
 	// https://mvnrepository.com/artifact/junit/junit
 	testCompile group: 'junit', name: 'junit', version: '4.12'*/
-	
-	
-	testCompile('org.springframework.boot:spring-boot-starter-test:2.0.3.RELEASE')
-	
-	compile("org.springframework:spring-tx")
+
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+	implementation("org.springframework:spring-tx")
 	
 	//compile group: 'org.slf4j', name: 'slf4j-api', version: '1.8.0-beta2'
 	//compile group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: '2.11.0'
@@ -102,17 +106,20 @@ dependencies {
 	//compile group: 'org.apache.logging.log4j', name: 'log4j-jcl', version: '2.11.0'
 	
 	// Redis
-	compile group: 'org.apache.commons', name: 'commons-pool2', version: '2.5.0'
-	compile group: 'redis.clients', name: 'jedis', version: '2.9.0'
-	
-	
-	compile group: 'org.hibernate', name: 'hibernate-validator', version: '5.4.0.Final'
-	
-	compile group: 'com.sun.codemodel', name: 'codemodel', version: '2.6'
-	
-	compile 'org.springframework.integration:spring-integration-file:5.0.6.RELEASE'
-	compile 'org.springframework.integration:spring-integration-stream:5.0.6.RELEASE'
-	compile 'org.springframework.integration:spring-integration-amqp:5.0.6.RELEASE'
+	implementation 'org.apache.commons:commons-pool2:2.11.1'
+	implementation 'redis.clients:jedis:4.4.3'
+	//implementation group: 'org.apache.commons', name: 'commons-pool2', version: '2.5.0'
+	//implementation group: 'redis.clients', name: 'jedis', version: '2.9.0'
+
+
+	implementation 'org.hibernate:hibernate-validator:8.0.1.Final'
+	//implementation group: 'org.hibernate', name: 'hibernate-validator', version: '5.4.0.Final'
+
+	implementation group: 'com.sun.codemodel', name: 'codemodel', version: '2.6'
+
+	implementation 'org.springframework.integration:spring-integration-file:5.0.6.RELEASE'
+	implementation 'org.springframework.integration:spring-integration-stream:5.0.6.RELEASE'
+	implementation 'org.springframework.integration:spring-integration-amqp:5.0.6.RELEASE'
 	/*compile 'org.springframework.integration:spring-integration-core:5.0.6.RELEASE'
 	compile 'org.springframework.integration:spring-integration-mail:5.0.6.RELEASE'
 	compile 'org.springframework.integration:spring-integration-file:5.0.6.RELEASE'
@@ -125,53 +132,50 @@ dependencies {
 	compile 'org.springframework.integration:spring-integration-mongodb:5.0.6.RELEASE'
 	compile 'org.springframework.integration:spring-integration-redis:5.0.6.RELEASE'*/
 	//compile 'org.springframework.data:spring-data-redis:2.0.5.RELEASE'
-	
-	compile 'org.springframework.cloud:spring-cloud-starter-stream-rabbit:2.0.1.RELEASE'
+
+	implementation 'org.springframework.cloud:spring-cloud-starter-stream-rabbit:2.0.1.RELEASE'
 	
 	//compile 'org.springframework.cloud:spring-cloud-starter-stream-kafka:2.0.1.RELEASE'
-	
-	compile group: 'org.jdom', name: 'jdom2', version: '2.0.6'
-	compile group: 'jaxen', name: 'jaxen', version: '1.1.6'
-	
-	compile group: 'org.ow2.asm', name: 'asm', version: '5.2'
-	
-	compile group: 'org.mongodb', name: 'mongo-java-driver', version: '3.4.1'
-	
+
+	implementation 'org.jdom:jdom2:2.0.6.1'
+	implementation 'jaxen:jaxen:2.0.0'
+
+	//implementation group: 'org.jdom', name: 'jdom2', version: '2.0.6'
+	//implementation group: 'jaxen', name: 'jaxen', version: '1.1.6'
+	// ------------
+	implementation group: 'org.ow2.asm', name: 'asm', version: '5.2'
+	// ------------
+	implementation group: 'org.mongodb', name: 'mongo-java-driver', version: '3.4.1'
+	//implementation 'org.mongodb:mongo-java-driver:3.12.14'
+
+
 	//compile 'org.springframework.amqp:spring-rabbit:1.5.3.RELEASE'
-	
-	compile 'org.springframework.batch:spring-batch-core:3.0.7.RELEASE'
-	
-	compile 'com.h2database:h2:1.3.175'
-	
-	compile group: 'aspectj', name: 'aspectjweaver', version: '1.5.4'
-	
-	compile 'javax.mail:javax.mail-api:1.5.5'
-	compile 'com.sun.mail:javax.mail:1.5.5'
+
+	//implementation 'org.springframework.batch:spring-batch-core:3.0.7.RELEASE'
+	implementation 'org.springframework.batch:spring-batch-core:5.0.2'
+
+
+	//implementation 'com.h2database:h2:1.3.175'
+	testImplementation 'com.h2database:h2:2.2.220'
+
+
+	//implementation group: 'aspectj', name: 'aspectjweaver', version: '1.5.4'
+	runtimeOnly 'org.aspectj:aspectjweaver:1.9.19'
+
+
+	//implementation 'javax.mail:javax.mail-api:1.5.5'
+	implementation 'javax.mail:javax.mail-api:1.6.2'
+
+	implementation 'com.sun.mail:javax.mail:1.6.2'
+	//implementation 'com.sun.mail:javax.mail:1.5.5'
 	
 	// https://mvnrepository.com/artifact/org.springframework.cloud/spring-cloud-stream
-	compile group: 'org.springframework.cloud', name: 'spring-cloud-stream', version: '2.0.1.RELEASE'
+	implementation group: 'org.springframework.cloud', name: 'spring-cloud-stream', version: '2.0.1.RELEASE'
 	// testCompile group: 'org.springframework.cloud', name: 'spring-cloud-stream-test-support', version: '2.0.1.RELEASE'
 	
 	// https://mvnrepository.com/artifact/io.projectreactor/reactor-core
-	compile group: 'io.projectreactor', name: 'reactor-core', version: '3.1.8.RELEASE'
-
-	// https://mvnrepository.com/artifact/org.web3j/core
-	implementation 'org.web3j:core:4.3.0'
-
-
-
-	// https://mvnrepository.com/artifact/org.web3j/abi
-	implementation 'org.web3j:abi:4.7.0'
-
-	// https://mvnrepository.com/artifact/org.web3j/utils
-	implementation 'org.web3j:utils:4.7.0'
-
-	// https://mvnrepository.com/artifact/org.web3j/codegen
-	implementation 'org.web3j:codegen:4.7.0'
-
-	// https://mvnrepository.com/artifact/org.web3j/parity
-	implementation 'org.web3j:parity:4.7.0'
-
+	//implementation group: 'io.projectreactor', name: 'reactor-core', version: '3.1.8.RELEASE'
+	implementation 'io.projectreactor:reactor-core:3.5.8'
 
 
 

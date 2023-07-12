@@ -34,7 +34,7 @@ class CallingServiceByEMailConfiguration {
 	}	
 	
 	@Bean
-	Application service1(){
+	Application service2(){
 		def program = new PersistentApplication(name: "service1", language: "Orcha")
 		def mailSenderAdapter = new MailSenderAdapter(to: "orchalang2@gmail.com", sendAsAttachmentFile: true, attachmentFilename: "data.json", username: "orchalang1@gmail.com", password: "Wasters1234")
 		program.input = new Input(type: "service.callingServiceByEMail.Person", adapter: mailSenderAdapter)

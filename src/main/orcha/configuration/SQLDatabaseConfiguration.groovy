@@ -10,7 +10,7 @@ import orcha.lang.configuration.JavaServiceAdapter
 import orcha.lang.configuration.Output
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import service.MyProgram
+import service.MyProgram1
 
 @Configuration
 class SQLDatabaseConfiguration {
@@ -24,14 +24,14 @@ class SQLDatabaseConfiguration {
 	}
 	
 	@Bean
-	MyProgram myProgram(){
-		return new MyProgram()
+	MyProgram1 myProgram(){
+		return new MyProgram1()
 	}
 	
 	@Bean
 	Application code(){
 		def codeApplication = new Application(name: "code", language: "Java")
-		def javaCodeAdapter = new JavaServiceAdapter(javaClass: 'service.MyProgram', method:'myMethod')
+		def javaCodeAdapter = new JavaServiceAdapter(javaClass: 'service.MyProgram1', method:'myMethod')
 		def codeInput = new Input(type: "java.lang.Integer", adapter: javaCodeAdapter)
 		codeApplication.input = codeInput
 		def codeOutput = new Output(type: "java.lang.Integer", adapter: javaCodeAdapter)

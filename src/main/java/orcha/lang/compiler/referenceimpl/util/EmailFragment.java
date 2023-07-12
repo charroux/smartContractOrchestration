@@ -45,9 +45,9 @@ public class EmailFragment {
 	public EmailFragment(File directory, String filename, Object data) {
 		super();
 
-		Assert.notNull(directory);
-		Assert.hasText(filename);
-		Assert.notNull(data);
+		Assert.notNull(directory, "directory must not be null");
+		Assert.hasText(filename, "filename must not be empty");
+		Assert.notNull(data, "data must not be null");
 
 		this.directory = directory;
 		this.filename = filename;

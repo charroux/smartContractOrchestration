@@ -46,12 +46,12 @@ class OrchaCompilerConfiguration {
 	}
 	
 	@Bean
-	OrchaCodeParser orchaCodeParser(){
+	OrchaCodeParser orchaCodeParser1(){
 		return new OrchaCodeParserImpl()
 	}
 	
 	@Bean
-	ExpressionParser ExpressionParser(){
+	ExpressionParser ExpressionParser1(){
 		return new ExpressionParserImpl()
 	}
 	
@@ -65,7 +65,7 @@ class OrchaCompilerConfiguration {
 	}
 	
 	@Bean
-	ServiceOfferSelectionGenerator serviceOfferSelectionGenerator(){
+	ServiceOfferSelectionGenerator serviceOfferSelectionGenerator1(){
 		return new ServiceOfferSelectionGenerator()
 	}
 	
@@ -79,7 +79,7 @@ class OrchaCompilerConfiguration {
 	}
 	
 	@Bean
-	ConfigurationMockGenerator configurationMockGenerator(){
+	ConfigurationMockGenerator configurationMockGenerator1(){
 		return new ConfigurationMockGenerator()
 	}
 	
@@ -93,17 +93,17 @@ class OrchaCompilerConfiguration {
 	}
 	
 	@Bean
-	ConfigurationPropertiesGenerator configurationPropertiesGenerator(){
+	ConfigurationPropertiesGenerator configurationPropertiesGenerator1(){
 		return new ConfigurationPropertiesGenerator()
 	}
 	
 	@Bean
-	Compile compile(){
+	Compile compile1(){
 		return new CompileServiceWithSpringIntegration()
 	}
 		
 	@Bean
-	XmlGenerator xmlGenerator(){
+	XmlGenerator xmlGenerator1(){
 		//return new XmlGeneratorForSpringIntegration()
 		return new JDom2XmlGeneratorForSpringIntegration()
 	}
@@ -114,12 +114,12 @@ class OrchaCompilerConfiguration {
 	}
 	
 	@Bean
-	QualityOfService qualityOfService(){
+	QualityOfService qualityOfService1(){
 		return new QualityOfServiceImpl()
 	}
 	
 	@Bean
-	OrchaLauncherGenerator orchaLauncherGenerator(){
+	OrchaLauncherGenerator orchaLauncherGenerator1(){
 		return new OrchaLauncherGenerator()
 	}
 
