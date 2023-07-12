@@ -32,8 +32,8 @@ class OrganizeTripConfiguration {
 	}*/
 
 	@Bean
-	Application selectTrain(){
-		def program = new Application(name: "selectTrain", specifications: "Select a train.", description: "Select a train.", language: "groovy")
+	Application selectATrain(){
+		def program = new Application(name: "selectATrain", specifications: "Select a train.", description: "Select a train.", language: "groovy")
 		def blockchainAdapter = new BlockchainAdapter(javaClass: 'service.tripAgency.TrainSelection', method:'select')
 		program.input = new Input(type: "configuration.tripAgency.TripInfo", adapter: blockchainAdapter)
 		program.output = new Output(type: "service.tripAgency.SelectedTrain", adapter: blockchainAdapter)

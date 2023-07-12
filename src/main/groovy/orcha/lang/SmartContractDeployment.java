@@ -21,8 +21,8 @@ public class SmartContractDeployment {
             log.info("web3j = " + web3j);
             SelecTrainSmartContrat selecTrainSmartContract = SelecTrainSmartContrat.deploy(web3j, Credentials.create("0xba915e64f14ff363abf52193444c30ae0cd2963034dc8a2448f02b95b33702f5"), new DefaultGasProvider()).send();
             log.info("deployed at: " + selecTrainSmartContract.getContractAddress());
-            SelecTrainSmartContrat.Train train = selecTrainSmartContract.getTrain(BigInteger.valueOf(19)).send();
-            log.info("selectedTrain: + " + train.number + ", " + train.effectiveDepartureDate + ", " + train.effectiveArrivalDate);
+            //SelecTrainSmartContrat.Train train = selecTrainSmartContract.getTrain(BigInteger.valueOf(19)).send();
+            //log.info("selectedTrain: + " + train.number + ", " + train.effectiveDepartureDate + ", " + train.effectiveArrivalDate);
             web3j.shutdown();
         } catch (Exception e) {
             e.printStackTrace();

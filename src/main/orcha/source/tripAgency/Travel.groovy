@@ -7,13 +7,13 @@ author "Ben C."
 version "1.0"
 
 receive tripInfo from tripAgency
-compute selectTrain with tripInfo.value
+compute selectATrain with tripInfo.value
 
-when "selectTrain terminates"
-compute selectHotel with selectTrain.value
+when "selectATrain terminates"
+compute selectHotel with selectATrain.value
 
-when "selectHotel terminates and selectTrain terminates"
-compute selectTaxi with selectHotel.value, selectTrain.value
+when "selectHotel terminates and selectATrain terminates"
+compute selectTaxi with selectHotel.value, selectATrain.value
 
 when "selectTaxi terminates"
 send selectTaxi.result to tripAgencyCustomer
