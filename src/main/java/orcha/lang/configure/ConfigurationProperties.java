@@ -10,18 +10,17 @@ package orcha.lang.configure;
 @org.springframework.boot.context.properties.ConfigurationProperties(prefix = "driving")
 public class ConfigurationProperties {
 
-	
-    public ConfigurationProperties.OrchaServiceOutputFile orchaServiceOutputFile = new OrchaServiceOutputFile();
+    public ConfigurationProperties.TripAgencyCustomer tripAgencyCustomer = new TripAgencyCustomer();
 
-    public ConfigurationProperties.OrchaServiceOutputFile getOrchaServiceOutputFile() {
-        return orchaServiceOutputFile;
+    public ConfigurationProperties.TripAgencyCustomer getTripAgencyCustomer() {
+        return tripAgencyCustomer;
     }
 
-    public void setOrchaServiceOutputFile(ConfigurationProperties.OrchaServiceOutputFile orchaServiceOutputFile) {
-        this.orchaServiceOutputFile = orchaServiceOutputFile;
+    public void setTripAgencyCustomer(ConfigurationProperties.TripAgencyCustomer tripAgencyCustomer) {
+        this.tripAgencyCustomer = tripAgencyCustomer;
     }
 
-    public class OrchaServiceOutputFile {
+    public class TripAgencyCustomer {
 
         public String directory;
         public String filename;

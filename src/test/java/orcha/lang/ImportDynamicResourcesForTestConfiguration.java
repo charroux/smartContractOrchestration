@@ -1,10 +1,7 @@
 
 package orcha.lang;
 
-import orcha.lang.compiler.referenceimpl.configurationproperties.ConfigurationPropertiesGenerator;
 import orcha.lang.configuration.OrchaSession;
-
-import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -16,14 +13,12 @@ import org.springframework.context.annotation.ImportResource;
  * 
  */
 @Configuration
-//@ImportAutoConfiguration(org.springframework.cloud.stream.test.binder.TestSupportBinderAutoConfiguration.class)
 @ComponentScan(basePackages = {
     "configuration",
     "generated"
 })
 @ImportResource({
-    "classpath:/Orcha partitioning.xml",
-    "classpath:/Orcha partitioningQoS.xml"
+
 })
 public class ImportDynamicResourcesForTestConfiguration {
 
@@ -33,10 +28,5 @@ public class ImportDynamicResourcesForTestConfiguration {
         OrchaSession orchaSession = new OrchaSession();
         return orchaSession;
     }
-    
-    @Bean
-	ConfigurationPropertiesGenerator configurationPropertiesGenerator(){
-		return new ConfigurationPropertiesGenerator();
-	}
 
 }

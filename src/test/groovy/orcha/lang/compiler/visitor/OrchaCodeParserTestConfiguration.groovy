@@ -30,9 +30,9 @@ import orcha.lang.configuration.OutputFileAdapter.WritingMode
 import service.orchaPartitioning.OrchaBankingService2
 import service.order.VendorComparison
 import service.order.VendorOrderConverter
-import service.travelAgency.HotelSelection
-import service.travelAgency.TaxiSelection
-import service.travelAgency.TrainSelection
+import service.tripAgency.HotelSelection
+import service.tripAgency.TaxiSelection
+import service.tripAgency.TrainSelection
 
 @SpringBootConfiguration
 class OrchaCodeParserTestConfiguration {

@@ -7,22 +7,22 @@ pragma experimental ABIEncoderV2;
  * @title Owner
  * @dev Set & change owner
  */
-contract SelecTrain {
+contract SelecTrainSmartContrat {
 
-    struct SelectedTrain {
+    struct Train {
         int number;
         uint effectiveDepartureDate;
         uint effectiveArrivalDate;
     }
 
-    SelectedTrain[] trains;
+    Train[] trains;
 
     constructor() public {
-        trains.push(SelectedTrain(1, 18, 20));
-        trains.push(SelectedTrain(1, 19, 20));
+        trains.push(Train(1, 18, 20));
+        trains.push(Train(1, 19, 20));
     }
 
-    function getTrain(uint dateP) public view returns(SelectedTrain memory) {
+    function getTrain(uint dateP) public view returns(Train memory) {
         uint length = trains.length;
         for(uint256 i=0; i< length; i++){
             if( trains[i].effectiveDepartureDate >=  dateP ) {

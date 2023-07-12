@@ -10,10 +10,10 @@ import orcha.lang.configuration.InputFileAdapter
 import orcha.lang.configuration.JavaServiceAdapter
 import orcha.lang.configuration.Output
 import orcha.lang.configuration.OutputFileAdapter
-import service.travelAgency.HotelSelection
-import service.travelAgency.TaxiSelection
-import service.travelAgency.TrainSelection
 import orcha.lang.configuration.OutputFileAdapter.WritingMode
+import service.tripAgency.HotelSelection
+import service.tripAgency.TaxiSelection
+import service.tripAgency.TrainSelection
 
 @Configuration
 trait BroadcastEventTestConfiguration {

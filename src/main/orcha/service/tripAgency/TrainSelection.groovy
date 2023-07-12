@@ -2,35 +2,12 @@ package service.tripAgency
 
 import configuration.tripAgency.TripInfo
 import groovy.util.logging.Slf4j
+import org.web3j.crypto.Credentials
 import org.web3j.protocol.Web3j
 import org.web3j.protocol.core.methods.response.TransactionReceipt
 import org.web3j.protocol.http.HttpService
-
-import java.util.concurrent.Callable
-import java.util.concurrent.CompletableFuture
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
-import java.util.concurrent.Future
-import java.util.function.Supplier
-
-@Slf4j
-class TrainSupplier implements Supplier<SelectedTrain>{
-
-	TripInfo tripInfo
-
-	TrainSupplier(TripInfo tripInfo) {
-		this.tripInfo = tripInfo
-	}
-
-	@Override
-	SelectedTrain get() {
-		Thread.sleep(500);
-		SelectedTrain selectedTrain = new SelectedTrain(number: 1234, passenger: tripInfo.passenger, departure: tripInfo.departure, arrival: tripInfo.arrival)
-		log.info "Supply selected train: " + selectedTrain
-		return selectedTrain
-	}
-
-}
+import org.web3j.selectrainsmartcontrat.SelecTrainSmartContrat
+import org.web3j.tx.gas.DefaultGasProvider
 
 @Slf4j
 class TrainSelection {
@@ -66,29 +43,41 @@ class TrainSelection {
 
 		log.info "Receives : " + tripInfo
 
-		try{
-
-
-			Web3j web3 = Web3j.build(new HttpService("http://127.0.0.1:8545"));
-
-			log.info "web3 : " + web3
-
-			SelectTrain contract = SelectTrain.load(
-					"0xD27764C82Cd05d7e405E2d7513c7a5a2e1705595", web3);
-
-			log.info "contract : " + contract
-
-			TransactionReceipt transactionReceipt = contract.getTrain(19).send();
-
-			log.info "transactionReceipt : " + transactionReceipt
-
-			log.info "Latest Ethereum block number: " + transactionReceipt;
-
-
-			return null;
-		} catch(Exception e) {
+		try {
+			Web3j web3j = Web3j.build(new HttpService("HTTP://127.0.0.1:7545"));
+			log.info("web3j = " + web3j);
+			SelecTrainSmartContrat selecTrainSmartContract = SelecTrainSmartContrat.deploy(web3j, Credentials.create("0xba915e64f14ff363abf52193444c30ae0cd2963034dc8a2448f02b95b33702f5"), new DefaultGasProvider()).send();
+			log.info("deployed at: " + selecTrainSmartContract.getContractAddress());
+			SelecTrainSmartContrat.Train train = selecTrainSmartContract.getTrain(BigInteger.valueOf(19)).send();
+			log.info("selectedTrain: + " + train.number + ", " + train.effectiveDepartureDate + ", " + train.effectiveArrivalDate);
+			web3j.shutdown();
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
+
+		return null;
+
+		/*try{
+
+			Web3j web3j = Web3j.build(new HttpService("HTTP://127.0.0.1:7545"));
+			log.info("web3j = " + web3j);
+			org.web3j.selectrain.SelecTrain selecTrainSmartContact = org.web3j.selectrain.SelecTrain.deploy(web3j, Credentials.create("0xc122d38143f971505a0c72ceae1c07c486d69a094500a16c10f4d2b19d1708eb"), new DefaultGasProvider()).send();
+			log.info("deployed at: " + selecTrainSmartContact.getContractAddress());
+			org.web3j.selectrain.SelecTrain.SelectedTrain train = selecTrainSmartContact.getTrain(BigInteger.valueOf(19)).send();
+			log.info("selectedTrain: + " + train.number + ", " + train.effectiveDepartureDate + ", " + train.effectiveArrivalDate);
+			service.tripAgency.SelectedTrain selectedTrain1 = new service.tripAgency.SelectedTrain();
+			selectedTrain1.number = train.number;
+			selectedTrain1.departure = tripInfo.departure;
+			selectedTrain1.arrival = tripInfo.arrival;
+			selectedTrain1.passenger = tripInfo.passenger;
+			return selectedTrain1;
+			web3j.shutdown();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return null;*/
 
 	}
 }
