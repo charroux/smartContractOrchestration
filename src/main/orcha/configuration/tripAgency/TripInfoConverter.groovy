@@ -15,9 +15,9 @@ class TripInfoConverter implements Converter<List, TripInfo>	{
 
 	@Override
 	public TripInfo convert(List source) {
-		log.info "receives: " + source[0] + " " + source[1] + " " + source[2] 
-		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy")
-		TripInfo travelInfo = new TripInfo(passenger: source[0].get("passenger"), departure: simpleDateFormat.parse(source[1].get("departure")), arrival: simpleDateFormat.parse(source[2].get("arrival")))
+		log.info "receives: " + source[0] + " " + source[1] + " " + source[2] + " " + source[3] + " " + source[4]
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy")
+		TripInfo travelInfo = new TripInfo(travelDestination: source[0].get("travelDestination"), traveller: source[1].get("traveller"), departure: simpleDateFormat.parse(source[2].get("departure")), arrival: simpleDateFormat.parse(source[3].get("arrival")), maximumPrice: source[4].get("maximumPrice"))
 		log.info "returns: " + travelInfo
 		return travelInfo
 	}

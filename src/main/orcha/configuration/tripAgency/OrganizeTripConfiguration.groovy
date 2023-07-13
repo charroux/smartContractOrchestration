@@ -36,7 +36,7 @@ class OrganizeTripConfiguration {
 		def program = new Application(name: "selectATrain", specifications: "Select a train.", description: "Select a train.", language: "groovy")
 		def blockchainAdapter = new BlockchainAdapter(javaClass: 'service.tripAgency.TrainSelection', method:'select')
 		program.input = new Input(type: "configuration.tripAgency.TripInfo", adapter: blockchainAdapter)
-		program.output = new Output(type: "service.tripAgency.SelectedTrain", adapter: blockchainAdapter)
+		program.output = new Output(type: "configuration.tripAgency.TripInfo", adapter: blockchainAdapter)
 		return program
 	}
 
@@ -49,8 +49,8 @@ class OrganizeTripConfiguration {
 	Application selectHotel(){
 		def program = new Application(name: "selectHotel", specifications: "Select a hotel.", description: "Select a hotel.", language: "groovy")
 		def javaAdapter = new JavaServiceAdapter(javaClass: 'service.travelAgency.HotelSelection', method:'select')
-		program.input = new Input(type: "service.tripAgency.SelectedTrain", adapter: javaAdapter)
-		program.output = new Output(type: "service.tripAgency.SelectedHotel", adapter: javaAdapter)
+		program.input = new Input(type: "configuration.tripAgency.TripInfo", adapter: javaAdapter)
+		program.output = new Output(type: "configuration.tripAgency.TripInfo", adapter: javaAdapter)
 		return program
 	}
 	
@@ -64,7 +64,7 @@ class OrganizeTripConfiguration {
 		def program = new Application(name: "selectTaxi", specifications: "Select a taxi.", description: "Select a taxi.", language: "groovy")
 		def javaAdapter = new JavaServiceAdapter(javaClass: 'service.tripAgency.TaxiSelection', method:'select')
 		program.input = new Input(type: "java.util.List", adapter: javaAdapter)
-		program.output = new Output(type: "service.tripAgency.SelectedTaxi", adapter: javaAdapter)
+		program.output = new Output(type: "configuration.tripAgency.TripInfo", adapter: javaAdapter)
 		return program
 	}
 	
@@ -77,7 +77,7 @@ class OrganizeTripConfiguration {
 	EventHandler tripAgencyCustomer(){
 		def eventHandler = new EventHandler(name: "tripAgencyCustomer")
 		def fileAdapter = new OutputFileAdapter(directory: 'data/output', createDirectory: true, filename:'trip.json', appendNewLine: true, writingMode: WritingMode.REPLACE)
-		eventHandler.output = new Output(mimeType: "application/json", type: "service.tripAgency.SelectedTaxi", adapter: fileAdapter)
+		eventHandler.output = new Output(mimeType: "application/json", type: "configuration.tripAgency.TripInfo", adapter: fileAdapter)
 		return eventHandler
 	}
 	

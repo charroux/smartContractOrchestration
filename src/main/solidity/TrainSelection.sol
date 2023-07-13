@@ -1,18 +1,16 @@
-// SPDX-License-Identifier: GPL-3.0
-
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.6.5;
 pragma experimental ABIEncoderV2;
 
-/**
- * @title Owner
- * @dev Set & change owner
- */
+
 contract SelecTrainSmartContrat {
 
     struct Train {
         uint number;
+        string destination;
         uint effectiveDepartureDate;
         uint effectiveArrivalDate;
+        uint ticketPrice;
     }
 
     Train[] trains;
@@ -20,17 +18,19 @@ contract SelecTrainSmartContrat {
     Train selectedTrain;
 
     constructor() public {
-        trains.push(Train(1, 18, 20));
-        trains.push(Train(2, 19, 20));
+        trains.push(Train(1, "Paris", 1693087200000, 1693346400000, 100));              // 27-08-2023, 30-08-2023
+        trains.push(Train(2, "Paris", 1693173600000, 1693346400000, 150));             // 28-08-2023, 30-08-2023
+        trains.push(Train(2, "Nice", 1693173600000, 1693346400000, 150));              // 28-08-2023, 30-08-2023
     }
 
-   function getTrain(uint dateP) public {
+   function getTrain(string calldata destination, uint dateDeparture) public {
         uint length = trains.length;
         for(uint256 i=0; i< length; i++){
-            if( trains[i].effectiveDepartureDate >=  dateP ) {
-               //return trains[i];
-                selectedTrain = trains[i];
-                return;
+            if(keccak256(abi.encodePacked(trains[i].destination)) == keccak256(abi.encodePacked(destination))) {
+                if( trains[i].effectiveDepartureDate >=  dateDeparture ) {
+                    selectedTrain = trains[i];
+                    return;
+                }
             }
         }
         revert("No train found");
@@ -38,6 +38,10 @@ contract SelecTrainSmartContrat {
 
     function getTrainNumber() public view returns(uint) {
         return selectedTrain.number;
+    }
+
+    function getDestination() public view returns(string memory) {
+        return selectedTrain.destination;
     }
 
     function getTrainDepartureDate() public view returns(uint) {
@@ -48,4 +52,7 @@ contract SelecTrainSmartContrat {
         return selectedTrain.effectiveArrivalDate;
     }
 
+    function getTicketPrice() public view returns(uint) {
+        return selectedTrain.ticketPrice;
+    }
 }

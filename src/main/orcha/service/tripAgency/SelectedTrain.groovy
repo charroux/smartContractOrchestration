@@ -60,8 +60,10 @@ contract SelecTrain {
 class SelectedTrain {
 	
 	int number
-	String passenger
+	String destination
 	Date departure
 	Date arrival
+	int ticketPrice
+	String selectedTrainContractAddress
 
 }

@@ -1,8 +1,14 @@
 package service.tripAgency
 
+import groovy.transform.ToString
+
+@ToString
 class SelectedTaxi {
-	
-	SelectedTrain train
-    service.tripAgency.SelectedHotel hotel
+
+    int number
+    String departureLocation
+    Date departureDate
+    String arrivalLocation
+    int price
 
 }

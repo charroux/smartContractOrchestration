@@ -4,8 +4,11 @@ import groovy.transform.ToString
 
 @ToString
 class SelectedHotel {
-	
-	String passenger
+
+	String address
 	Date arrival
+	int roomNumber
+	int roomPrice
+	String selectedHotelContractAddress
 	
 }
