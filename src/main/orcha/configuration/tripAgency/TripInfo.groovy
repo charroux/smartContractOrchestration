@@ -18,6 +18,8 @@ class TripInfo {
 	int billableAmount
 	int creditBalance
 
+	String booking = "PENDING"
+
 	SelectedTrain selectedTrain
 	SelectedHotel selectedHotel
 	SelectedTaxi selectedTaxi

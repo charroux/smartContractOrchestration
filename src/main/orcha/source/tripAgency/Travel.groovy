@@ -16,10 +16,14 @@ when "selectHotel terminates and selectATrain terminates"
 compute selectTaxi with selectHotel.value, selectATrain.value
 
 when "selectTaxi terminates"
-send selectTaxi.result to tripAgencyCustomer
+compute payment with selectTaxi.value
 
-//compute payment with selectTaxi.value
+when "payment terminates"
+send payment.result to tripAgencyCustomer
 
-//when "payment terminates"
-//send payment.result to tripAgencyCustomer
+
+//send selectTaxi.result to tripAgencyCustomer
+
+
+
 

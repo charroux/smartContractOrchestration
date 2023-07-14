@@ -6,8 +6,8 @@ import orcha.lang.configuration.OutputFileAdapter.WritingMode
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import service.tripAgency.HotelSelection
+import service.tripAgency.PaymentService
 import service.tripAgency.TaxiSelection
-import service.tripAgency.TrainSelection
 import service.tripAgency.TrainSelection
 
 @Configuration
@@ -71,6 +71,20 @@ class OrganizeTripConfiguration {
 	@Bean
 	TaxiSelection taxiSelection(){
 		return new TaxiSelection()
+	}
+
+	@Bean
+	Application payment(){
+		def program = new Application(name: "payment", specifications: "Payment.", description: "Pay for the train, the hotel and the taxi.", language: "groovy")
+		def javaAdapter = new JavaServiceAdapter(javaClass: 'service.tripAgency.PaymentService', method:'pay')
+		program.input = new Input(type: "configuration.tripAgency.TripInfo", adapter: javaAdapter)
+		program.output = new Output(type: "configuration.tripAgency.TripInfo", adapter: javaAdapter)
+		return program
+	}
+
+	@Bean
+	PaymentService paymentService(){
+		return new PaymentService()
 	}
 
 	@Bean

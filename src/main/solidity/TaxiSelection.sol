@@ -15,29 +15,39 @@ contract TaxiSelectionSmartContrat {
 
     Taxi selectedTaxi;
 
+    event bookingNumber(uint number);
+
     function getTaxi(string calldata depertureLocation, uint departureDate, string calldata arrivalLocation) public {
         selectedTaxi = Taxi(114, depertureLocation, departureDate, arrivalLocation, 100);
+        emit bookingNumber(1);
     }
 
-    function getTaxiFrom() public view returns(string memory) {
+    function getTaxiFrom(uint bookingNumber) public view returns(string memory) {
         return selectedTaxi.departureLocation;
     }
 
-    function getDepartureDate() public view returns(uint) {
+    function getDepartureDate(uint bookingNumber) public view returns(uint) {
         return selectedTaxi.departureDate;
     }
 
-    function getTaxiTo() public view returns(string memory) {
+    function getTaxiTo(uint bookingNumber) public view returns(string memory) {
         return selectedTaxi.arrivalLocation;
     }
 
-    function getNumber() public view returns(uint) {
+    function getNumber(uint bookingNumber) public view returns(uint) {
         return selectedTaxi.number;
     }
 
-    function getPrice() public view returns(uint) {
+    function getPrice(uint bookingNumber) public view returns(uint) {
         return selectedTaxi.price;
     }
 
+    function pay(uint bookingNumber) public {
+        // ...
+    }
+
+    function cancel(uint bookingNumber) public {
+        // ...
+    }
 
 }

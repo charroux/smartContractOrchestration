@@ -14,6 +14,8 @@ contract HotelSelectionSmartContrat {
 
     Hotel selectedHotel;
 
+    event bookingNumber(uint number);
+
     constructor() public {
         hotels.push(Hotel("Paris", 200));
         hotels.push(Hotel("Marseille", 100));
@@ -24,22 +26,31 @@ contract HotelSelectionSmartContrat {
         for(uint256 i=0; i< length; i++){
             if(keccak256(abi.encodePacked(hotels[i].hotelAddress)) == keccak256(abi.encodePacked(destination))) {
                 selectedHotel = hotels[i];
-               return;
+                emit bookingNumber(1);
+                return;
             }
         }
         revert("No hotel found");
     }
 
-    function getRoomNumber() public view returns(uint) {
+    function getRoomNumber(uint bookingNumber) public view returns(uint) {
         return 101;
     }
 
-    function getPrice() public view returns(uint) {
+    function getPrice(uint bookingNumber) public view returns(uint) {
         return selectedHotel.roomPrice;
     }
 
     function getAddress() public view returns(string memory) {
         return selectedHotel.hotelAddress;
+    }
+
+    function pay(uint bookingNumber) public {
+        // ...
+    }
+
+    function cancel(uint bookingNumber) public {
+        // ...
     }
 
 }

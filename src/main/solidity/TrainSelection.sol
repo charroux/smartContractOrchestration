@@ -13,6 +13,8 @@ contract SelecTrainSmartContrat {
         uint ticketPrice;
     }
 
+    event bookingNumber(uint number);
+
     Train[] trains;
 
     Train selectedTrain;
@@ -23,12 +25,14 @@ contract SelecTrainSmartContrat {
         trains.push(Train(2, "Nice", 1693173600000, 1693346400000, 150));              // 28-08-2023, 30-08-2023
     }
 
-   function getTrain(string calldata destination, uint dateDeparture) public {
+   //function getTrain(string calldata destination, uint dateDeparture) public returns(uint) {
+    function getTrain(string calldata destination, uint dateDeparture) public {
         uint length = trains.length;
         for(uint256 i=0; i< length; i++){
             if(keccak256(abi.encodePacked(trains[i].destination)) == keccak256(abi.encodePacked(destination))) {
                 if( trains[i].effectiveDepartureDate >=  dateDeparture ) {
                     selectedTrain = trains[i];
+                    emit bookingNumber(1);
                     return;
                 }
             }
@@ -36,23 +40,31 @@ contract SelecTrainSmartContrat {
         revert("No train found");
     }
 
-    function getTrainNumber() public view returns(uint) {
+    function getTrainNumber(uint bookingNumber) public view returns(uint) {
         return selectedTrain.number;
     }
 
-    function getDestination() public view returns(string memory) {
+    function getDestination(uint bookingNumber) public view returns(string memory) {
         return selectedTrain.destination;
     }
 
-    function getTrainDepartureDate() public view returns(uint) {
+    function getTrainDepartureDate(uint bookingNumber) public view returns(uint) {
         return selectedTrain.effectiveDepartureDate;
     }
 
-    function getTrainArrivalDate() public view returns(uint) {
+    function getTrainArrivalDate(uint bookingNumber) public view returns(uint) {
         return selectedTrain.effectiveArrivalDate;
     }
 
-    function getTicketPrice() public view returns(uint) {
+    function getTicketPrice(uint bookingNumber) public view returns(uint) {
         return selectedTrain.ticketPrice;
+    }
+
+    function pay(uint bookingNumber) public {
+        // ...
+    }
+
+    function cancel(uint bookingNumber) public {
+        // ...
     }
 }

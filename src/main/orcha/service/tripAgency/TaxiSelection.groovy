@@ -52,26 +52,29 @@ class TaxiSelection {
 					date, 											// departure date of the taxi = arrival date of the train
 					tripInfoFromHotel.selectedHotel.address 		// destination of the taxi = address of the hotel
 			).send();
+			BigInteger bookingNumber = 1;
 			log.info("getTaxi");
-			String taxiFrom = taxiSelectionSmartContrat.getTaxiFrom().send();
+			String taxiFrom = taxiSelectionSmartContrat.getTaxiFrom(bookingNumber).send();
 			log.info("taxi from: " + taxiFrom);
-			BigInteger departureDate = taxiSelectionSmartContrat.getDepartureDate().send();
+			BigInteger departureDate = taxiSelectionSmartContrat.getDepartureDate(bookingNumber).send();
 			log.info("taxi departure date: " + departureDate);
-			String taxiTo = taxiSelectionSmartContrat.getTaxiTo().send();
+			String taxiTo = taxiSelectionSmartContrat.getTaxiTo(bookingNumber).send();
 			log.info("taxi to: " + taxiTo);
-			int number = taxiSelectionSmartContrat.getNumber().send();
+			int number = taxiSelectionSmartContrat.getNumber(bookingNumber).send();
 			log.info("taxi number: " + number);
-			int price = taxiSelectionSmartContrat.getPrice().send();
+			int price = taxiSelectionSmartContrat.getPrice(bookingNumber).send();
 			log.info("price: " + price);
 
 			web3j.shutdown();
 
 			SelectedTaxi selectedTaxi = new SelectedTaxi(
+				bookingNumber: bookingNumber,
 				number: number,
 				departureLocation: taxiFrom,
 				departureDate: new Date(departureDate.longValue()),
 				arrivalLocation: taxiTo,
-				price: price
+				price: price,
+				selectedTaxiContractAddress: taxiSelectionSmartContrat.getContractAddress()
 			)
 
 			log.info("Selected taxi: " + selectedTaxi)

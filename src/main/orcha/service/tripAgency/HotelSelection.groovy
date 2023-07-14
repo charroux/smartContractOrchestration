@@ -38,17 +38,19 @@ class HotelSelection {
 			log.info("smart contract address: " + selecHotelSmartContrat.getContractAddress());
 			BigInteger date = BigInteger.valueOf(tripInfo.getSelectedTrain().getArrival().getTime());
 			selecHotelSmartContrat.getRoomInHotel(tripInfo.getSelectedTrain().getDestination(), date).send();
+			BigInteger bookingNumber = 1;
 			log.info("getRoomInHotel");
 			String address = selecHotelSmartContrat.getAddress().send();
 			log.info("hotel address: " + address);
-			BigInteger roomNumber = selecHotelSmartContrat.getRoomNumber().send();
+			BigInteger roomNumber = selecHotelSmartContrat.getRoomNumber(bookingNumber).send();
 			log.info("room number: " + roomNumber);
-			BigInteger price = selecHotelSmartContrat.getPrice().send();
+			BigInteger price = selecHotelSmartContrat.getPrice(bookingNumber).send();
 			log.info("price: " + price);
 
 			web3j.shutdown();
 
 			SelectedHotel selectedHotel = new SelectedHotel(
+					bookingNumber: bookingNumber,
 					address: address,
 					roomNumber: roomNumber,
 					arrival: new Date(date.longValue()),
