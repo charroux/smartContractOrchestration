@@ -14,7 +14,15 @@ https://github.com/charroux/smartContractOrchestration/tree/main/src/main/orcha/
 
 Train selection service colling the train selection smart contract: https://github.com/charroux/smartContractOrchestration/blob/main/src/main/orcha/service/tripAgency/TrainSelection.groovy
 
-Train selection smart contract: 
+Train selection smart contract: https://github.com/charroux/smartContractOrchestration/blob/main/src/main/solidity/TrainSelection.sol
+
+Hotel selection service colling the hotel selection smart contract: https://github.com/charroux/smartContractOrchestration/blob/main/src/main/orcha/service/tripAgency/HotelSelection.groovy
+
+Hotel selection smart contract: https://github.com/charroux/smartContractOrchestration/blob/main/src/main/solidity/HotelSelection.sol
+
+Taxi selection service colling the taxi selection smart contract: https://github.com/charroux/smartContractOrchestration/blob/main/src/main/orcha/service/tripAgency/TaxiSelection.groovy
+
+Taxi selection smart contract: https://github.com/charroux/smartContractOrchestration/blob/main/src/main/solidity/TaxiSelection.sol
 ========
 
 Un Oracle :
