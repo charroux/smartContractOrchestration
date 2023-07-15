@@ -1,1 +1,0 @@
-{"person":{"firstName":"Morgane"},"salary":1000}
