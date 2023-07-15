@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:context="http://www.springframework.org/schema/context" xmlns:int="http://www.springframework.org/schema/integration" xmlns:int-amqp="http://www.springframework.org/schema/integration/amqp" xmlns:int-event="http://www.springframework.org/schema/integration/event" xmlns:int-file="http://www.springframework.org/schema/integration/file" xmlns:int-groovy="http://www.springframework.org/schema/integration/groovy" xmlns:int-http="http://www.springframework.org/schema/integration/http" xmlns:int-jdbc="http://www.springframework.org/schema/integration/jdbc" xmlns:int-mail="http://www.springframework.org/schema/integration/mail" xmlns:int-script="http://www.springframework.org/schema/integration/scripting" xmlns:int-stream="http://www.springframework.org/schema/integration/stream" xmlns:jdbc="http://www.springframework.org/schema/jdbc" xmlns:rabbit="http://www.springframework.org/schema/rabbit" xmlns:task="http://www.springframework.org/schema/task" xmlns:util="http://www.springframework.org/schema/util" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration-5.0.xsd http://www.springframework.org/schema/integration/mail http://www.springframework.org/schema/integration/mail/spring-integration-mail-5.0.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd http://www.springframework.org/schema/integration/file http://www.springframework.org/schema/integration/file/spring-integration-file-5.0.xsd http://www.springframework.org/schema/integration/stream http://www.springframework.org/schema/integration/stream/spring-integration-stream-5.0.xsd http://www.springframework.org/schema/integration/jdbc http://www.springframework.org/schema/integration/jdbc/spring-integration-jdbc-5.0.xsd http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-5.0.xsd http://www.springframework.org/schema/integration/http http://www.springframework.org/schema/integration/http/spring-integration-http-5.0.xsd http://www.springframework.org/schema/integration/groovy http://www.springframework.org/schema/integration/groovy/spring-integration-groovy-5.0.xsd http://www.springframework.org/schema/integration/scripting http://www.springframework.org/schema/integration/scripting/spring-integration-scripting-5.0.xsd http://www.springframework.org/schema/integration/event http://www.springframework.org/schema/integration/event/spring-integration-event-5.0.xsd http://www.springframework.org/schema/rabbit http://www.springframework.org/schema/rabbit/spring-rabbit.xsd http://www.springframework.org/schema/integration/amqp http://www.springframework.org/schema/integration/amqp/spring-integration-amqp-5.0.xsd http://www.springframework.org/schema/integration/stream http://www.springframework.org/schema/integration/stream/spring-integration-stream-5.0.xsd">
+  <int:logging-channel-adapter id="loggingChannel" level="INFO" />
+  <int-stream:stderr-channel-adapter channel="errorChannel" append-newline="true" />
+  <bean id="errorUnwrapper" class="orcha.lang.compiler.referenceimpl.xmlgenerator.impl.ErrorUnwrapper" />
+  <int:channel id="recoveryChannel" />
+  <int:transformer input-channel="recoveryChannel" output-channel="loggingChannel" expression="'Failure after many attemps for the message :' + payload.failedMessage.payload" />
+  <int:poller fixed-delay="1000" default="true" />
+  <int-file:inbound-channel-adapter id="file-tripAgency-InputChannel-id" directory="data/input" channel="tripAgency-InputChannel" prevent-duplicates="true" filename-pattern="tripInfo.json" />
+  <int-file:file-to-string-transformer input-channel="tripAgency-InputChannel" output-channel="tripAgency-InputChannelTransformer" delete-files="false" />
+  <int:chain input-channel="tripAgency-InputChannelTransformer" output-channel="tripAgency-OutputChannel">
+    <int:json-to-object-transformer type="java.util.List" />
+    <int:header-enricher>
+      <int:header name="messageID" expression="headers['id'].toString()" />
+    </int:header-enricher>
+  </int:chain>
+  <int:chain input-channel="tripAgency-OutputChannel" output-channel="selectATrainServiceAcivatorOutput" id="service-activator-chain-selectATrainChannel-id">
+    <int:service-activator id="service-activator-selectATrainChannel-id" expression="@trainSelection.select(payload)">
+      <int:request-handler-advice-chain />
+    </int:service-activator>
+  </int:chain>
+  <int:transformer id="transformer-selectATrainServiceAcivatorOutput-id" input-channel="selectATrainServiceAcivatorOutput" output-channel="selectATrainOutput" method="transform">
+    <bean class="orcha.lang.compiler.referenceimpl.xmlgenerator.impl.ObjectToApplicationTransformer">
+      <property name="application" ref="selectATrain" />
+    </bean>
+  </int:transformer>
+  <int:recipient-list-router id="router-selectATrainOutput-id" input-channel="selectATrainOutput">
+    <int:recipient channel="selectATrainAggregatorInput" />
+    <int:recipient channel="selectHotelselectATrainAggregatorInputSequence" />
+  </int:recipient-list-router>
+  <int:chain input-channel="selectHotelselectATrainAggregatorInputSequence" output-channel="selectHotelselectATrainAggregatorInput" id="sequenceNumber-selectHotelselectATrainAggregatorInput-id">
+    <int:header-enricher>
+      <int:header name="sequenceSize" expression="2" />
+    </int:header-enricher>
+    <int:header-enricher>
+      <int:header name="sequenceNumber" expression="2" />
+    </int:header-enricher>
+  </int:chain>
+  <int:aggregator id="aggregator-selectATrainAggregatorInput-id" input-channel="selectATrainAggregatorInput" output-channel="selectATrainAggregatorInputTransformer" release-strategy-expression="size()==1 and ( (messages[0].payload instanceof T(orcha.lang.configuration.Application) and messages[0].payload.state==T(orcha.lang.configuration.State).TERMINATED) )" correlation-strategy-expression="headers['messageID']" />
+  <int:transformer id="transformer-selectATrainAggregatorInput-id" input-channel="selectATrainAggregatorInputTransformer" output-channel="selectATrainAggregatorInputAggregatorOutput" expression="payload.?[name=='selectATrain']" />
+  <int:transformer id="transformer-selectATrainAggregatorInputAggregatorOutput-id" input-channel="selectATrainAggregatorInputAggregatorOutput" output-channel="selectATrainAggregatorOutputTransformer" method="transform">
+    <bean class="orcha.lang.compiler.referenceimpl.xmlgenerator.impl.ApplicationToObjectTransformer" />
+  </int:transformer>
+  <int:chain input-channel="selectATrainAggregatorOutputTransformer" output-channel="selectHotelServiceAcivatorOutput" id="service-activator-chain-selectHotelChannel-id">
+    <int:header-enricher>
+      <int:header name="sequenceSize" expression="2" />
+    </int:header-enricher>
+    <int:header-enricher>
+      <int:header name="sequenceNumber" expression="1" />
+    </int:header-enricher>
+    <int:service-activator id="service-activator-selectHotelChannel-id" expression="@hotelSelection.select(payload)">
+      <int:request-handler-advice-chain />
+    </int:service-activator>
+  </int:chain>
+  <int:transformer id="transformer-selectHotelServiceAcivatorOutput-id" input-channel="selectHotelServiceAcivatorOutput" output-channel="selectHotelselectATrainAggregatorInput" method="transform">
+    <bean class="orcha.lang.compiler.referenceimpl.xmlgenerator.impl.ObjectToApplicationTransformer">
+      <property name="application" ref="selectHotel" />
+    </bean>
+  </int:transformer>
+  <int:resequencer id="resequencer-selectHotelselectATrainAggregatorInput-id" input-channel="selectHotelselectATrainAggregatorInput" output-channel="selectHotelselectATrainAggregatorInputResequencer" release-partial-sequences="false" release-strategy-expression="size()==2" correlation-strategy-expression="headers['messageID']" />
+  <int:aggregator id="aggregator-selectHotelselectATrainAggregatorInput-id" input-channel="selectHotelselectATrainAggregatorInputResequencer" output-channel="selectHotelselectATrainAggregatorInputTransformer" release-strategy-expression="size()==2 and ( (messages[0].payload instanceof T(orcha.lang.configuration.Application) and messages[0].payload.state==T(orcha.lang.configuration.State).TERMINATED)  and  (messages[1].payload instanceof T(orcha.lang.configuration.Application) and messages[1].payload.state==T(orcha.lang.configuration.State).TERMINATED) )" correlation-strategy-expression="headers['messageID']" />
+  <int:transformer id="transformer-selectHotelselectATrainAggregatorInput-id" input-channel="selectHotelselectATrainAggregatorInputTransformer" output-channel="selectHotelselectATrainAggregatorInputAggregatorOutput" expression="payload.?[name=='selectHotel' or name=='selectATrain']" />
+  <int:transformer id="transformer-selectHotelselectATrainAggregatorInputAggregatorOutput-id" input-channel="selectHotelselectATrainAggregatorInputAggregatorOutput" output-channel="selectHotelselectATrainAggregatorOutputTransformer" method="transform">
+    <bean class="orcha.lang.compiler.referenceimpl.xmlgenerator.impl.ApplicationsListToObjectsListTransformer" />
+  </int:transformer>
+  <int:chain input-channel="selectHotelselectATrainAggregatorOutputTransformer" output-channel="selectTaxiServiceAcivatorOutput" id="service-activator-chain-selectTaxiChannel-id">
+    <int:service-activator id="service-activator-selectTaxiChannel-id" expression="@taxiSelection.select(payload)">
+      <int:request-handler-advice-chain />
+    </int:service-activator>
+  </int:chain>
+  <int:transformer id="transformer-selectTaxiServiceAcivatorOutput-id" input-channel="selectTaxiServiceAcivatorOutput" output-channel="selectTaxiAggregatorInput" method="transform">
+    <bean class="orcha.lang.compiler.referenceimpl.xmlgenerator.impl.ObjectToApplicationTransformer">
+      <property name="application" ref="selectTaxi" />
+    </bean>
+  </int:transformer>
+  <int:aggregator id="aggregator-selectTaxiAggregatorInput-id" input-channel="selectTaxiAggregatorInput" output-channel="selectTaxiAggregatorInputTransformer" release-strategy-expression="size()==1 and ( (messages[0].payload instanceof T(orcha.lang.configuration.Application) and messages[0].payload.state==T(orcha.lang.configuration.State).TERMINATED) )" correlation-strategy-expression="headers['messageID']" />
+  <int:transformer id="transformer-selectTaxiAggregatorInput-id" input-channel="selectTaxiAggregatorInputTransformer" output-channel="selectTaxiAggregatorInputAggregatorOutput" expression="payload.?[name=='selectTaxi']" />
+  <int:transformer id="transformer-selectTaxiAggregatorInputAggregatorOutput-id" input-channel="selectTaxiAggregatorInputAggregatorOutput" output-channel="selectTaxiAggregatorOutputTransformer" method="transform">
+    <bean class="orcha.lang.compiler.referenceimpl.xmlgenerator.impl.ApplicationToObjectTransformer" />
+  </int:transformer>
+  <int:chain input-channel="selectTaxiAggregatorOutputTransformer" output-channel="paymentServiceAcivatorOutput" id="service-activator-chain-paymentChannel-id">
+    <int:service-activator id="service-activator-paymentChannel-id" expression="@paymentService.pay(payload)">
+      <int:request-handler-advice-chain />
+    </int:service-activator>
+  </int:chain>
+  <int:transformer id="transformer-paymentServiceAcivatorOutput-id" input-channel="paymentServiceAcivatorOutput" output-channel="paymentAggregatorInput" method="transform">
+    <bean class="orcha.lang.compiler.referenceimpl.xmlgenerator.impl.ObjectToApplicationTransformer">
+      <property name="application" ref="payment" />
+    </bean>
+  </int:transformer>
+  <int:aggregator id="aggregator-paymentAggregatorInput-id" input-channel="paymentAggregatorInput" output-channel="paymentAggregatorInputTransformer" release-strategy-expression="size()==1 and ( (messages[0].payload instanceof T(orcha.lang.configuration.Application) and messages[0].payload.state==T(orcha.lang.configuration.State).TERMINATED) )" correlation-strategy-expression="headers['messageID']" />
+  <int:transformer id="transformer-paymentAggregatorInput-id" input-channel="paymentAggregatorInputTransformer" output-channel="paymentAggregatorInputAggregatorOutput" expression="payload.?[name=='payment']" />
+  <int:transformer id="transformer-paymentAggregatorInputAggregatorOutput-id" input-channel="paymentAggregatorInputAggregatorOutput" output-channel="paymentAggregatorOutputTransformer" method="transform">
+    <bean class="orcha.lang.compiler.referenceimpl.xmlgenerator.impl.ApplicationToObjectTransformer" />
+  </int:transformer>
+  <int:chain input-channel="paymentAggregatorOutputTransformer" output-channel="paymentOutputFileChannelAdaptertripAgencyCustomer">
+    <int:object-to-json-transformer />
+  </int:chain>
+  <int:channel id="paymentOutputFileChannelAdaptertripAgencyCustomer" />
+  <int-file:outbound-channel-adapter id="file-paymenttripAgencyCustomerChannel-id" channel="paymentOutputFileChannelAdaptertripAgencyCustomer" directory-expression="@tripAgencyCustomer.output.adapter.directory" filename-generator-expression="@tripAgencyCustomer.output.adapter.filename" append-new-line="true" mode="REPLACE" auto-create-directory="true" delete-source-files="false" />
+</beans>

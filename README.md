@@ -24,3 +24,6 @@ Taxi selection service colling the taxi selection smart contract: https://github
 
 Taxi selection smart contract: https://github.com/charroux/smartContractOrchestration/blob/main/src/main/solidity/TaxiSelection.sol
 
+## Transpilation of the Orcha program
+
+The Orcha program need to be transpiled before processed. The transpilation leads to an XML file compatible with Spring integration: 
