@@ -1,3 +1,20 @@
+# Smart Contracts orchestration with Orcha
+
+## Orcha program
+
+https://github.com/charroux/smartContractOrchestration/blob/main/src/main/orcha/source/tripAgency/Travel.groovy
+
+## Orcha configuration of the Orcha program
+
+https://github.com/charroux/smartContractOrchestration/blob/main/src/main/orcha/configuration/tripAgency/OrganizeTripConfiguration.groovy
+
+## Services called by the Orcha program
+
+https://github.com/charroux/smartContractOrchestration/tree/main/src/main/orcha/service/tripAgency
+
+Train selection service colling the train selection smart contract: https://github.com/charroux/smartContractOrchestration/blob/main/src/main/orcha/service/tripAgency/TrainSelection.groovy
+
+Train selection smart contract: 
 ========
 
 Un Oracle :
