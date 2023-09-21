@@ -5,6 +5,9 @@ import groovy.util.logging.Slf4j
 import org.web3j.crypto.Credentials
 import org.web3j.hotelselectionsmartcontrat.HotelSelectionSmartContrat
 import org.web3j.protocol.Web3j
+import org.web3j.protocol.core.DefaultBlockParameterName
+import org.web3j.protocol.core.methods.request.EthFilter
+import org.web3j.protocol.core.methods.response.TransactionReceipt
 import org.web3j.protocol.http.HttpService
 import org.web3j.taxiselectionsmartcontrat.TaxiSelectionSmartContrat
 import org.web3j.tx.gas.DefaultGasProvider
@@ -47,13 +50,22 @@ class TaxiSelection {
 			TaxiSelectionSmartContrat taxiSelectionSmartContrat = TaxiSelectionSmartContrat.load(smartContractAddress, web3j, Credentials.create("0xba915e64f14ff363abf52193444c30ae0cd2963034dc8a2448f02b95b33702f5"), new DefaultGasProvider());
 			log.info("smart contract address: " + taxiSelectionSmartContrat.getContractAddress());
 			BigInteger date = BigInteger.valueOf(tripInfoFromHotel.selectedTrain.arrival.getTime());
-			taxiSelectionSmartContrat.getTaxi(
+			TransactionReceipt transactionReceiptData = taxiSelectionSmartContrat.getTaxi(
 					tripInfoFromHotel.selectedTrain.destination, 	// departure of the taxi = destination if the train
 					date, 											// departure date of the taxi = arrival date of the train
 					tripInfoFromHotel.selectedHotel.address 		// destination of the taxi = address of the hotel
 			).send();
-			BigInteger bookingNumber = 1;
-			log.info("getTaxi");
+			EthFilter filter = new EthFilter(DefaultBlockParameterName.LATEST, DefaultBlockParameterName.LATEST, taxiSelectionSmartContrat.getContractAddress());
+			BigInteger bookingNumber;
+			web3j.ethLogFlowable(filter).subscribe(eventLog -> {
+				String hexa = eventLog.getData(); 	// 0x00000000...2
+				hexa = hexa.substring(2);	// skip the two first characteres
+				bookingNumber = new BigInteger(hexa , 16);
+				log.info("Event: " + bookingNumber);
+			}, error -> {
+				log.error(error);
+			});
+			log.info("getTaxi returns booking number: " + bookingNumber);
 			String taxiFrom = taxiSelectionSmartContrat.getTaxiFrom(bookingNumber).send();
 			log.info("taxi from: " + taxiFrom);
 			BigInteger departureDate = taxiSelectionSmartContrat.getDepartureDate(bookingNumber).send();

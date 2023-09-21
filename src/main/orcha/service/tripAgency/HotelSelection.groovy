@@ -5,9 +5,13 @@ import groovy.util.logging.Slf4j
 import org.web3j.crypto.Credentials
 import org.web3j.hotelselectionsmartcontrat.HotelSelectionSmartContrat
 import org.web3j.protocol.Web3j
+import org.web3j.protocol.core.methods.request.EthFilter
+import org.web3j.protocol.core.methods.response.TransactionReceipt
 import org.web3j.protocol.http.HttpService
 import org.web3j.selectrainsmartcontrat.SelecTrainSmartContrat
 import org.web3j.tx.gas.DefaultGasProvider
+import org.web3j.protocol.core.DefaultBlockParameterName
+import org.web3j.abi.EventEncoder
 
 @Slf4j
 class HotelSelection {
@@ -37,9 +41,18 @@ class HotelSelection {
 			HotelSelectionSmartContrat selecHotelSmartContrat = HotelSelectionSmartContrat.load(smartContractAddress, web3j, Credentials.create("0xba915e64f14ff363abf52193444c30ae0cd2963034dc8a2448f02b95b33702f5"), new DefaultGasProvider());
 			log.info("smart contract address: " + selecHotelSmartContrat.getContractAddress());
 			BigInteger date = BigInteger.valueOf(tripInfo.getSelectedTrain().getArrival().getTime());
-			selecHotelSmartContrat.getRoomInHotel(tripInfo.getSelectedTrain().getDestination(), date).send();
-			BigInteger bookingNumber = 1;
-			log.info("getRoomInHotel");
+			TransactionReceipt transactionReceiptData = selecHotelSmartContrat.getRoomInHotel(tripInfo.getSelectedTrain().getDestination(), date).send();
+			EthFilter filter = new EthFilter(DefaultBlockParameterName.LATEST, DefaultBlockParameterName.LATEST, selecHotelSmartContrat.getContractAddress());
+			BigInteger bookingNumber;
+			web3j.ethLogFlowable(filter).subscribe(eventLog -> {
+				String hexa = eventLog.getData(); 	// 0x00000000...2
+				hexa = hexa.substring(2);	// skip the two first characteres
+				bookingNumber = new BigInteger(hexa , 16);
+				log.info("Event: " + bookingNumber);
+			}, error -> {
+				log.error(error);
+			});
+			log.info("getRoomInHotel returns booking number: " + bookingNumber);
 			String address = selecHotelSmartContrat.getAddress().send();
 			log.info("hotel address: " + address);
 			BigInteger roomNumber = selecHotelSmartContrat.getRoomNumber(bookingNumber).send();

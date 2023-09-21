@@ -26,7 +26,7 @@ contract HotelSelectionSmartContrat {
         for(uint256 i=0; i< length; i++){
             if(keccak256(abi.encodePacked(hotels[i].hotelAddress)) == keccak256(abi.encodePacked(destination))) {
                 selectedHotel = hotels[i];
-                emit bookingNumber(1);
+                emit bookingNumber(999);
                 return;
             }
         }

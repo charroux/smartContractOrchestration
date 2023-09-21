@@ -32,7 +32,7 @@ contract SelecTrainSmartContrat {
             if(keccak256(abi.encodePacked(trains[i].destination)) == keccak256(abi.encodePacked(destination))) {
                 if( trains[i].effectiveDepartureDate >=  dateDeparture ) {
                     selectedTrain = trains[i];
-                    emit bookingNumber(1);
+                    emit bookingNumber(888);
                     return;
                 }
             }

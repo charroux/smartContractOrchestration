@@ -27,3 +27,7 @@ Taxi selection smart contract: https://github.com/charroux/smartContractOrchestr
 ## Transpilation of the Orcha program
 
 The Orcha program need to be transpiled before processed. The transpilation leads to an XML file compatible with Spring integration: https://github.com/charroux/smartContractOrchestration/blob/main/src/main/resources/organize%20trip.xml
+
+## Test
+
+Tested with Ganache with Gas limit extended to 9999999.

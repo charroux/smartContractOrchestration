@@ -19,7 +19,7 @@ contract TaxiSelectionSmartContrat {
 
     function getTaxi(string calldata depertureLocation, uint departureDate, string calldata arrivalLocation) public {
         selectedTaxi = Taxi(114, depertureLocation, departureDate, arrivalLocation, 100);
-        emit bookingNumber(1);
+        emit bookingNumber(777);
     }
 
     function getTaxiFrom(uint bookingNumber) public view returns(string memory) {
