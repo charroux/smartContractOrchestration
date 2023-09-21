@@ -21,15 +21,6 @@ class OrganizeTripConfiguration {
 		eventHandler.input = new Input(mimeType: "application/json", type: "java.util.List", adapter: fileAdapter)
 		return eventHandler
 	}
-	
-	/*@Bean
-	Application selectTrain(){
-		def program = new Application(name: "selectTrain", specifications: "Select a train.", description: "Select a train.", language: "groovy")
-		def javaAdapter = new JavaServiceAdapter(javaClass: 'service.tripAgency.TrainSelection', method:'select')
-		program.input = new Input(type: "configuration.tripAgency.TripInfo", adapter: javaAdapter)
-		program.output = new Output(type: "service.tripAgency.SelectedTrain", adapter: javaAdapter)
-		return program
-	}*/
 
 	@Bean
 	Application selectATrain(){

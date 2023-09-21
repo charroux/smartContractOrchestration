@@ -22,8 +22,4 @@ when "payment terminates"
 send payment.result to tripAgencyCustomer
 
 
-//send selectTaxi.result to tripAgencyCustomer
-
-
-
 

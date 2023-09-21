@@ -8,6 +8,18 @@ https://github.com/charroux/smartContractOrchestration/blob/main/src/main/orcha/
 
 https://github.com/charroux/smartContractOrchestration/blob/main/src/main/orcha/configuration/tripAgency/OrganizeTripConfiguration.groovy
 
+### Configuration 
+
+'''
+@Bean
+EventHandler tripAgency(){
+def eventHandler = new EventHandler(name: "tripAgency")
+def fileAdapter = new InputFileAdapter(directory: 'data/input', filenamePattern: "tripInfo.json")
+eventHandler.input = new Input(mimeType: "application/json", type: "java.util.List", adapter: fileAdapter)
+return eventHandler
+}
+'''
+
 ## Services called by the Orcha program
 
 https://github.com/charroux/smartContractOrchestration/tree/main/src/main/orcha/service/tripAgency
